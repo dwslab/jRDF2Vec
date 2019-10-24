@@ -1,5 +1,6 @@
 import walkGenerators.BabelNetWalkGenerator;
 import walkGenerators.DbnaryWalkGenerator;
+import walkGenerators.WordNetWalkGenerator;
 
 /**
  * Mini command line tool for server application.
@@ -48,10 +49,16 @@ public class Main {
         }
 
         String resourcePath = getValue("-res", args);
+        if(resourcePath == null){
+            System.out.println("ERROR: You have not defined the resource path (parameter '-res <resource path>'). " +
+                    "However, this is a required parameter." +
+                    "The program execution will stop now.");
+        }
+
+
         switch (dataset.toLowerCase()) {
             case "babelnet":
                 String language = getValue("-en", args);
-                if(resourcePath != null){
                     if(language != null){
                         boolean isEnglishOnly = true;
                         if(language != null && (language.equalsIgnoreCase("true") || language.equalsIgnoreCase("false"))){
@@ -85,23 +92,51 @@ public class Main {
                                     "Target to be written: " + fileWritten);
                         }
                     }
-                } else System.out.println("-res <resource directory> not found. Aborting.");
                 break;
             case "wordnet":
-                if(resourcePath != null){
-                    DbnaryWalkGenerator generator = new DbnaryWalkGenerator(resourcePath);
-                    System.out.println("CLI CALL NOT YET IMPLEMENTED. PLEASE EXECUTE IN IDE.");
-                    // TODO implement
-                }
+                    WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath);
+                    if(isDuplicateFree){
+                        if(fileWritten != null) {
+                            wordNetWalkGenerator.generateRandomWalksDuplicateFree(threads, walks, depth);
+                        } else wordNetWalkGenerator.generateRandomWalksDuplicateFree(threads, walks, depth, fileWritten);
+                    } else {
+                        if(fileWritten != null) {
+                            wordNetWalkGenerator.generateRandomWalks(threads, walks, depth);
+                        } else wordNetWalkGenerator.generateRandomWalks(threads, walks, depth, fileWritten);
+                    }
+                    System.out.println("Generating  walks for WordNet with:\n" +
+                            "with duplicates: " + isDuplicateFree + "\n" +
+                            walks + " walks per entity\n" +
+                            "depth of " + depth + "\n" +
+                            "Target to be written: " + fileWritten);
                 break;
             case "wiktionary":
-                System.out.println("CLI CALL NOT YET IMPLEMENTED. PLEASE EXECUTE IN IDE.");
-                // TODO implement
+                DbnaryWalkGenerator wiktionaryGenerator = new DbnaryWalkGenerator(resourcePath);
+                if(isDuplicateFree){
+                    if(fileWritten != null) {
+                        wiktionaryGenerator.generateRandomWalksDuplicateFree(threads, walks, depth);
+                    } else wiktionaryGenerator.generateRandomWalksDuplicateFree(threads, walks, depth, fileWritten);
+                } else {
+                    if(fileWritten != null) {
+                        wiktionaryGenerator.generateRandomWalks(threads, walks, depth);
+                    } else wiktionaryGenerator.generateRandomWalks(threads, walks, depth, fileWritten);
+                }
+                System.out.println("Generating  walks for Wiktionary with:\n" +
+                        "with duplicates: " + isDuplicateFree + "\n" +
+                        walks + " walks per entity\n" +
+                        "depth of " + depth + "\n" +
+                        "Target to be written: " + fileWritten);
                 break;
         }
     }
 
 
+    /**
+     * Helper method.
+     * @param key Arg key.
+     * @param arguments Arguments as received upon program start.
+     * @return Value of argument if existing, else null.
+     */
     private static String getValue(String key, String[] arguments){
         int positionSet = -1;
         for(int i = 0; i < arguments.length; i++){
@@ -114,6 +149,7 @@ public class Main {
             return arguments[positionSet +1];
         } else return null;
     }
+
 
     /**
      * Returns a help string.
