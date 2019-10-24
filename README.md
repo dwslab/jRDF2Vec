@@ -1,0 +1,1 @@
+This project allows to generate walks for WordNet and Dbnary. 
