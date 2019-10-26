@@ -1,6 +1,7 @@
 import walkGenerators.BabelNetWalkGenerator;
 import walkGenerators.DbnaryWalkGenerator;
 import walkGenerators.WordNetWalkGenerator;
+import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 
 /**
  * Mini command line tool for server application.
@@ -24,14 +25,14 @@ public class Main {
             System.out.println("-threads <number_of_threads> not found. Aborting.");
             return;
         }
-        int threads = Integer.valueOf(threadsWritten);
+        int numberOfThreads = Integer.valueOf(threadsWritten);
 
         String walksWritten = getValue("-walks", args);
         if(threadsWritten == null){
             System.out.println("-walks <number_of_walks> not found. Aborting.");
             return;
         }
-        int walks = Integer.valueOf(walksWritten);
+        int numberOfWalks = Integer.valueOf(walksWritten);
 
         String depthWritten = getValue("-depth", args);
         if(depthWritten == null){
@@ -67,26 +68,26 @@ public class Main {
                         BabelNetWalkGenerator generator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
                         if(fileWritten != null) {
                             if(isDuplicateFree){
-                                generator.generateRandomWalksDuplicateFree(threads, walks, depth, fileWritten);
+                                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileWritten);
                             } else {
-                                generator.generateRandomWalks(threads, walks, depth, fileWritten);
+                                generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileWritten);
                             }
                                 System.out.println("Generating  walks for BabelNet with:\n" +
                                         "with duplicates: " + isDuplicateFree + "\n" +
-                                        walks + " walks per entity\n" +
+                                        numberOfWalks + " walks per entity\n" +
                                         "English entities only: " + isEnglishOnly + "\n" +
                                         "depth of " + depth + "\n" +
                                         "Target to be written: " + fileWritten);
                         } else { // the file to be written is null
                             fileWritten = "DEFAULT OPTION (working directory)";
                             if(isDuplicateFree){
-                                generator.generateRandomWalksDuplicateFree(threads, walks, depth);
+                                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
                             } else {
-                                generator.generateRandomWalks(threads, walks, depth);
+                                generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
                             }
                             System.out.println("Generating  walks for BabelNet with:\n" +
                                     "with duplicates: " + isDuplicateFree + "\n" +
-                                    walks + " walks per entity\n" +
+                                    numberOfWalks + " walks per entity\n" +
                                     "English entities only: " + isEnglishOnly + "\n" +
                                     "depth of " + depth + "\n" +
                                     "Target to be written: " + fileWritten);
@@ -97,16 +98,16 @@ public class Main {
                     WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath);
                     if(isDuplicateFree){
                         if(fileWritten != null) {
-                            wordNetWalkGenerator.generateRandomWalksDuplicateFree(threads, walks, depth);
-                        } else wordNetWalkGenerator.generateRandomWalksDuplicateFree(threads, walks, depth, fileWritten);
+                            wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+                        } else wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileWritten);
                     } else {
                         if(fileWritten != null) {
-                            wordNetWalkGenerator.generateRandomWalks(threads, walks, depth);
-                        } else wordNetWalkGenerator.generateRandomWalks(threads, walks, depth, fileWritten);
+                            wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+                        } else wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileWritten);
                     }
                     System.out.println("Generating  walks for WordNet with:\n" +
                             "with duplicates: " + isDuplicateFree + "\n" +
-                            walks + " walks per entity\n" +
+                            numberOfWalks + " walks per entity\n" +
                             "depth of " + depth + "\n" +
                             "Target to be written: " + fileWritten);
                 break;
@@ -114,20 +115,27 @@ public class Main {
                 DbnaryWalkGenerator wiktionaryGenerator = new DbnaryWalkGenerator(resourcePath);
                 if(isDuplicateFree){
                     if(fileWritten != null) {
-                        wiktionaryGenerator.generateRandomWalksDuplicateFree(threads, walks, depth);
-                    } else wiktionaryGenerator.generateRandomWalksDuplicateFree(threads, walks, depth, fileWritten);
+                        wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+                    } else wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileWritten);
                 } else {
                     if(fileWritten != null) {
-                        wiktionaryGenerator.generateRandomWalks(threads, walks, depth);
-                    } else wiktionaryGenerator.generateRandomWalks(threads, walks, depth, fileWritten);
+                        wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+                    } else wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileWritten);
                 }
                 System.out.println("Generating  walks for Wiktionary with:\n" +
                         "with duplicates: " + isDuplicateFree + "\n" +
-                        walks + " walks per entity\n" +
+                        numberOfWalks + " walks per entity\n" +
                         "depth of " + depth + "\n" +
                         "Target to be written: " + fileWritten);
                 break;
+            case "alod":
+                // TODO implement
+                WalkGeneratorClassicWalks generator = new WalkGeneratorClassicWalks();
+                generator.load(resourcePath);
+                generator.generateWalksDuplicateFree(fileWritten, numberOfWalks, depth, numberOfThreads);
+                break;
         }
+        System.out.println("DONE");
     }
 
 

@@ -41,6 +41,17 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
 
     /**
      *
+     * @param numberOfWalks
+     * @param depth
+     * @param numberOfThreads
+     */
+    public void generateWalksDuplicateFree(int numberOfWalks, int depth, int numberOfThreads) {
+        String walkOutputFileName = "./walks/alod_classic_walks_df_" + numberOfWalks + "_" + depth + "_.gz";
+        generateWalksDuplicateFree(walkOutputFileName, numberOfWalks, depth, numberOfThreads);
+    }
+
+    /**
+     *
      * @param walkOutputFileName
      * @param numberOfWalks
      * @param depth
@@ -93,6 +104,16 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
         }
     }
 
+    /**
+     *
+     * @param numberOfWalks
+     * @param depth
+     * @param numberOfThreads
+     */
+    public void generateWalks(int numberOfWalks, int depth, int numberOfThreads) {
+        String walkOutputFileName = "./walks/alod_classic_walks_with_duplicates_" + numberOfWalks + "_" + depth + "_.gz";
+        generateWalks(walkOutputFileName, numberOfWalks, depth, numberOfThreads);
+    }
 
     /**
      * This method assumes that the ALOD classic file has been loaded into memory.
@@ -213,6 +234,23 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
         LOG.info("Number of entities loaded: " + broaderConcepts.size());
     }
 
+
+    /**
+     * Load and determine the kind of load. Note: If you use the optimized file, you have to add optimized to the name.
+     * @param pathToFile The path to the file.
+     */
+    public void load(String pathToFile){
+        File file = new File(pathToFile);
+        if(!file.exists()){
+            LOG.error("File does not exist. ABORT");
+            return;
+        }
+        if(file.getName().contains("optimized")){
+            loadFromOptimizedFile(pathToFile);
+        } else {
+            loadFromNquadsFile(pathToFile, "./alod_optimized.gz");
+        }
+    }
 
     /**
      * Load ALOD Classic nquad file. A new, storage-optimized file is written for later use.

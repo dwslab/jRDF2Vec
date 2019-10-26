@@ -231,8 +231,14 @@ public class BabelNetWalkGenerator extends WalkGenerator {
 
     @Override
     public String shortenUri(String uri) {
-        replaceMatcher = replacePattern.matcher(uri);
-        return replaceMatcher.replaceAll("$1$2$3$4$5:");
+        try {
+            replaceMatcher = replacePattern.matcher(uri);
+            return replaceMatcher.replaceAll("$1$2$3$4$5:");
+        } catch (OutOfMemoryError ome){
+            LOGGER.error("Out of Memory Error", ome);
+            LOGGER.error("URI causing the error: " + uri);
+            return uri;
+        }
     }
 
     /**
@@ -241,8 +247,14 @@ public class BabelNetWalkGenerator extends WalkGenerator {
      * @return
      */
     public static String shortenUri_2(String uri) {
+        try {
         replaceMatcher = replacePattern.matcher(uri);
         return replaceMatcher.replaceAll("$1$2$3$4$5:");
+        } catch (OutOfMemoryError ome){
+            LOGGER.error("Out of Memory Error", ome);
+            LOGGER.error("URI causing the error: " + uri);
+            return uri;
+        }
     }
 
 }
