@@ -22,7 +22,7 @@ public class DbnaryWalkGenerator extends WalkGenerator {
 
     public static void main(String[] args) {
         DbnaryWalkGenerator generator = new DbnaryWalkGenerator("./dbnary_eng.nt");
-        generator.generateRandomWalks(50, 500, 8, "./walks/dbnary_500_4_pages_df/dbnary_500_4_pages_df.gz");
+        generator.generateRandomWalks(50, 500, 8, "./walks/dbnary_500_8_pages_df/dbnary_500_8_pages_df.gz");
     }
 
     /**

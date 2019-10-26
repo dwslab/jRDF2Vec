@@ -34,11 +34,14 @@ public class BabelNetWalkGenerator extends WalkGenerator {
      */
     private boolean isEnglishEntitiesOnly;
 
+    private HashSet<String> babelnetEntities;
+
     /**
      * Constructor
      * @param pathToNtFiles
      */
     public BabelNetWalkGenerator(String pathToNtFiles, boolean isEnglishEntitiesOnly){
+        this.babelnetEntities = getBabelNetEntities(pathToNtFiles, isEnglishEntitiesOnly);
         this.parser = new NtParser(this);
         this.pathToNtDirectory = pathToNtFiles;
         this.isEnglishEntitiesOnly = isEnglishEntitiesOnly;
@@ -47,16 +50,17 @@ public class BabelNetWalkGenerator extends WalkGenerator {
         parser.setSkipCondition(new IsearchCondition() {
             Pattern pattern = Pattern.compile("\".*\"");
             Pattern glossPattern = Pattern.compile("_Gloss[0-9]"); // _Gloss[0-9]
+            Matcher matcher;
             @Override
             public boolean isHit(String input) {
                 if(input.trim().startsWith("#")) return true; // just a comment line
                 if(input.trim().equals("")) return true; // empty line
                 if(input.contains("http://purl.org/dc/terms/license")) return true;
                 if(input.contains("http://purl.org/dc/elements/1.1/source")) return true;
-                Matcher matcher = pattern.matcher(input);
+                matcher = pattern.matcher(input);
                 if(matcher.find()) return true;
-                Matcher glossMatcher = glossPattern.matcher(input);
-                if(glossMatcher.find()) return true;
+                matcher = glossPattern.matcher(input);
+                if(matcher.find()) return true;
                 return false;
             }
         });
@@ -71,13 +75,13 @@ public class BabelNetWalkGenerator extends WalkGenerator {
     @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         this.filePath = filePathOfFileToBeWritten;
-        generateWalksForEntities(getBabelNetEntities(this.pathToNtDirectory, this.isEnglishEntitiesOnly), numberOfThreads, numberOfWalksPerEntity, depth);
+        generateWalksForEntities(this.babelnetEntities, numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     @Override
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         this.filePath = filePathOfFileToBeWritten;
-        generateDuplicateFreeWalksForEntities(getBabelNetEntities(this.pathToNtDirectory, this.isEnglishEntitiesOnly), numberOfThreads, numberOfWalksPerEntity, depth);
+        generateDuplicateFreeWalksForEntities(this.babelnetEntities, numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     @Override
@@ -93,12 +97,17 @@ public class BabelNetWalkGenerator extends WalkGenerator {
      */
     public HashSet<String> getBabelNetEntities(String pathToDirectoryOfGzippedTripleDataSets, boolean isWriteOnlyEnglishEntities){
         File file;
-        if(isWriteOnlyEnglishEntities) file = new File("./cache/babelnet_entities_en.txt");
-        else file = new File("./cache/babelnet_entities.txt");
+        if(isWriteOnlyEnglishEntities) {
+            file = new File("./cache/babelnet_entities_en.txt");
+        }
+        else {
+            file = new File("./cache/babelnet_entities.txt");
+        }
         if (file.exists()) {
             LOGGER.info("Cached file found. Obtaining entities from cache.");
             return readHashSetFromFile(file);
         } else {
+            LOGGER.info("Reading entities into memory.");
             return writeBabelNetEntitiesToFile(pathToDirectoryOfGzippedTripleDataSets, file, isWriteOnlyEnglishEntities, true);
         }
     }
@@ -144,17 +153,18 @@ public class BabelNetWalkGenerator extends WalkGenerator {
             BufferedWriter writer = new BufferedWriter(new FileWriter(entityFileToBeWritten));
             for (File file : directoryOfDataSets.listFiles()) {
                 if(!file.getName().endsWith(".gz")){
-                    System.out.println("Skipping file " + file.getName());
+                    LOGGER.info("Skipping file " + file.getName());
                     continue;
                 }
-                System.out.println("Processing file " + file.getName());
+                LOGGER.info("Processing file " + file.getName());
                 try {
                     GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(file));
                     BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
                     String readLine;
+                    Matcher matcher;
                     while ((readLine = reader.readLine()) != null) {
                         if(readLine.contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") && readLine.contains("http://www.lemon-model.net/lemon#LexicalEntry")){
-                            Matcher matcher = pattern.matcher(readLine);
+                            matcher = pattern.matcher(readLine);
                             if(!matcher.find()){
                                 System.out.println("There is a problem with parsing the following line: " + readLine);
                             } else {
@@ -181,18 +191,18 @@ public class BabelNetWalkGenerator extends WalkGenerator {
                         }
                     }
                     reader.close();
-                    System.out.println("File " + file.getName() + " completed.");
+                    LOGGER.info("File " + file.getName() + " completed.");
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
-                    System.out.println("Problem while reading file: " + file.getName());
+                    LOGGER.info("Problem while reading file: " + file.getName());
                 }
             }
             writer.flush();
             writer.close();
-            System.out.println("Retrieving Entities completed.\n" + numberOfSubjects + " read.");
+            LOGGER.info("Retrieving Entities completed.\n" + numberOfSubjects + " read.");
         } catch (IOException ioe){
             ioe.printStackTrace();
-            System.out.println("Problem with writer.");
+            LOGGER.error("Problem with writer.");
         } finally {
             return result;
         }

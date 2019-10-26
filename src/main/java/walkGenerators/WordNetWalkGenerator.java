@@ -4,10 +4,13 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scripts.IsearchCondition;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Generates walks for WordNet RDF graph.
@@ -16,9 +19,19 @@ public class WordNetWalkGenerator extends WalkGenerator {
 
 
     public static void main(String[] args) throws Exception {
-        WordNetWalkGenerator generator = new WordNetWalkGenerator("C:\\Users\\D060249\\OneDrive - SAP SE\\Documents\\PhD\\Experiments\\WordNet_RDF\\wordnet.nt");
-        generator.getEntities(generator.model);
-        //generator.generateWalks(8, 100, 8);
+        String wnFile = "/Users/janportisch/Documents/Wordnet/wordnet.nt";
+        WordNetWalkGenerator generator = new WordNetWalkGenerator(wnFile, true);
+        //generator.getEntities(generator.model);
+        generator.generateRandomWalksDuplicateFree(8, 500, 8, "./walks/wordnet_500_8_df/wordnet_500_8_df.gz");
+    }
+
+
+    /**
+     * Default: Ignore datatype properties for walk generation.
+     * @param pathToTripleFile The path to the WordNet triple file.
+     */
+    public WordNetWalkGenerator(String pathToTripleFile){
+        this(pathToTripleFile, false);
     }
 
 
@@ -27,10 +40,14 @@ public class WordNetWalkGenerator extends WalkGenerator {
      *
      * @param pathToTripleFile Path to RDF Wordnet file in n-triples format.
      */
-    public WordNetWalkGenerator(String pathToTripleFile) {
+    public WordNetWalkGenerator(String pathToTripleFile, boolean isIncludeDatatypeProperties) {
         try {
             this.model = readOntology(pathToTripleFile, "NT");
-            this.parser = new NtParser(pathToTripleFile, this);
+            this.parser = new NtParser(this);
+            if (isIncludeDatatypeProperties) {
+                this.parser.setIncludeDatatypeProperties(true);
+            }
+            this.parser.readNTriples(pathToTripleFile);
             LOGGER.info("Model read into memory.");
         } catch (MalformedURLException mue) {
             LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
@@ -99,10 +116,11 @@ public class WordNetWalkGenerator extends WalkGenerator {
     }
 
     @Override
-    public String shortenUri(String uri){
+    public String shortenUri(String uri) {
         String result = uri
                 .replace("http://www.w3.org/ns/lemon/ontolex#", "ontolex:")
                 .replace("http://wordnet-rdf.princeton.edu/rdf/lemma/", "wn-lemma:")
+                .replace("http://wordnet-rdf.princeton.edu/id/", "wn-id:")
                 .replace("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf:")
                 .replace(" http://wordnet-rdf.princeton.edu/ontology#", "wn-ontology:");
         return result;
