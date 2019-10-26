@@ -209,13 +209,40 @@ public class BabelNetWalkGenerator extends WalkGenerator {
     }
 
 
+    /*
     @Override
     public String shortenUri(String uri) {
-        String result = uri
-                .replace("http://www.lemon-model.net/lemon#", "lemon:")
-                .replace("http://babelnet.org/rdf/", "bn:")
-                .replace("http://purl.org/dc/", "dc:")
-                .replace("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf:");
-        return result;
+        try {
+            uri = uri
+                    .replace("http://www.lemon-model.net/lemon#", "lemon:")
+                    .replace("http://babelnet.org/rdf/", "bn:")
+                    .replace("http://purl.org/dc/", "dc:")
+                    .replace("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf:");
+        } catch (OutOfMemoryError ome){
+            LOGGER.error("Out of Memory Error", ome);
+            LOGGER.error("URI causing the error: " + uri);
+        }
+        return uri;
     }
+    */
+
+    static Pattern replacePattern = Pattern.compile("http://(?:purl\\.org/(dc)/|(b)abel(n)et\\.org/rdf/|www\\.(?:lemon-model\\.net/(lemon)|w3\\.org/1999/02/22-(rdf)-syntax-ns)#)");
+    static Matcher replaceMatcher;
+
+    @Override
+    public String shortenUri(String uri) {
+        replaceMatcher = replacePattern.matcher(uri);
+        return replaceMatcher.replaceAll("$1$2$3$4$5:");
+    }
+
+    /**
+     * Ignore - just for testing.
+     * @param uri
+     * @return
+     */
+    public static String shortenUri_2(String uri) {
+        replaceMatcher = replacePattern.matcher(uri);
+        return replaceMatcher.replaceAll("$1$2$3$4$5:");
+    }
+
 }

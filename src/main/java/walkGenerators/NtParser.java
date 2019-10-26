@@ -152,7 +152,7 @@ public class NtParser {
             return;
         }
         try {
-            BufferedReader reader = null;
+            BufferedReader reader;
             if (isGzippedFile) {
                 GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(fileToReadFrom));
                 reader = new BufferedReader(new InputStreamReader(gzip));
