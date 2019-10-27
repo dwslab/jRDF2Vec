@@ -9,130 +9,120 @@ import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.contr
 public class Main {
 
     public static void main(String[] args) {
-        if(args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("-help")){
+        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("-help")) {
             System.out.println(getHelp());
             return;
         }
 
-        String dataset = getValue("-set", args);
-        if(dataset == null){
+        String dataSet = getValue("-set", args);
+        if (dataSet == null) {
             System.out.println("-set <set> not found. Aborting.");
             return;
         }
 
         String threadsWritten = getValue("-threads", args);
-        if(threadsWritten == null){
+        if (threadsWritten == null) {
             System.out.println("-threads <number_of_threads> not found. Aborting.");
             return;
         }
         int numberOfThreads = Integer.valueOf(threadsWritten);
 
         String walksWritten = getValue("-walks", args);
-        if(threadsWritten == null){
+        if (threadsWritten == null) {
             System.out.println("-walks <number_of_walks> not found. Aborting.");
             return;
         }
         int numberOfWalks = Integer.valueOf(walksWritten);
 
         String depthWritten = getValue("-depth", args);
-        if(depthWritten == null){
+        if (depthWritten == null) {
             System.out.println("-depth <sentence_length> not found. Aborting.");
             return;
         }
         int depth = Integer.valueOf(depthWritten);
 
-        String fileWritten = getValue("-file", args);
+        String fileToWrite = getValue("-file", args);
 
         String generationModeString = getValue("-duplicateFree", args);
         boolean isDuplicateFree = true;
-        if(generationModeString != null && (generationModeString.equalsIgnoreCase("true") || generationModeString.equalsIgnoreCase("false"))){
+        if (generationModeString != null && (generationModeString.equalsIgnoreCase("true") || generationModeString.equalsIgnoreCase("false"))) {
             isDuplicateFree = Boolean.valueOf(generationModeString);
         }
 
         String resourcePath = getValue("-res", args);
-        if(resourcePath == null){
+        if (resourcePath == null) {
             System.out.println("ERROR: You have not defined the resource path (parameter '-res <resource path>'). " +
                     "However, this is a required parameter." +
                     "The program execution will stop now.");
         }
 
+        String language = getValue("-en", args);
+        boolean isEnglishOnly = true;
+        if (language != null) {
+            if (language != null && (language.equalsIgnoreCase("true") || language.equalsIgnoreCase("false"))) {
+                isEnglishOnly = Boolean.valueOf(language);
+            }
+        }
 
-        switch (dataset.toLowerCase()) {
+        // print configuration for verification
+        System.out.println(getConfiguration(dataSet, isDuplicateFree, numberOfThreads, numberOfWalks, depth, fileToWrite, isEnglishOnly));
+
+        switch (dataSet.toLowerCase()) {
             case "babelnet":
-                String language = getValue("-en", args);
-                    if(language != null){
-                        boolean isEnglishOnly = true;
-                        if(language != null && (language.equalsIgnoreCase("true") || language.equalsIgnoreCase("false"))){
-                            isEnglishOnly = Boolean.valueOf(language);
-                        }
-                        BabelNetWalkGenerator generator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
-                        if(fileWritten != null) {
-                            if(isDuplicateFree){
-                                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileWritten);
-                            } else {
-                                generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileWritten);
-                            }
-                                System.out.println("Generating  walks for BabelNet with:\n" +
-                                        "with duplicates: " + isDuplicateFree + "\n" +
-                                        numberOfWalks + " walks per entity\n" +
-                                        "English entities only: " + isEnglishOnly + "\n" +
-                                        "depth of " + depth + "\n" +
-                                        "Target to be written: " + fileWritten);
-                        } else { // the file to be written is null
-                            fileWritten = "DEFAULT OPTION (working directory)";
-                            if(isDuplicateFree){
-                                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                            } else {
-                                generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                            }
-                            System.out.println("Generating  walks for BabelNet with:\n" +
-                                    "with duplicates: " + isDuplicateFree + "\n" +
-                                    numberOfWalks + " walks per entity\n" +
-                                    "English entities only: " + isEnglishOnly + "\n" +
-                                    "depth of " + depth + "\n" +
-                                    "Target to be written: " + fileWritten);
-                        }
+                BabelNetWalkGenerator generator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
+                if (fileToWrite != null) {
+                    if (isDuplicateFree) {
+                        generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                    } else {
+                        generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
                     }
+                } else { // the file to be written is null
+                    if (isDuplicateFree) {
+                        generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+                    } else {
+                        generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+                    }
+                }
                 break;
             case "wordnet":
-                    WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath);
-                    if(isDuplicateFree){
-                        if(fileWritten != null) {
-                            wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                        } else wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileWritten);
-                    } else {
-                        if(fileWritten != null) {
-                            wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                        } else wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileWritten);
-                    }
-                    System.out.println("Generating  walks for WordNet with:\n" +
-                            "with duplicates: " + isDuplicateFree + "\n" +
-                            numberOfWalks + " walks per entity\n" +
-                            "depth of " + depth + "\n" +
-                            "Target to be written: " + fileWritten);
+                WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath);
+                if (isDuplicateFree) {
+                    if (fileToWrite != null) {
+                        wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+                    } else
+                        wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                } else {
+                    if (fileToWrite != null) {
+                        wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+                    } else wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                }
                 break;
             case "wiktionary":
                 DbnaryWalkGenerator wiktionaryGenerator = new DbnaryWalkGenerator(resourcePath);
-                if(isDuplicateFree){
-                    if(fileWritten != null) {
+                if (isDuplicateFree) {
+                    if (fileToWrite != null) {
                         wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                    } else wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileWritten);
+                    } else
+                        wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
                 } else {
-                    if(fileWritten != null) {
+                    if (fileToWrite != null) {
                         wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                    } else wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileWritten);
+                    } else wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
                 }
-                System.out.println("Generating  walks for Wiktionary with:\n" +
-                        "with duplicates: " + isDuplicateFree + "\n" +
-                        numberOfWalks + " walks per entity\n" +
-                        "depth of " + depth + "\n" +
-                        "Target to be written: " + fileWritten);
                 break;
             case "alod":
-                // TODO implement
-                WalkGeneratorClassicWalks generator = new WalkGeneratorClassicWalks();
-                generator.load(resourcePath);
-                generator.generateWalksDuplicateFree(fileWritten, numberOfWalks, depth, numberOfThreads);
+                WalkGeneratorClassicWalks alodGenerator = new WalkGeneratorClassicWalks();
+                alodGenerator.load(resourcePath);
+                if (isDuplicateFree) {
+                    if (fileToWrite != null) {
+                        alodGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+                    } else
+                        alodGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                } else {
+                    if (fileToWrite != null) {
+                        alodGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+                    } else alodGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                }
                 break;
         }
         System.out.println("DONE");
@@ -140,30 +130,61 @@ public class Main {
 
 
     /**
+     * Prints the current configuration.
+     *
+     * @param dataSet
+     * @param isDuplicateFree
+     * @param numberOfThreads
+     * @param numberOfWalks
+     * @param depth
+     * @param fileToWrite
+     */
+    private static String getConfiguration(String dataSet, boolean isDuplicateFree, int numberOfThreads, int numberOfWalks, int depth, String fileToWrite, boolean isEnglishOnly) {
+        String result = "Generating walks for " + dataSet + " with the follwoing configuration:\n" +
+                "- dulplicate free walk generation: " + isDuplicateFree + "\n" +
+                "- walks per entity: " + numberOfWalks + "\n" +
+                "- depth of each walk: " + depth + "\n";
+
+        if (dataSet.equalsIgnoreCase("babelnet")) {
+            result += "- create walks for only English nodes: " + isEnglishOnly + "\n";
+        }
+
+        if (fileToWrite.equals("")) {
+            result += "- writing files to default directory (./walks/)";
+        } else {
+            result += "- writing walks to directory: " + fileToWrite;
+        }
+        return result;
+    }
+
+
+    /**
      * Helper method.
-     * @param key Arg key.
+     *
+     * @param key       Arg key.
      * @param arguments Arguments as received upon program start.
      * @return Value of argument if existing, else null.
      */
-    private static String getValue(String key, String[] arguments){
+    private static String getValue(String key, String[] arguments) {
         int positionSet = -1;
-        for(int i = 0; i < arguments.length; i++){
-            if(arguments[i].equalsIgnoreCase(key)) {
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments[i].equalsIgnoreCase(key)) {
                 positionSet = i;
                 break;
             }
         }
-        if(positionSet != -1 && arguments.length >= positionSet + 1){
-            return arguments[positionSet +1];
+        if (positionSet != -1 && arguments.length >= positionSet + 1) {
+            return arguments[positionSet + 1];
         } else return null;
     }
 
 
     /**
      * Returns a help string.
+     *
      * @return
      */
-    private static String getHelp(){
+    private static String getHelp() {
         String result = "The following settings are required:\n\n" +
                 "-set <set>\n" +
                 "The kind of data set.\n" +

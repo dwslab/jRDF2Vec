@@ -45,9 +45,9 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
      * @param depth
      * @param numberOfThreads
      */
-    public void generateWalksDuplicateFree(int numberOfWalks, int depth, int numberOfThreads) {
+    public void generateRandomWalksDuplicateFree(int numberOfWalks, int depth, int numberOfThreads) {
         String walkOutputFileName = "./walks/alod_classic_walks_df_" + numberOfWalks + "_" + depth + "_.gz";
-        generateWalksDuplicateFree(walkOutputFileName, numberOfWalks, depth, numberOfThreads);
+        generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkOutputFileName);
     }
 
     /**
@@ -57,7 +57,7 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
      * @param depth
      * @param numberOfThreads
      */
-    public void generateWalksDuplicateFree(String walkOutputFileName, int numberOfWalks, int depth, int numberOfThreads){
+    public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalks, int depth, String walkOutputFileName){
         // validity check
         if(broaderConcepts == null || broaderConcepts.size() < 5){
             LOG.error("No broader concepts seem to be loaded. ABORT.");
@@ -106,13 +106,13 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
 
     /**
      *
+     * @param numberOfThreads
      * @param numberOfWalks
      * @param depth
-     * @param numberOfThreads
      */
-    public void generateWalks(int numberOfWalks, int depth, int numberOfThreads) {
+    public void generateRandomWalks(int numberOfThreads, int numberOfWalks, int depth) {
         String walkOutputFileName = "./walks/alod_classic_walks_with_duplicates_" + numberOfWalks + "_" + depth + "_.gz";
-        generateWalks(walkOutputFileName, numberOfWalks, depth, numberOfThreads);
+        generateRandomWalks(numberOfThreads, numberOfWalks, depth, walkOutputFileName);
     }
 
     /**
@@ -122,7 +122,7 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
      * @param depth The depth of each walk.
      * @param numberOfThreads The number of threads to be used.
      */
-    public void generateWalks(String walkOutputFileName, int numberOfWalks, int depth, int numberOfThreads){
+    public void generateRandomWalks(int numberOfThreads, int numberOfWalks, int depth, String walkOutputFileName){
         // validity check
         if(broaderConcepts == null || broaderConcepts.size() < 5){
             LOG.error("No broader concepts seem to be loaded. ABORT.");
