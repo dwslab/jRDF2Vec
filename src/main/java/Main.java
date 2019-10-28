@@ -3,69 +3,138 @@ import walkGenerators.DbnaryWalkGenerator;
 import walkGenerators.WordNetWalkGenerator;
 import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 
+import javax.sound.midi.Soundbank;
+import java.util.Scanner;
+
 /**
  * Mini command line tool for server application.
  */
 public class Main {
 
-    public static void main(String[] args) {
+    private static String dataSet;
+    private static String resourcePath;
+    private static boolean isDuplicateFree;
+    private static int numberOfThreads;
+    private static int numberOfWalks;
+    private static int depth;
+    private static boolean isEnglishOnly;
+    private static String fileToWrite;
+
+    public static void main(String[] args) throws Exception {
         if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("-help")) {
             System.out.println(getHelp());
             return;
         }
 
-        String dataSet = getValue("-set", args);
-        if (dataSet == null) {
-            System.out.println("-set <set> not found. Aborting.");
-            return;
-        }
+        if (args.length == 1 &&
+                (args[0].equalsIgnoreCase("-guided") || args[0].equalsIgnoreCase("--guided"))) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Welcome to the guided walk generation.");
 
-        String threadsWritten = getValue("-threads", args);
-        if (threadsWritten == null) {
-            System.out.println("-threads <number_of_threads> not found. Aborting.");
-            return;
-        }
-        int numberOfThreads = Integer.valueOf(threadsWritten);
+            // data set
+            System.out.println("For which data set do you want to generate walks?");
+            dataSet = scanner.nextLine();
+            if(dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("babelnet") ||
+                    dataSet.equalsIgnoreCase("dbpedia") || dataSet.equalsIgnoreCase("wiktionary") ||
+                    dataSet.equalsIgnoreCase("wordnet")){
+                // input ok
+            } else {
+                System.out.println("Invalid input. Has to be one of: alod | babelnet | dbpedia | wiktionary | wordnet");
+                System.out.println("Please refer to -help for the documentation.");
+                return;
+            }
 
-        String walksWritten = getValue("-walks", args);
-        if (threadsWritten == null) {
-            System.out.println("-walks <number_of_walks> not found. Aborting.");
-            return;
-        }
-        int numberOfWalks = Integer.valueOf(walksWritten);
+            // resource path
+            System.out.println("Where do the resources reside?");
+            resourcePath = scanner.nextLine();
 
-        String depthWritten = getValue("-depth", args);
-        if (depthWritten == null) {
-            System.out.println("-depth <sentence_length> not found. Aborting.");
-            return;
-        }
-        int depth = Integer.valueOf(depthWritten);
+            // is duplicate free
+            System.out.println("Do you want duplicate free walks? [true|false]");
+            isDuplicateFree = scanner.nextBoolean();
+            scanner.nextLine();
 
-        String fileToWrite = getValue("-file", args);
+            // threads
+            System.out.println("How many threads shall be used for the walk generation?");
+            numberOfThreads = scanner.nextInt();
+            scanner.nextLine();
 
-        String generationModeString = getValue("-duplicateFree", args);
-        boolean isDuplicateFree = true;
-        if (generationModeString != null && (generationModeString.equalsIgnoreCase("true") || generationModeString.equalsIgnoreCase("false"))) {
-            isDuplicateFree = Boolean.valueOf(generationModeString);
-        }
+            // walks
+            System.out.println("How many walks shall be generated per entity?");
+            numberOfWalks = scanner.nextInt();
+            scanner.nextLine();
 
-        String resourcePath = getValue("-res", args);
-        if (resourcePath == null) {
-            System.out.println("ERROR: You have not defined the resource path (parameter '-res <resource path>'). " +
-                    "However, this is a required parameter." +
-                    "The program execution will stop now.");
-        }
+            // depth
+            System.out.println("What is the desired maximal depth of each walk?");
+            depth = scanner.nextInt();
+            scanner.nextLine();
 
-        String language = getValue("-en", args);
-        boolean isEnglishOnly = true;
-        if (language != null) {
-            if (language != null && (language.equalsIgnoreCase("true") || language.equalsIgnoreCase("false"))) {
-                isEnglishOnly = Boolean.valueOf(language);
+            // file to write
+            System.out.println("Into which file shall the walks be written?");
+            fileToWrite = scanner.nextLine();
+
+            if(dataSet.equalsIgnoreCase("babelnet")){
+                System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false]");
+                isEnglishOnly = scanner.nextBoolean();
+            }
+
+        } else {
+
+            dataSet = getValue("-set", args);
+            if (dataSet == null) {
+                System.out.println("-set <set> not found. Aborting.");
+                return;
+            }
+
+            String threadsWritten = getValue("-threads", args);
+            if (threadsWritten == null) {
+                System.out.println("-threads <number_of_threads> not found. Aborting.");
+                return;
+            }
+            numberOfThreads = Integer.valueOf(threadsWritten);
+
+            String walksWritten = getValue("-walks", args);
+            if (threadsWritten == null) {
+                System.out.println("-walks <number_of_walks> not found. Aborting.");
+                return;
+            }
+            numberOfWalks = Integer.valueOf(walksWritten);
+
+            String depthWritten = getValue("-depth", args);
+            if (depthWritten == null) {
+                System.out.println("-depth <sentence_length> not found. Aborting.");
+                return;
+            }
+            depth = Integer.valueOf(depthWritten);
+
+            fileToWrite = getValue("-file", args);
+
+            String isDuplicateFreeWritten = getValue("-duplicateFree", args);
+            isDuplicateFree = true;
+            if (isDuplicateFreeWritten != null && (isDuplicateFreeWritten.equalsIgnoreCase("true") || isDuplicateFreeWritten.equalsIgnoreCase("false"))) {
+                isDuplicateFree = Boolean.valueOf(isDuplicateFreeWritten);
+            }
+
+            resourcePath = getValue("-res", args);
+            if (resourcePath == null) {
+                System.out.println("ERROR: You have not defined the resource path (parameter '-res <resource path>'). " +
+                        "However, this is a required parameter." +
+                        "The program execution will stop now.");
+            }
+
+            String isEnglishOnlyWritten = getValue("-en", args);
+            isEnglishOnly = true;
+            if (isEnglishOnlyWritten != null) {
+                if (isEnglishOnlyWritten != null && (isEnglishOnlyWritten.equalsIgnoreCase("true") || isEnglishOnlyWritten.equalsIgnoreCase("false"))) {
+                    isEnglishOnly = Boolean.valueOf(isEnglishOnlyWritten);
+                }
             }
         }
 
         // print configuration for verification
         System.out.println(getConfiguration(dataSet, isDuplicateFree, numberOfThreads, numberOfWalks, depth, fileToWrite, isEnglishOnly));
+        System.out.println("\nYour quick configuration for next time:");
+        System.out.println(getQuickConfiguration());
+        System.out.println();
 
         switch (dataSet.toLowerCase()) {
             case "babelnet":
@@ -159,12 +228,28 @@ public class Main {
 
 
     /**
-     * Helper method.
-     *
-     * @param key       Arg key.
-     * @param arguments Arguments as received upon program start.
-     * @return Value of argument if existing, else null.
-     */
+     * Prints the current quick start configuration.
+     **/
+    private static String getQuickConfiguration() {
+        String result = "-set " + dataSet + " -res \"" + resourcePath + "\" -threads " + numberOfThreads + " -walks " + numberOfWalks + " -depth " + depth;
+        result += " -duplicateFree " + isDuplicateFree;
+        if(fileToWrite != null) {
+            result += " -file \"" + fileToWrite + "\"";
+        }
+        if(dataSet.equalsIgnoreCase("babelnet")){
+            result += " -en " + isEnglishOnly;
+        }
+        return result;
+    }
+
+
+        /**
+         * Helper method.
+         *
+         * @param key       Arg key.
+         * @param arguments Arguments as received upon program start.
+         * @return Value of argument if existing, else null.
+         */
     private static String getValue(String key, String[] arguments) {
         int positionSet = -1;
         for (int i = 0; i < arguments.length; i++) {
