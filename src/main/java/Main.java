@@ -140,7 +140,7 @@ public class Main {
      * @param fileToWrite
      */
     private static String getConfiguration(String dataSet, boolean isDuplicateFree, int numberOfThreads, int numberOfWalks, int depth, String fileToWrite, boolean isEnglishOnly) {
-        String result = "Generating walks for " + dataSet + " with the follwoing configuration:\n" +
+        String result = "Generating walks for " + dataSet + " with the following configuration:\n" +
                 "- dulplicate free walk generation: " + isDuplicateFree + "\n" +
                 "- walks per entity: " + numberOfWalks + "\n" +
                 "- depth of each walk: " + depth + "\n";
@@ -189,6 +189,7 @@ public class Main {
                 "-set <set>\n" +
                 "The kind of data set.\n" +
                 "Options for <set>\n" +
+                "\talod\n" +
                 "\tbabelnet\n" +
                 "\twordnet\n" +
                 "\twiktionary\n\n" +

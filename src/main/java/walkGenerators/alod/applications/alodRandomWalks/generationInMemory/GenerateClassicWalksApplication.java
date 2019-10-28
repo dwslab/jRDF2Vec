@@ -19,6 +19,6 @@ public class GenerateClassicWalksApplication {
         WalkGeneratorClassicWalks generator = new WalkGeneratorClassicWalks();
         //generator.loadFromNquadsFile(pathToInstanceFile, pathToOptimizedFile);
         generator.loadFromOptimizedFile(pathToOptimizedFile);
-        generator.generateRandomWalksDuplicateFree(pathToWalkFile, numberOfWalks, depth, numberOfThreads);
+        generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, pathToWalkFile);
     }
 }

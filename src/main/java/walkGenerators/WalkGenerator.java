@@ -250,6 +250,7 @@ public abstract class WalkGenerator {
             LOGGER.error("IOException occured.", e);
             e.printStackTrace();
         }
+        LOGGER.info("Entities read into cache.");
         return result;
     }
 
