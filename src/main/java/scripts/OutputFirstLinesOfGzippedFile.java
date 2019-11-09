@@ -15,7 +15,7 @@ public class OutputFirstLinesOfGzippedFile {
         long endLineNumber   = 2000;
 
         try {
-            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("C:\\Users\\D060249\\Downloads\\babelnet-3.6-RDFNT\\part2_CC_BY_SA_30_URI.nt.gz"));
+            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream("/Users/janportisch/IdeaProjects/Walk-Generator/target/part1_CC_BY_30_URI.nt.gz"));
             BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
             String readLine;
             long lineNumber = 0;

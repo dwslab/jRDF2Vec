@@ -41,6 +41,15 @@ public class DbnaryWalkGenerator extends WalkGenerator {
      * @param pathToTripleFile The path to the NT file.
      */
     public DbnaryWalkGenerator(String pathToTripleFile) {
+        File file = new File(pathToTripleFile);
+        if(file.isDirectory()){
+            LOGGER.error("You specified a directory, but a file needs to be specified as resource file. ABORT.");
+            return;
+        }
+        if(!file.exists()){
+            LOGGER.error("The resource file you specified does not exist. ABORT.");
+            return;
+        }
         try {
             this.model = readOntology(pathToTripleFile, "NT");
             this.parser = new NtParser(pathToTripleFile, this);

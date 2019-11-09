@@ -9,10 +9,13 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * A parser for NT files. Mainly implemented to support {@link NtParser#getRandomPredicateObjectForSubject(String)} in
@@ -23,7 +26,7 @@ public class NtParser {
     /**
      * the actual data structure
      */
-    private HashMap<String, ArrayList<PredicateObject>> data;
+    private Map<String, ArrayList<PredicateObject>> data;
 
     /**
      * Default logger
@@ -47,10 +50,15 @@ public class NtParser {
     boolean isIncludeDatatypeProperties = false;
 
     /**
+     * Indicator whether an optimized file shall be written for quick parsing later on (will be written in ./optmized/)
+     */
+    boolean isWriteOptimizedFile = false;
+
+    /**
      * Default Constructor
      */
     public NtParser(WalkGenerator walkGenerator) {
-        data = new HashMap<>(10000000);
+        data = new ConcurrentHashMap<>(10000000);
         specificWalkGenerator = walkGenerator;
         skipCondition = new IsearchCondition() {
             Pattern pattern = Pattern.compile("\".*\"");
@@ -118,7 +126,7 @@ public class NtParser {
             LOGGER.info("Processing file " + file.getName());
             if (file.getName().endsWith(".gz")) {
                 readNTriples(file, true);
-            } else if (file.getName().endsWith(".nt")) {
+            } else if (file.getName().endsWith(".nt") || file.getName().endsWith(".ttl")) {
                 readNTriples(file, false);
             } else {
                 LOGGER.info("Skipping file: " + file.getName());
@@ -126,6 +134,72 @@ public class NtParser {
             }
         }
     }
+
+
+    /**
+     * A new thread will be opened for each file.
+     * @param pathToDirectory
+     */
+    public void readNtTriplesFromDirectoryMultiThreaded(String pathToDirectory, boolean isWriteOptimizedFile){
+        this.isWriteOptimizedFile = isWriteOptimizedFile;
+        File directoryOfDataSets = new File(pathToDirectory);
+        if (!directoryOfDataSets.isDirectory()) {
+            LOGGER.error("The given pathToDirectory is no directory, aborting. (given: " + pathToDirectory + ")");
+            return;
+        }
+
+        ArrayList<Thread> allThreads = new ArrayList<>();
+
+        for (File file : directoryOfDataSets.listFiles()) {
+            if (file.getName().endsWith(".gz")) {
+                FileReaderThread zThread = new FileReaderThread(this, file, true);
+                zThread.start();
+                allThreads.add(zThread);
+            } else if (file.getName().endsWith(".nt") || file.getName().endsWith(".ttl")) {
+                FileReaderThread zThread = new FileReaderThread(this, file, false);
+                zThread.run();
+                allThreads.add(zThread);
+            } else {
+                LOGGER.info("Skipping file: " + file.getName());
+                continue;
+            }
+        }
+
+        // wait for thread completion
+        try {
+            for (Thread thread : allThreads) {
+                thread.join();
+            }
+        } catch (InterruptedException ie){
+            LOGGER.error("Problem waiting for thread...", ie);
+        }
+        LOGGER.info("Data read.");
+    }
+
+
+    /**
+     * Simple Thread
+     */
+    class FileReaderThread extends Thread{
+
+        public FileReaderThread(NtParser parser, File fileToRead, boolean gzipped){
+            this.fileToRead = fileToRead;
+            this.parser = parser;
+            this.isGzipped = gzipped;
+        }
+
+        private NtParser parser;
+        private File fileToRead;
+        private boolean isGzipped;
+
+        @Override
+        public void run(){
+            LOGGER.info("STARTED thread for file " + fileToRead.getName());
+            parser.readNTriples(fileToRead, isGzipped);
+            LOGGER.info("Thread for file " + fileToRead.getName() + " completed.");
+        }
+    }
+
 
 
     /**
@@ -151,6 +225,23 @@ public class NtParser {
             LOGGER.error("File does not exist. Cannot parse.");
             return;
         }
+
+        BufferedWriter writer = null; // the writer used to write the optimized file
+        if(isWriteOptimizedFile){
+            try {
+                File fileToWrite = new File("./optimized/" + fileToReadFrom.getName());
+                fileToWrite.getParentFile().mkdirs();
+                GZIPOutputStream gzip = new GZIPOutputStream(new FileOutputStream(fileToWrite));
+                writer = new BufferedWriter(new OutputStreamWriter(gzip));
+                LOGGER.info("Writer initialized.");
+            } catch (FileNotFoundException fnfe){
+                LOGGER.error("Could not initialize gzip output stream.", fnfe);
+            } catch (IOException e) {
+                LOGGER.error("Problem initializing gzip output stream.", e);
+            }
+        }
+
+        Pattern datatypePattern = Pattern.compile("\".*");
         try {
             BufferedReader reader;
             if (isGzippedFile) {
@@ -161,45 +252,64 @@ public class NtParser {
             }
             String readLine;
             long lineNumber = 0;
+            Matcher datatypeMatcher; // only required if datatype properties shall be included
             nextLine:
             while ((readLine = reader.readLine()) != null) {
-                lineNumber++;
-                if (skipCondition.isHit(readLine)) {
-                    continue nextLine;
-                }
-                readLine = readLine.replaceAll("(?<=>)*[ ]*.[ ]*$", "");
+                try {
+                    lineNumber++;
+                    if (skipCondition.isHit(readLine)) {
+                        continue nextLine;
+                    }
 
-                Pattern datatypePattern = Pattern.compile("\".*");
-                Matcher datatypeMatcher;
-                if (isIncludeDatatypeProperties) {
-                    datatypeMatcher = datatypePattern.matcher(readLine);
-                    if(datatypeMatcher.find()){
-                        String datatypeValue = datatypeMatcher.group(0);
-                        String newDatatypeValue = datatypeValue.replaceAll(" ", "_");
-                        readLine = readLine.replace(datatypeValue, newDatatypeValue);
+                    // remove the dot at the end of a statement
+                    readLine = readLine.replaceAll("(?<=>)*[ ]*.[ ]*$", "");
+
+
+                    if (isIncludeDatatypeProperties) {
+                        datatypeMatcher = datatypePattern.matcher(readLine);
+                        if (datatypeMatcher.find()) {
+                            String datatypeValue = datatypeMatcher.group(0);
+                            String newDatatypeValue = datatypeValue.replaceAll(" ", "_");
+                            readLine = readLine.replace(datatypeValue, newDatatypeValue);
+                        }
                     }
-                }
-                String[] spo = readLine.split(" ");
-                if (spo.length != 3) {
-                    LOGGER.error("Error in file " + fileToReadFrom.getName() + " in line " + lineNumber + " while parsing the following line:\n" + readLine + "\n Required tokens: 3\nActual tokens: " + spo.length);
-                    int i = 1;
-                    for (String token : spo) {
-                        LOGGER.error("Token " + i++ + ": " + token);
+
+                    String[] spo = readLine.split(" ");
+                    if (spo.length != 3) {
+                        LOGGER.error("Error in file " + fileToReadFrom.getName() + " in line " + lineNumber + " while parsing the following line:\n" + readLine + "\n Required tokens: 3\nActual tokens: " + spo.length);
+                        int i = 1;
+                        for (String token : spo) {
+                            LOGGER.error("Token " + i++ + ": " + token);
+                        }
+                        continue nextLine;
                     }
-                    continue nextLine;
-                }
-                String subject = specificWalkGenerator.shortenUri(removeTags(spo[0]));
-                subject = subject.intern();
-                if (data.get(subject) == null) {
-                    ArrayList<PredicateObject> list = new ArrayList<>();
-                    list.add(new PredicateObject(specificWalkGenerator.shortenUri(removeTags(spo[1]).intern()), specificWalkGenerator.shortenUri(removeTags(spo[2])).intern()));
-                    data.put(subject, list);
-                } else {
-                    ArrayList<PredicateObject> list = data.get(subject);
-                    list.add(new PredicateObject(specificWalkGenerator.shortenUri(removeTags(spo[1]).intern()), specificWalkGenerator.shortenUri(removeTags(spo[2])).intern()));
+                    String subject = specificWalkGenerator.shortenUri(removeTags(spo[0])).intern();
+                    String predicate = specificWalkGenerator.shortenUri(removeTags(spo[1]).intern());
+                    String object = specificWalkGenerator.shortenUri(removeTags(spo[2])).intern();
+
+                    if (data.get(subject) == null) {
+                        ArrayList<PredicateObject> list = new ArrayList<>();
+                        list.add(new PredicateObject(predicate, object));
+                        data.put(subject, list);
+                    } else {
+                        ArrayList<PredicateObject> list = data.get(subject);
+                        list.add(new PredicateObject(predicate, object));
+                    }
+
+                    if(isWriteOptimizedFile) {
+                        writer.write(subject + " " + predicate + " " + object + "\n");
+                    }
+
+                } catch (Exception e){
+                    // it is important that the parsing continues no matter what happens
+                    LOGGER.error("A problem occurred while parsing line number " + lineNumber + " of file " + fileToReadFrom.getName(), e);
+                    LOGGER.error("The problem occured in the following line:\n" + readLine);
                 }
             } // end of while loop
-            LOGGER.info("File successfuly read. " + data.size() + " subjects loaded.");
+            LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.size() + " subjects loaded.");
+            writer.flush();
+            writer.close();
+            reader.close();
         } catch (Exception e) {
             LOGGER.error("Error while parsing file.", e);
         }

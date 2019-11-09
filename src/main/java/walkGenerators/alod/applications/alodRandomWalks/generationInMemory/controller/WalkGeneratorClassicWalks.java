@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import walkGenerators.IWalkGenerator;
 import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.model.StringFloat;
 import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.model.WalkGeneratorClassic;
 
@@ -23,7 +24,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * This class can read the ALOD classic nquad file and generate paths.
  */
-public class WalkGeneratorClassicWalks implements WalkGeneratorClassic {
+public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGenerator {
 
     private static Logger LOG = LoggerFactory.getLogger(WalkGeneratorClassicWalks.class);
     private HashMap<String, ArrayList<StringFloat>> broaderConcepts = new HashMap<String, ArrayList<StringFloat>>(); // storage structure for concepts

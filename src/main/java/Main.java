@@ -1,6 +1,4 @@
-import walkGenerators.BabelNetWalkGenerator;
-import walkGenerators.DbnaryWalkGenerator;
-import walkGenerators.WordNetWalkGenerator;
+import walkGenerators.*;
 import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 
 import javax.sound.midi.Soundbank;
@@ -131,85 +129,58 @@ public class Main {
         }
 
         // print configuration for verification
-        System.out.println(getConfiguration(dataSet, isDuplicateFree, numberOfThreads, numberOfWalks, depth, fileToWrite, isEnglishOnly));
+        System.out.println(getConfiguration());
         System.out.println("\nYour quick configuration for next time:");
         System.out.println(getQuickConfiguration());
         System.out.println();
 
         switch (dataSet.toLowerCase()) {
             case "babelnet":
-                BabelNetWalkGenerator generator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
-                if (fileToWrite != null) {
-                    if (isDuplicateFree) {
-                        generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                    } else {
-                        generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                    }
-                } else { // the file to be written is null
-                    if (isDuplicateFree) {
-                        generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                    } else {
-                        generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                    }
-                }
+                BabelNetWalkGenerator babelnetGenerator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
+                generatorExecution(babelnetGenerator);
+                break;
+            case "dbpedia":
+                DBpediaWalkGenerator dBpediaWalkGenerator = new DBpediaWalkGenerator(resourcePath);
+                generatorExecution(dBpediaWalkGenerator);
                 break;
             case "wordnet":
                 WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath);
-                if (isDuplicateFree) {
-                    if (fileToWrite != null) {
-                        wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                    } else
-                        wordNetWalkGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                } else {
-                    if (fileToWrite != null) {
-                        wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                    } else wordNetWalkGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                }
+                generatorExecution(wordNetWalkGenerator);
                 break;
             case "wiktionary":
                 DbnaryWalkGenerator wiktionaryGenerator = new DbnaryWalkGenerator(resourcePath);
-                if (isDuplicateFree) {
-                    if (fileToWrite != null) {
-                        wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                    } else
-                        wiktionaryGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                } else {
-                    if (fileToWrite != null) {
-                        wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                    } else wiktionaryGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                }
+                generatorExecution(wiktionaryGenerator);
                 break;
             case "alod":
                 WalkGeneratorClassicWalks alodGenerator = new WalkGeneratorClassicWalks();
                 alodGenerator.load(resourcePath);
-                if (isDuplicateFree) {
-                    if (fileToWrite != null) {
-                        alodGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                    } else
-                        alodGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                } else {
-                    if (fileToWrite != null) {
-                        alodGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                    } else alodGenerator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                }
-                break;
+                generatorExecution(alodGenerator);
         }
         System.out.println("DONE");
     }
 
 
+    private static void generatorExecution(IWalkGenerator generator){
+        if (isDuplicateFree) {
+            if (fileToWrite != null) {
+                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
+            } else
+                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+        } else {
+            if (fileToWrite != null) {
+                generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
+            } else generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+        }
+    }
+
+
+
     /**
      * Prints the current configuration.
-     *
-     * @param dataSet
-     * @param isDuplicateFree
-     * @param numberOfThreads
-     * @param numberOfWalks
-     * @param depth
-     * @param fileToWrite
      */
-    private static String getConfiguration(String dataSet, boolean isDuplicateFree, int numberOfThreads, int numberOfWalks, int depth, String fileToWrite, boolean isEnglishOnly) {
+    private static String getConfiguration() {
         String result = "Generating walks for " + dataSet + " with the following configuration:\n" +
+                "- number of threads: " + numberOfThreads + "\n" +
                 "- dulplicate free walk generation: " + isDuplicateFree + "\n" +
                 "- walks per entity: " + numberOfWalks + "\n" +
                 "- depth of each walk: " + depth + "\n";
@@ -301,6 +272,5 @@ public class Main {
                 "\tfalse\n\n";
         return result;
     }
-
 
 }

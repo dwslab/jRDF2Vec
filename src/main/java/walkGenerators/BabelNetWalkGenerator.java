@@ -38,9 +38,10 @@ public class BabelNetWalkGenerator extends WalkGenerator {
 
     /**
      * Constructor
+     *
      * @param pathToNtFiles
      */
-    public BabelNetWalkGenerator(String pathToNtFiles, boolean isEnglishEntitiesOnly){
+    public BabelNetWalkGenerator(String pathToNtFiles, boolean isEnglishEntitiesOnly) {
         this.babelnetEntities = getBabelNetEntities(pathToNtFiles, isEnglishEntitiesOnly);
         this.parser = new NtParser(this);
         this.pathToNtDirectory = pathToNtFiles;
@@ -51,20 +52,21 @@ public class BabelNetWalkGenerator extends WalkGenerator {
             Pattern pattern = Pattern.compile("\".*\"");
             Pattern glossPattern = Pattern.compile("_Gloss[0-9]"); // _Gloss[0-9]
             Matcher matcher;
+
             @Override
             public boolean isHit(String input) {
-                if(input.trim().startsWith("#")) return true; // just a comment line
-                if(input.trim().equals("")) return true; // empty line
-                if(input.contains("http://purl.org/dc/terms/license")) return true;
-                if(input.contains("http://purl.org/dc/elements/1.1/source")) return true;
+                if (input.trim().startsWith("#")) return true; // just a comment line
+                if (input.trim().equals("")) return true; // empty line
+                if (input.contains("http://purl.org/dc/terms/license")) return true;
+                if (input.contains("http://purl.org/dc/elements/1.1/source")) return true;
                 matcher = pattern.matcher(input);
-                if(matcher.find()) return true;
+                if (matcher.find()) return true;
                 matcher = glossPattern.matcher(input);
-                if(matcher.find()) return true;
+                if (matcher.find()) return true;
                 return false;
             }
         });
-        parser.readNTriplesFilesFromDirectory(pathToNtFiles);
+        parser.readNtTriplesFromDirectoryMultiThreaded(pathToNtFiles, true);
     }
 
     @Override
@@ -92,15 +94,15 @@ public class BabelNetWalkGenerator extends WalkGenerator {
 
     /**
      * Retrieve all babelnet lemon:LexicalEntry instances.
+     *
      * @param pathToDirectoryOfGzippedTripleDataSets Path to the BabelNet RDF resources.
      * @return All instances in a Hash Set (you need some RAM to do this).
      */
-    public HashSet<String> getBabelNetEntities(String pathToDirectoryOfGzippedTripleDataSets, boolean isWriteOnlyEnglishEntities){
+    public HashSet<String> getBabelNetEntities(String pathToDirectoryOfGzippedTripleDataSets, boolean isWriteOnlyEnglishEntities) {
         File file;
-        if(isWriteOnlyEnglishEntities) {
+        if (isWriteOnlyEnglishEntities) {
             file = new File("./cache/babelnet_entities_en.txt");
-        }
-        else {
+        } else {
             file = new File("./cache/babelnet_entities.txt");
         }
         if (file.exists()) {
@@ -115,34 +117,37 @@ public class BabelNetWalkGenerator extends WalkGenerator {
 
     /**
      * This method will write the BabelNet entities that are of type lemon:LexicalEntry to a file.
+     *
      * @param pathToDirectoryOfGzippedTripleDataSets Path to the file where the Babelnet RDF resources reside.
-     * @param entityFileToBeWritten Path to the file that will be written.
-     * @param isWriteOnlyEnglishEntities If true, only the English concepts will be written.
+     * @param entityFileToBeWritten                  Path to the file that will be written.
+     * @param isWriteOnlyEnglishEntities             If true, only the English concepts will be written.
      */
-    public void writeBabelNetEntitiesToFile(String pathToDirectoryOfGzippedTripleDataSets, String entityFileToBeWritten, boolean isWriteOnlyEnglishEntities){
+    public void writeBabelNetEntitiesToFile(String pathToDirectoryOfGzippedTripleDataSets, String entityFileToBeWritten, boolean isWriteOnlyEnglishEntities) {
         writeBabelNetEntitiesToFile(pathToDirectoryOfGzippedTripleDataSets, entityFileToBeWritten, isWriteOnlyEnglishEntities, false);
     }
 
 
     /**
      * This method will write the BabelNet entities that are of type lemon:LexicalEntry to a file.
+     *
      * @param pathToDirectoryOfGzippedTripleDataSets Path to the file where the Babelnet RDF resources reside.
-     * @param entityFileToBeWritten Path to the file that will be written.
-     * @param keepInMemory True if returning hash set shall contain all entities.
+     * @param entityFileToBeWritten                  Path to the file that will be written.
+     * @param keepInMemory                           True if returning hash set shall contain all entities.
      * @return Empty hash set if {@code keepInMemory} is false. Else the lemmas in the hash set. Note that you need a considerable amount of memory.
      */
-    private HashSet<String> writeBabelNetEntitiesToFile(String pathToDirectoryOfGzippedTripleDataSets, String entityFileToBeWritten, boolean isWriteOnlyEnglishEntities, boolean keepInMemory){
+    private HashSet<String> writeBabelNetEntitiesToFile(String pathToDirectoryOfGzippedTripleDataSets, String entityFileToBeWritten, boolean isWriteOnlyEnglishEntities, boolean keepInMemory) {
         return writeBabelNetEntitiesToFile(pathToDirectoryOfGzippedTripleDataSets, new File(entityFileToBeWritten), isWriteOnlyEnglishEntities, keepInMemory);
     }
 
     /**
      * This method will write the BabelNet entities that are of type lemon:LexicalEntry to a file.
+     *
      * @param pathToDirectoryOfGzippedTripleDataSets Path to the file where the Babelnet RDF resources reside.
-     * @param entityFileToBeWritten File that will be written.
-     * @param keepInMemory True if returning hash set shall contain all entities.
+     * @param entityFileToBeWritten                  File that will be written.
+     * @param keepInMemory                           True if returning hash set shall contain all entities.
      * @return Empty hash set if {@code keepInMemory} is false. Else the lemmas in the hash set. Note that you need a considerable amount of memory.
      */
-    private HashSet<String> writeBabelNetEntitiesToFile(String pathToDirectoryOfGzippedTripleDataSets, File entityFileToBeWritten, boolean isWriteOnlyEnglishEntities, boolean keepInMemory){
+    private HashSet<String> writeBabelNetEntitiesToFile(String pathToDirectoryOfGzippedTripleDataSets, File entityFileToBeWritten, boolean isWriteOnlyEnglishEntities, boolean keepInMemory) {
         entityFileToBeWritten.getParentFile().mkdirs();
         HashSet<String> result = new HashSet<>();
         String regexGetSubject = "(?<=<)[^<]*(?=>)"; // (?<=<)[^<]*(?=>)
@@ -152,7 +157,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(entityFileToBeWritten));
             for (File file : directoryOfDataSets.listFiles()) {
-                if(!file.getName().endsWith(".gz")){
+                if (!file.getName().endsWith(".gz")) {
                     LOGGER.info("Skipping file " + file.getName());
                     continue;
                 }
@@ -163,19 +168,19 @@ public class BabelNetWalkGenerator extends WalkGenerator {
                     String readLine;
                     Matcher matcher;
                     while ((readLine = reader.readLine()) != null) {
-                        if(readLine.contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") && readLine.contains("http://www.lemon-model.net/lemon#LexicalEntry")){
+                        if (readLine.contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#type") && readLine.contains("http://www.lemon-model.net/lemon#LexicalEntry")) {
                             matcher = pattern.matcher(readLine);
-                            if(!matcher.find()){
+                            if (!matcher.find()) {
                                 System.out.println("There is a problem with parsing the following line: " + readLine);
                             } else {
                                 String subject = matcher.group(0);
 
-                                if(isWriteOnlyEnglishEntities) {
+                                if (isWriteOnlyEnglishEntities) {
                                     if (subject.toLowerCase().endsWith("en")) {
                                         subject = shortenUri(subject);
                                         writer.write(subject + "\n");
                                         numberOfSubjects++;
-                                        if(keepInMemory){
+                                        if (keepInMemory) {
                                             result.add(subject);
                                         }
                                     }
@@ -183,7 +188,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
                                     subject = shortenUri(subject);
                                     writer.write(subject + "\n");
                                     numberOfSubjects++;
-                                    if(keepInMemory){
+                                    if (keepInMemory) {
                                         result.add(subject);
                                     }
                                 }
@@ -200,7 +205,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
             writer.flush();
             writer.close();
             LOGGER.info("Retrieving Entities completed.\n" + numberOfSubjects + " read.");
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             ioe.printStackTrace();
             LOGGER.error("Problem with writer.");
         } finally {
@@ -227,34 +232,35 @@ public class BabelNetWalkGenerator extends WalkGenerator {
     */
 
     static Pattern replacePattern = Pattern.compile("http://(?:purl\\.org/(dc)/|(b)abel(n)et\\.org/rdf/|www\\.(?:lemon-model\\.net/(lemon)|w3\\.org/1999/02/22-(rdf)-syntax-ns)#)");
-    static Matcher replaceMatcher;
+
 
     @Override
     public String shortenUri(String uri) {
-        try {
-            replaceMatcher = replacePattern.matcher(uri);
-            return replaceMatcher.replaceAll("$1$2$3$4$5:");
-        } catch (OutOfMemoryError ome){
-            LOGGER.error("Out of Memory Error", ome);
-            LOGGER.error("URI causing the error: " + uri);
-            return uri;
-        }
+        return shortenUri_static(uri);
     }
 
     /**
      * Ignore - just for testing.
+     *
      * @param uri
      * @return
      */
-    public static String shortenUri_2(String uri) {
+    public static String shortenUri_static(String uri) {
         try {
-        replaceMatcher = replacePattern.matcher(uri);
-        return replaceMatcher.replaceAll("$1$2$3$4$5:");
-        } catch (OutOfMemoryError ome){
+            Matcher replaceMatcher = replacePattern.matcher(uri);
+            String result = replaceMatcher.replaceAll("$1$2$3$4$5:");
+            return result;
+        } catch (OutOfMemoryError ome) {
             LOGGER.error("Out of Memory Error", ome);
             LOGGER.error("URI causing the error: " + uri);
             return uri;
+        } catch(Exception e){
+            LOGGER.error("An exception occurred in shortenUri of BabelnetWalkGenerator.", e);
+            LOGGER.error("The problem is handled by returning an unedited URI.");
+            LOGGER.error("Problematic URI that will be returned as it is:\n" + uri);
+            return uri;
         }
     }
+
 
 }

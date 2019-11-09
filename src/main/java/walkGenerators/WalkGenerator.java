@@ -18,7 +18,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Abstract class for all Walk generators.
  */
-public abstract class WalkGenerator {
+public abstract class WalkGenerator implements IWalkGenerator {
 
     /**
      * The walk file(s) will be persisted in "./walks".
@@ -291,6 +291,20 @@ public abstract class WalkGenerator {
         OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         model.read(url.toString(), language);
         return model;
+    }
+
+
+    /**
+     * This method will remove a leading less-than and a trailing greater-than sign (tags).
+     *
+     * @param stringToBeEdited The string that is to be edited.
+     * @return String without tags.
+     */
+    public static String removeTags(String stringToBeEdited) {
+        if (stringToBeEdited.startsWith("<")) stringToBeEdited = stringToBeEdited.substring(1);
+        if (stringToBeEdited.endsWith(">"))
+            stringToBeEdited = stringToBeEdited.substring(0, stringToBeEdited.length() - 1);
+        return stringToBeEdited;
     }
 
 
