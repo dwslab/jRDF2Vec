@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import scripts.IsearchCondition;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,13 @@ public class NtParser {
      */
     boolean isIncludeDatatypeProperties = false;
 
+
+    /**
+     * Indicator whether anonymous nodes shall be handled as if they were just one node.
+     * E.g. _:genid413438 is handled like -> ANODE
+     */
+    boolean isUnifiyAnonymousNodes = false;
+
     /**
      * Indicator whether an optimized file shall be written for quick parsing later on (will be written in ./optmized/)
      */
@@ -58,7 +66,8 @@ public class NtParser {
      * Default Constructor
      */
     public NtParser(WalkGenerator walkGenerator) {
-        data = new ConcurrentHashMap<>(10000000);
+        data = new ConcurrentHashMap<>(1000000000); // one billion is reasonable for babelnet
+
         specificWalkGenerator = walkGenerator;
         skipCondition = new IsearchCondition() {
             Pattern pattern = Pattern.compile("\".*\"");
@@ -138,9 +147,10 @@ public class NtParser {
 
     /**
      * A new thread will be opened for each file.
+     *
      * @param pathToDirectory
      */
-    public void readNtTriplesFromDirectoryMultiThreaded(String pathToDirectory, boolean isWriteOptimizedFile){
+    public void readNtTriplesFromDirectoryMultiThreaded(String pathToDirectory, boolean isWriteOptimizedFile) {
         this.isWriteOptimizedFile = isWriteOptimizedFile;
         File directoryOfDataSets = new File(pathToDirectory);
         if (!directoryOfDataSets.isDirectory()) {
@@ -148,19 +158,33 @@ public class NtParser {
             return;
         }
 
-        ArrayList<Thread> allThreads = new ArrayList<>();
+        HashMap<String, File> optimizedFiles = new HashMap<>();
+        // check for optimized files
+        File optimizedDirectory = new File("./optimized");
+        if (optimizedDirectory.exists() && optimizedDirectory.isDirectory()) {
+            LOGGER.info("Found optimized directory. Will use it for reading.");
+            for (File optimizedFile : optimizedDirectory.listFiles()) {
+                optimizedFiles.put(optimizedFile.getName(), optimizedFile);
+            }
+        }
 
-        for (File file : directoryOfDataSets.listFiles()) {
-            if (file.getName().endsWith(".gz")) {
-                FileReaderThread zThread = new FileReaderThread(this, file, true);
+        ArrayList<Thread> allThreads = new ArrayList<>();
+        for (File fileOriginal : directoryOfDataSets.listFiles()) {
+            if(optimizedFiles.containsKey(fileOriginal.getName())){
+                LOGGER.info("Found optimized file for " + fileOriginal.getName() + ", will use that one.");
+                FileReaderThread zThread = new FileReaderThread(this, optimizedFiles.get(fileOriginal.getName()), true, true);
                 zThread.start();
                 allThreads.add(zThread);
-            } else if (file.getName().endsWith(".nt") || file.getName().endsWith(".ttl")) {
-                FileReaderThread zThread = new FileReaderThread(this, file, false);
-                zThread.run();
+            } else if (fileOriginal.getName().endsWith(".gz")) {
+                FileReaderThread zThread = new FileReaderThread(this, fileOriginal, true, false);
+                zThread.start();
+                allThreads.add(zThread);
+            } else if (fileOriginal.getName().endsWith(".nt") || fileOriginal.getName().endsWith(".ttl")) {
+                FileReaderThread zThread = new FileReaderThread(this, fileOriginal, false, false);
+                zThread.start();
                 allThreads.add(zThread);
             } else {
-                LOGGER.info("Skipping file: " + file.getName());
+                LOGGER.info("Skipping file: " + fileOriginal.getName());
                 continue;
             }
         }
@@ -170,7 +194,7 @@ public class NtParser {
             for (Thread thread : allThreads) {
                 thread.join();
             }
-        } catch (InterruptedException ie){
+        } catch (InterruptedException ie) {
             LOGGER.error("Problem waiting for thread...", ie);
         }
         LOGGER.info("Data read.");
@@ -180,26 +204,32 @@ public class NtParser {
     /**
      * Simple Thread
      */
-    class FileReaderThread extends Thread{
+    class FileReaderThread extends Thread {
 
-        public FileReaderThread(NtParser parser, File fileToRead, boolean gzipped){
+        public FileReaderThread(NtParser parser, File fileToRead, boolean gzipped, boolean optimized) {
             this.fileToRead = fileToRead;
             this.parser = parser;
             this.isGzipped = gzipped;
+            this.isOptimizedFile = optimized;
         }
 
+        private boolean isOptimizedFile;
         private NtParser parser;
         private File fileToRead;
         private boolean isGzipped;
 
         @Override
-        public void run(){
-            LOGGER.info("STARTED thread for file " + fileToRead.getName());
-            parser.readNTriples(fileToRead, isGzipped);
+        public void run() {
+            if(!isOptimizedFile) {
+                LOGGER.info("STARTED thread for file " + fileToRead.getName());
+                parser.readNTriples(fileToRead, isGzipped);
+            } else {
+                LOGGER.info("STARTED (optimized) thread for file " + fileToRead.getName());
+                parser.readNTriplesOptimized(fileToRead);
+            }
             LOGGER.info("Thread for file " + fileToRead.getName() + " completed.");
         }
     }
-
 
 
     /**
@@ -211,6 +241,53 @@ public class NtParser {
     public void readNTriples(String pathToFile, boolean isGzippedFile) {
         File fileToReadFrom = new File(pathToFile);
         readNTriples(fileToReadFrom, isGzippedFile);
+    }
+
+
+    public void readNTriplesOptimized(File fileToReadFrom) {
+        if (!fileToReadFrom.exists()) {
+            LOGGER.error("File does not exist. Cannot parse.");
+            return;
+        }
+        try {
+            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(fileToReadFrom));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
+
+            String readLine;
+            int lineNumber = 0;
+            while((readLine = reader.readLine()) != null){
+                lineNumber += 1;
+                String[] parsed = readLine.split(" ");
+                if(parsed.length != 3){
+                    LOGGER.error("Problem with line: \n" + readLine);
+                } else {
+                    String subject = parsed[0];
+                    String predicate = parsed[1];
+                    String object = parsed[2];
+                    addToDataThreadSafe(subject, predicate, object);
+                }
+            }
+        } catch (IOException ioe) {
+            LOGGER.error("Could not initialize optimized reader for file " + fileToReadFrom.getName());
+        }
+    }
+
+
+    /**
+     * Add data in a thread safe way.
+     * @param subject The subject to be added.
+     * @param predicate The predicate to be added.
+     * @param object The object to be added.
+     */
+    private synchronized void addToDataThreadSafe(String subject, String predicate, String object){
+        if (data.get(subject) == null) {
+            ArrayList<PredicateObject> list = new ArrayList<>();
+            list.add(new PredicateObject(predicate, object));
+            data.put(subject, list);
+        } else {
+            ArrayList<PredicateObject> list = data.get(subject);
+            list.add(new PredicateObject(predicate, object));
+        }
     }
 
 
@@ -227,14 +304,14 @@ public class NtParser {
         }
 
         BufferedWriter writer = null; // the writer used to write the optimized file
-        if(isWriteOptimizedFile){
+        if (isWriteOptimizedFile) {
             try {
                 File fileToWrite = new File("./optimized/" + fileToReadFrom.getName());
                 fileToWrite.getParentFile().mkdirs();
                 GZIPOutputStream gzip = new GZIPOutputStream(new FileOutputStream(fileToWrite));
-                writer = new BufferedWriter(new OutputStreamWriter(gzip));
+                writer = new BufferedWriter(new OutputStreamWriter(gzip, StandardCharsets.UTF_8));
                 LOGGER.info("Writer initialized.");
-            } catch (FileNotFoundException fnfe){
+            } catch (FileNotFoundException fnfe) {
                 LOGGER.error("Could not initialize gzip output stream.", fnfe);
             } catch (IOException e) {
                 LOGGER.error("Problem initializing gzip output stream.", e);
@@ -246,9 +323,9 @@ public class NtParser {
             BufferedReader reader;
             if (isGzippedFile) {
                 GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(fileToReadFrom));
-                reader = new BufferedReader(new InputStreamReader(gzip));
+                reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
             } else {
-                reader = new BufferedReader(new FileReader(fileToReadFrom));
+                reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileToReadFrom), StandardCharsets.UTF_8));
             }
             String readLine;
             long lineNumber = 0;
@@ -287,28 +364,23 @@ public class NtParser {
                     String predicate = specificWalkGenerator.shortenUri(removeTags(spo[1]).intern());
                     String object = specificWalkGenerator.shortenUri(removeTags(spo[2])).intern();
 
-                    if (data.get(subject) == null) {
-                        ArrayList<PredicateObject> list = new ArrayList<>();
-                        list.add(new PredicateObject(predicate, object));
-                        data.put(subject, list);
-                    } else {
-                        ArrayList<PredicateObject> list = data.get(subject);
-                        list.add(new PredicateObject(predicate, object));
-                    }
+                    addToDataThreadSafe(subject, predicate, object);
 
-                    if(isWriteOptimizedFile) {
+                    if (isWriteOptimizedFile) {
                         writer.write(subject + " " + predicate + " " + object + "\n");
                     }
 
-                } catch (Exception e){
+                } catch (Exception e) {
                     // it is important that the parsing continues no matter what happens
                     LOGGER.error("A problem occurred while parsing line number " + lineNumber + " of file " + fileToReadFrom.getName(), e);
                     LOGGER.error("The problem occured in the following line:\n" + readLine);
                 }
             } // end of while loop
             LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.size() + " subjects loaded.");
-            writer.flush();
-            writer.close();
+            if(isWriteOptimizedFile) {
+                writer.flush();
+                writer.close();
+            }
             reader.close();
         } catch (Exception e) {
             LOGGER.error("Error while parsing file.", e);
@@ -337,7 +409,7 @@ public class NtParser {
 
 
     /**
-     * Generates duplication free walks for the given entitiy.
+     * Generates duplicate-free walks for the given entity.
      *
      * @param entity        The entity for which walks shall be generated.
      * @param numberOfWalks The number of walks to be generated.
@@ -392,8 +464,18 @@ public class NtParser {
         // now we need to translate our walks into strings
         for (List<PredicateObject> walk : walks) {
             String finalSentence = entity;
-            for (PredicateObject po : walk) {
-                finalSentence += " " + po.predicate + " " + po.object;
+            if(this.isUnifiyAnonymousNodes()){
+                for (PredicateObject po : walk) {
+                    String object = po.object;
+                    if(isAnonymousNode(object)){
+                        object = "ANode";
+                    }
+                    finalSentence += " " + po.predicate + " " + object;
+                }
+            } else {
+                for (PredicateObject po : walk) {
+                    finalSentence += " " + po.predicate + " " + po.object;
+                }
             }
             result.add(finalSentence);
         }
@@ -455,7 +537,28 @@ public class NtParser {
     }
 
     /**
+     * Returns true if the given parameter follows the schema of an anonymous node
+     * @param uriString The URI string to be checked.
+     * @return True if anonymous node.
+     */
+    public boolean isAnonymousNode (String uriString){
+        uriString = uriString.trim();
+        if(uriString.startsWith("_:genid")){
+            return true;
+        } else return false;
+    }
+
+    public boolean isUnifiyAnonymousNodes() {
+        return isUnifiyAnonymousNodes;
+    }
+
+    public void setUnifiyAnonymousNodes(boolean unifiyAnonymousNodes) {
+        isUnifiyAnonymousNodes = unifiyAnonymousNodes;
+    }
+
+    /**
      * Note that this function will overwrite the skip condition.
+     *
      * @param includeDatatypeProperties
      */
     public void setIncludeDatatypeProperties(boolean includeDatatypeProperties) {

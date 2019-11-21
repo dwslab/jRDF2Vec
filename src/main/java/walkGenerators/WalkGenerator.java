@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -111,7 +112,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
         // initialize the writer
         try {
             this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), "utf-8");
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
         } catch (Exception e1) {
             LOGGER.error("Could not initialize writer. Aborting process.", e1);
             return;
@@ -150,7 +151,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
         // initialize the writer
         try {
             this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), "utf-8");
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
         } catch (Exception e1) {
             LOGGER.error("Could not initialize writer. Aborting process.", e1);
             return;
@@ -175,10 +176,10 @@ public abstract class WalkGenerator implements IWalkGenerator {
     }
 
     /**
-     * Adds new walks to the list; If the list is filled it is written to the
+     * Adds new walks to the list; If the list is filled, it is written to the
      * file.
      *
-     * @param tmpList
+     * @param tmpList Entries that shall be written.
      */
     public synchronized void writeToFile(List<String> tmpList) {
         processedEntities++;
@@ -190,7 +191,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        if (processedEntities % 100 == 0) {
+        if (processedEntities % 1000 == 0) {
             LOGGER.info("TOTAL PROCESSED ENTITIES: " + processedEntities);
             LOGGER.info("TOTAL NUMBER OF PATHS : " + processedWalks);
         }
@@ -207,7 +208,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
             String tmpFilename = filePath.replace(".gz", tmpNM + ".gz");
             try {
                 writer = new OutputStreamWriter(new GZIPOutputStream(
-                        new FileOutputStream(tmpFilename, false)), "utf-8");
+                        new FileOutputStream(tmpFilename, false)), StandardCharsets.UTF_8);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -238,7 +239,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
             return result;
         }
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 result.add(line);
@@ -263,7 +264,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      */
     static void writeHashSetToFile(String filePath, HashSet<String> setToWrite) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filePath)));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8));
             boolean isFirstLine = true;
             for (String entry : setToWrite) {
                 if (isFirstLine) isFirstLine = false;

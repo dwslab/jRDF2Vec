@@ -34,12 +34,15 @@ public class BabelNetWalkGenerator extends WalkGenerator {
      */
     private boolean isEnglishEntitiesOnly;
 
+
     private HashSet<String> babelnetEntities;
+
 
     /**
      * Constructor
      *
      * @param pathToNtFiles
+     * @param isEnglishEntitiesOnly Indicator whether only English lemmas shall be considered.
      */
     public BabelNetWalkGenerator(String pathToNtFiles, boolean isEnglishEntitiesOnly) {
         this.babelnetEntities = getBabelNetEntities(pathToNtFiles, isEnglishEntitiesOnly);
@@ -55,10 +58,10 @@ public class BabelNetWalkGenerator extends WalkGenerator {
 
             @Override
             public boolean isHit(String input) {
-                if (input.trim().startsWith("#")) return true; // just a comment line
-                if (input.trim().equals("")) return true; // empty line
                 if (input.contains("http://purl.org/dc/terms/license")) return true;
                 if (input.contains("http://purl.org/dc/elements/1.1/source")) return true;
+                if (input.trim().startsWith("#")) return true; // just a comment line
+                if (input.trim().equals("")) return true; // empty line
                 matcher = pattern.matcher(input);
                 if (matcher.find()) return true;
                 matcher = glossPattern.matcher(input);

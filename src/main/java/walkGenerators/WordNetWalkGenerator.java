@@ -20,9 +20,9 @@ public class WordNetWalkGenerator extends WalkGenerator {
 
     public static void main(String[] args) throws Exception {
         String wnFile = "/Users/janportisch/Documents/Wordnet/wordnet.nt";
-        WordNetWalkGenerator generator = new WordNetWalkGenerator(wnFile, true);
+        WordNetWalkGenerator generator = new WordNetWalkGenerator(wnFile, false, true);
         //generator.getEntities(generator.model);
-        generator.generateRandomWalksDuplicateFree(8, 500, 8, "./walks/wordnet_500_8_df/wordnet_500_8_df.gz");
+        generator.generateRandomWalksDuplicateFree(8, 500, 8, "./walks/wordnet_500_8_df_anonymous/wordnet_500_8_df_anonymous.gz");
     }
 
 
@@ -31,7 +31,7 @@ public class WordNetWalkGenerator extends WalkGenerator {
      * @param pathToTripleFile The path to the WordNet triple file.
      */
     public WordNetWalkGenerator(String pathToTripleFile){
-        this(pathToTripleFile, false);
+        this(pathToTripleFile, false, true);
     }
 
 
@@ -39,13 +39,20 @@ public class WordNetWalkGenerator extends WalkGenerator {
      * Constructor
      *
      * @param pathToTripleFile Path to RDF Wordnet file in n-triples format.
+     * @param isIncludeDatatypeProperties True if datatype properties shall be included into the walk generation.
+     * @param isUnifiyAnonymousNodes True if anonymous nodes shall be unified in the walk generation process.
      */
-    public WordNetWalkGenerator(String pathToTripleFile, boolean isIncludeDatatypeProperties) {
+    public WordNetWalkGenerator(String pathToTripleFile, boolean isIncludeDatatypeProperties, boolean isUnifiyAnonymousNodes) {
         try {
             this.model = readOntology(pathToTripleFile, "NT");
             this.parser = new NtParser(this);
             if (isIncludeDatatypeProperties) {
+                LOGGER.info("[WN setting] isIncludeDatatypeProperties: " + isUnifiyAnonymousNodes);
                 this.parser.setIncludeDatatypeProperties(true);
+            }
+            if(isUnifiyAnonymousNodes){
+                LOGGER.info("[WN setting] unify anonymous nodes: " + isUnifiyAnonymousNodes);
+                this.parser.setUnifiyAnonymousNodes(true);
             }
             this.parser.readNTriples(pathToTripleFile);
             LOGGER.info("Model read into memory.");

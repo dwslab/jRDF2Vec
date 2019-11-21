@@ -52,6 +52,7 @@ results/*
 result.rdf
 /oaei-resources/*
 /src/main/java/com/sap/wiktionaryMatcher/matcher/playground/*
+/src/main/java/playground/*
 /found.txt
 /persistences/*
 trackCache/*

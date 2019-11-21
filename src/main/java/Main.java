@@ -1,7 +1,6 @@
 import walkGenerators.*;
 import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 
-import javax.sound.midi.Soundbank;
 import java.util.Scanner;
 
 /**
@@ -17,6 +16,7 @@ public class Main {
     private static int depth;
     private static boolean isEnglishOnly;
     private static String fileToWrite;
+    private static boolean isUnifyAnonymousNodes;
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("-help")) {
@@ -70,6 +70,12 @@ public class Main {
             System.out.println("Into which file shall the walks be written?");
             fileToWrite = scanner.nextLine();
 
+            // anonymous node handling
+            System.out.println("Do you want to unify anonymous nodes? [true | false] (If in doubt, set 'false'.)");
+            isUnifyAnonymousNodes = scanner.nextBoolean();
+            scanner.nextLine();
+
+
             if(dataSet.equalsIgnoreCase("babelnet")){
                 System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false]");
                 isEnglishOnly = scanner.nextBoolean();
@@ -119,6 +125,12 @@ public class Main {
                         "The program execution will stop now.");
             }
 
+            String isUnifyAnonymousNodesWritten = getValue("-unifyAnonymousNodes", args);
+            isUnifyAnonymousNodes = false;
+            if(isUnifyAnonymousNodesWritten != null && (isUnifyAnonymousNodesWritten.equalsIgnoreCase("true") || isUnifyAnonymousNodesWritten.equalsIgnoreCase("false"))){
+                isUnifyAnonymousNodes = Boolean.valueOf(isUnifyAnonymousNodesWritten);
+            }
+
             String isEnglishOnlyWritten = getValue("-en", args);
             isEnglishOnly = true;
             if (isEnglishOnlyWritten != null) {
@@ -144,7 +156,7 @@ public class Main {
                 generatorExecution(dBpediaWalkGenerator);
                 break;
             case "wordnet":
-                WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath);
+                WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath, false, isUnifyAnonymousNodes);
                 generatorExecution(wordNetWalkGenerator);
                 break;
             case "wiktionary":
@@ -204,6 +216,7 @@ public class Main {
     private static String getQuickConfiguration() {
         String result = "-set " + dataSet + " -res \"" + resourcePath + "\" -threads " + numberOfThreads + " -walks " + numberOfWalks + " -depth " + depth;
         result += " -duplicateFree " + isDuplicateFree;
+        result += " -unifyAnonymousNodes " + isUnifyAnonymousNodes;
         if(fileToWrite != null) {
             result += " -file \"" + fileToWrite + "\"";
         }
@@ -241,7 +254,9 @@ public class Main {
      * @return
      */
     private static String getHelp() {
-        String result = "The following settings are required:\n\n" +
+        String result =
+                // required values
+                "The following settings are required:\n\n" +
                 "-set <set>\n" +
                 "The kind of data set.\n" +
                 "Options for <set>\n" +
@@ -259,6 +274,8 @@ public class Main {
                 "The length of each sentence.\n\n" +
                 "-file <file_to_be_written>\n" +
                 "The path to the file that will be written.\n\n\n" +
+
+                // optional values
                 "The following settings are optional:\n\n" +
                 "-en <bool>\n" +
                 "Required only for babelnet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
@@ -267,6 +284,11 @@ public class Main {
                 "\tfalse\n\n" +
                 "-duplicateFree <bool>\n" +
                 "Indicator whether the walks shall be duplicate free or not.\n" +
+                "Values for <bool>\n" +
+                "\ttrue\n" +
+                "\tfalse\n\n" +
+                "-unifyAnonymousNodes <bool>\n" +
+                "Indicator whether anonymous node ids shall be unified or not. Default: False.\n" +
                 "Values for <bool>\n" +
                 "\ttrue\n" +
                 "\tfalse\n\n";

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -49,13 +50,14 @@ public class DBpediaWalkGenerator extends WalkGenerator {
                 }
             }
             // others:
-            try {
-                this.parser.readNTriples(f.getCanonicalPath());
-            } catch (IOException e) {
-                LOGGER.error("Could not determine canonical file path for file " + f.getName(), e);
-                e.printStackTrace();
-            }
+            //try {
+            //    this.parser.readNTriples(f.getCanonicalPath());
+            //} catch (IOException e) {
+            //    LOGGER.error("Could not determine canonical file path for file " + f.getName(), e);
+            //    e.printStackTrace();
+            //}
         }
+        this.parser.readNtTriplesFromDirectoryMultiThreaded(pathToDirectory, true);
     }
 
 
@@ -86,7 +88,7 @@ public class DBpediaWalkGenerator extends WalkGenerator {
         // parsing
         HashSet<String> result = new HashSet<>();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(labelsFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(labelsFile), StandardCharsets.UTF_8));
             String readLine;
             while((readLine = reader.readLine()) != null){
                 if (readLine.startsWith("#")) continue; // just a comment
