@@ -32,9 +32,9 @@ public class Main {
             // data set
             System.out.println("For which data set do you want to generate walks?");
             dataSet = scanner.nextLine();
-            if(dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("babelnet") ||
+            if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("babelnet") ||
                     dataSet.equalsIgnoreCase("dbpedia") || dataSet.equalsIgnoreCase("wiktionary") ||
-                    dataSet.equalsIgnoreCase("wordnet")){
+                    dataSet.equalsIgnoreCase("wordnet")) {
                 // input ok
             } else {
                 System.out.println("Invalid input. Has to be one of: alod | babelnet | dbpedia | wiktionary | wordnet");
@@ -75,8 +75,7 @@ public class Main {
             isUnifyAnonymousNodes = scanner.nextBoolean();
             scanner.nextLine();
 
-
-            if(dataSet.equalsIgnoreCase("babelnet")){
+            if (dataSet.equalsIgnoreCase("babelnet")) {
                 System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false]");
                 isEnglishOnly = scanner.nextBoolean();
             }
@@ -127,7 +126,7 @@ public class Main {
 
             String isUnifyAnonymousNodesWritten = getValue("-unifyAnonymousNodes", args);
             isUnifyAnonymousNodes = false;
-            if(isUnifyAnonymousNodesWritten != null && (isUnifyAnonymousNodesWritten.equalsIgnoreCase("true") || isUnifyAnonymousNodesWritten.equalsIgnoreCase("false"))){
+            if (isUnifyAnonymousNodesWritten != null && (isUnifyAnonymousNodesWritten.equalsIgnoreCase("true") || isUnifyAnonymousNodesWritten.equalsIgnoreCase("false"))) {
                 isUnifyAnonymousNodes = Boolean.valueOf(isUnifyAnonymousNodesWritten);
             }
 
@@ -160,6 +159,7 @@ public class Main {
                 generatorExecution(wordNetWalkGenerator);
                 break;
             case "wiktionary":
+            case "dbnary":
                 DbnaryWalkGenerator wiktionaryGenerator = new DbnaryWalkGenerator(resourcePath);
                 generatorExecution(wiktionaryGenerator);
                 break;
@@ -171,8 +171,7 @@ public class Main {
         System.out.println("DONE");
     }
 
-
-    private static void generatorExecution(IWalkGenerator generator){
+    private static void generatorExecution(IWalkGenerator generator) {
         if (isDuplicateFree) {
             if (fileToWrite != null) {
                 generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
@@ -184,8 +183,6 @@ public class Main {
             } else generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
         }
     }
-
-
 
     /**
      * Prints the current configuration.
@@ -209,7 +206,6 @@ public class Main {
         return result;
     }
 
-
     /**
      * Prints the current quick start configuration.
      **/
@@ -217,23 +213,22 @@ public class Main {
         String result = "-set " + dataSet + " -res \"" + resourcePath + "\" -threads " + numberOfThreads + " -walks " + numberOfWalks + " -depth " + depth;
         result += " -duplicateFree " + isDuplicateFree;
         result += " -unifyAnonymousNodes " + isUnifyAnonymousNodes;
-        if(fileToWrite != null) {
+        if (fileToWrite != null) {
             result += " -file \"" + fileToWrite + "\"";
         }
-        if(dataSet.equalsIgnoreCase("babelnet")){
+        if (dataSet.equalsIgnoreCase("babelnet")) {
             result += " -en " + isEnglishOnly;
         }
         return result;
     }
 
-
-        /**
-         * Helper method.
-         *
-         * @param key       Arg key.
-         * @param arguments Arguments as received upon program start.
-         * @return Value of argument if existing, else null.
-         */
+    /**
+     * Helper method.
+     *
+     * @param key       Arg key.
+     * @param arguments Arguments as received upon program start.
+     * @return Value of argument if existing, else null.
+     */
     private static String getValue(String key, String[] arguments) {
         int positionSet = -1;
         for (int i = 0; i < arguments.length; i++) {
@@ -247,7 +242,6 @@ public class Main {
         } else return null;
     }
 
-
     /**
      * Returns a help string.
      *
@@ -257,42 +251,41 @@ public class Main {
         String result =
                 // required values
                 "The following settings are required:\n\n" +
-                "-set <set>\n" +
-                "The kind of data set.\n" +
-                "Options for <set>\n" +
-                "\talod\n" +
-                "\tbabelnet\n" +
-                "\twordnet\n" +
-                "\twiktionary\n\n" +
-                "-res <resource>\n" +
-                "Path to data set file or directory.\n\n" +
-                "-threads <number_of_threads>\n" +
-                "The number of desired threads.\n\n" +
-                "-walks <number_of_walks_per_entity>\n" +
-                "The number of walks per entity.\n\n" +
-                "-depth <desired_sentence_depth>\n" +
-                "The length of each sentence.\n\n" +
-                "-file <file_to_be_written>\n" +
-                "The path to the file that will be written.\n\n\n" +
+                        "-set <set>\n" +
+                        "The kind of data set.\n" +
+                        "Options for <set>\n" +
+                        "\talod\n" +
+                        "\tbabelnet\n" +
+                        "\twordnet\n" +
+                        "\twiktionary\n\n" +
+                        "-res <resource>\n" +
+                        "Path to data set file or directory.\n\n" +
+                        "-threads <number_of_threads>\n" +
+                        "The number of desired threads.\n\n" +
+                        "-walks <number_of_walks_per_entity>\n" +
+                        "The number of walks per entity.\n\n" +
+                        "-depth <desired_sentence_depth>\n" +
+                        "The length of each sentence.\n\n" +
+                        "-file <file_to_be_written>\n" +
+                        "The path to the file that will be written.\n\n\n" +
 
-                // optional values
-                "The following settings are optional:\n\n" +
-                "-en <bool>\n" +
-                "Required only for babelnet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
-                "Values for <bool>\n" +
-                "\ttrue\n" +
-                "\tfalse\n\n" +
-                "-duplicateFree <bool>\n" +
-                "Indicator whether the walks shall be duplicate free or not.\n" +
-                "Values for <bool>\n" +
-                "\ttrue\n" +
-                "\tfalse\n\n" +
-                "-unifyAnonymousNodes <bool>\n" +
-                "Indicator whether anonymous node ids shall be unified or not. Default: False.\n" +
-                "Values for <bool>\n" +
-                "\ttrue\n" +
-                "\tfalse\n\n";
+                        // optional values
+                        "The following settings are optional:\n\n" +
+                        "-en <bool>\n" +
+                        "Required only for babelnet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
+                        "Values for <bool>\n" +
+                        "\ttrue\n" +
+                        "\tfalse\n\n" +
+                        "-duplicateFree <bool>\n" +
+                        "Indicator whether the walks shall be duplicate free or not.\n" +
+                        "Values for <bool>\n" +
+                        "\ttrue\n" +
+                        "\tfalse\n\n" +
+                        "-unifyAnonymousNodes <bool>\n" +
+                        "Indicator whether anonymous node ids shall be unified or not. Default: False.\n" +
+                        "Values for <bool>\n" +
+                        "\ttrue\n" +
+                        "\tfalse\n\n";
         return result;
     }
-
 }

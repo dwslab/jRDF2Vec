@@ -74,3 +74,6 @@ bin/
 
 # exceptions/
 !/jars/*
+
+# mac
+.DS_Store
