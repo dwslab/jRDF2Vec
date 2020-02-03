@@ -10,3 +10,15 @@ rather than running the `jar` with many option parameters, you can execute the p
 Note that depending on the data set the 
 computing requirements might be high. For BabelNet, the largest graph supported by this framework, more than 350 GB of 
 RAM are required. Do not forget to increase the heap space when runnign the program (`-Xmx` and `-Xmx`).
+
+You can generate walks for any `NT`, `OWL/XML`, or `TTL` file.
+
+## Example
+To run the walk generation for the <a href="https://protege.stanford.edu/ontologies/pizza/pizza.owl">pizza ontology</a>, 
+build the project and run the following command: 
+
+```
+java -jar walkGenerator-1.0-SNAPSHOT.jar -set any -res "<path_to_pizza_ontology>" -threads 10 -walks 10 -depth 10 -duplicateFree true -unifyAnonymousNodes false -file "<path_to_file_to_be_written>"
+```
+
+Note that for BabelNet, DBnary, DBpedia, and WordNet (RDF) specific implementations are available (controllable via `-set`).

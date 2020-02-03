@@ -32,7 +32,7 @@ public class Main {
             // data set
             System.out.println("For which data set do you want to generate walks?");
             dataSet = scanner.nextLine();
-            if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("alod")  || dataSet.equalsIgnoreCase("babelnet") ||
+            if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("any")  || dataSet.equalsIgnoreCase("babelnet") ||
                     dataSet.equalsIgnoreCase("dbpedia") || dataSet.equalsIgnoreCase("wiktionary") ||
                     dataSet.equalsIgnoreCase("wordnet")) {
                 // input ok
@@ -71,9 +71,11 @@ public class Main {
             fileToWrite = scanner.nextLine();
 
             // anonymous node handling
-            System.out.println("Do you want to unify anonymous nodes? [true | false] (If in doubt, set 'false'.)");
-            isUnifyAnonymousNodes = scanner.nextBoolean();
-            scanner.nextLine();
+            if (!dataSet.equalsIgnoreCase("any")) {
+                System.out.println("Do you want to unify anonymous nodes? [true | false] (If in doubt, set 'false'.)");
+                isUnifyAnonymousNodes = scanner.nextBoolean();
+                scanner.nextLine();
+            }
 
             if (dataSet.equalsIgnoreCase("babelnet")) {
                 System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false]");
