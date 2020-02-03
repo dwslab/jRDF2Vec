@@ -66,7 +66,7 @@ public class NtParser {
      * Default Constructor
      */
     public NtParser(WalkGenerator walkGenerator) {
-        data = new ConcurrentHashMap<>(1000000000); // one billion is reasonable for babelnet
+        data = new ConcurrentHashMap<>(10000); // one billion is reasonable for babelnet
 
         specificWalkGenerator = walkGenerator;
         skipCondition = new IsearchCondition() {
@@ -94,6 +94,15 @@ public class NtParser {
         readNTriples(pathToTripleFile);
     }
 
+    /**
+     * Constructor
+     *
+     * @param tripleFile The nt file to be read (not zipped).
+     */
+    public NtParser(File tripleFile, WalkGenerator walkGenerator) {
+        this(walkGenerator);
+        readNTriples(tripleFile, false);
+    }
 
     /**
      * Save an ontModel as TTL file.
@@ -102,8 +111,18 @@ public class NtParser {
      * @param filePathToFileToWrite File that shall be written.
      */
     public static void saveAsNt(OntModel ontModel, String filePathToFileToWrite) {
+        saveAsNt(ontModel, new File(filePathToFileToWrite));
+    }
+
+    /**
+     * Save an ontModel as TTL file.
+     *
+     * @param ontModel    Model to Write.
+     * @param fileToWrite File that shall be written.
+     */
+    public static void saveAsNt(OntModel ontModel, File fileToWrite) {
         try {
-            ontModel.write(new FileWriter(new File(filePathToFileToWrite)), "N-Triples");
+            ontModel.write(new FileWriter(fileToWrite), "N-Triples");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -170,7 +189,7 @@ public class NtParser {
 
         ArrayList<Thread> allThreads = new ArrayList<>();
         for (File fileOriginal : directoryOfDataSets.listFiles()) {
-            if(optimizedFiles.containsKey(fileOriginal.getName())){
+            if (optimizedFiles.containsKey(fileOriginal.getName())) {
                 LOGGER.info("Found optimized file for " + fileOriginal.getName() + ", will use that one.");
                 FileReaderThread zThread = new FileReaderThread(this, optimizedFiles.get(fileOriginal.getName()), true, true);
                 zThread.start();
@@ -220,7 +239,7 @@ public class NtParser {
 
         @Override
         public void run() {
-            if(!isOptimizedFile) {
+            if (!isOptimizedFile) {
                 LOGGER.info("STARTED thread for file " + fileToRead.getName());
                 parser.readNTriples(fileToRead, isGzipped);
             } else {
@@ -255,10 +274,10 @@ public class NtParser {
 
             String readLine;
             int lineNumber = 0;
-            while((readLine = reader.readLine()) != null){
+            while ((readLine = reader.readLine()) != null) {
                 lineNumber += 1;
                 String[] parsed = readLine.split(" ");
-                if(parsed.length != 3){
+                if (parsed.length != 3) {
                     LOGGER.error("Problem with line: \n" + readLine);
                 } else {
                     String subject = parsed[0];
@@ -275,11 +294,12 @@ public class NtParser {
 
     /**
      * Add data in a thread safe way.
-     * @param subject The subject to be added.
+     *
+     * @param subject   The subject to be added.
      * @param predicate The predicate to be added.
-     * @param object The object to be added.
+     * @param object    The object to be added.
      */
-    private synchronized void addToDataThreadSafe(String subject, String predicate, String object){
+    private synchronized void addToDataThreadSafe(String subject, String predicate, String object) {
         if (data.get(subject) == null) {
             ArrayList<PredicateObject> list = new ArrayList<>();
             list.add(new PredicateObject(predicate, object));
@@ -377,7 +397,7 @@ public class NtParser {
                 }
             } // end of while loop
             LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.size() + " subjects loaded.");
-            if(isWriteOptimizedFile) {
+            if (isWriteOptimizedFile) {
                 writer.flush();
                 writer.close();
             }
@@ -464,10 +484,10 @@ public class NtParser {
         // now we need to translate our walks into strings
         for (List<PredicateObject> walk : walks) {
             String finalSentence = entity;
-            if(this.isUnifiyAnonymousNodes()){
+            if (this.isUnifiyAnonymousNodes()) {
                 for (PredicateObject po : walk) {
                     String object = po.object;
-                    if(isAnonymousNode(object)){
+                    if (isAnonymousNode(object)) {
                         object = "ANode";
                     }
                     finalSentence += " " + po.predicate + " " + object;
@@ -538,12 +558,13 @@ public class NtParser {
 
     /**
      * Returns true if the given parameter follows the schema of an anonymous node
+     *
      * @param uriString The URI string to be checked.
      * @return True if anonymous node.
      */
-    public boolean isAnonymousNode (String uriString){
+    public boolean isAnonymousNode(String uriString) {
         uriString = uriString.trim();
-        if(uriString.startsWith("_:genid")){
+        if (uriString.startsWith("_:genid")) {
             return true;
         } else return false;
     }

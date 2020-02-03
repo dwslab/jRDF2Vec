@@ -32,12 +32,12 @@ public class Main {
             // data set
             System.out.println("For which data set do you want to generate walks?");
             dataSet = scanner.nextLine();
-            if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("babelnet") ||
+            if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("alod")  || dataSet.equalsIgnoreCase("babelnet") ||
                     dataSet.equalsIgnoreCase("dbpedia") || dataSet.equalsIgnoreCase("wiktionary") ||
                     dataSet.equalsIgnoreCase("wordnet")) {
                 // input ok
             } else {
-                System.out.println("Invalid input. Has to be one of: alod | babelnet | dbpedia | wiktionary | wordnet");
+                System.out.println("Invalid input. Has to be one of: alod | any | babelnet | dbpedia | wiktionary | wordnet");
                 System.out.println("Please refer to -help for the documentation.");
                 return;
             }
@@ -146,6 +146,10 @@ public class Main {
         System.out.println();
 
         switch (dataSet.toLowerCase()) {
+            case "any":
+                WalkGeneratorClassic classicGenerator = new WalkGeneratorClassic(resourcePath);
+                generatorExecution(classicGenerator);
+                break;
             case "babelnet":
                 BabelNetWalkGenerator babelnetGenerator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
                 generatorExecution(babelnetGenerator);
@@ -255,6 +259,7 @@ public class Main {
                         "The kind of data set.\n" +
                         "Options for <set>\n" +
                         "\talod\n" +
+                        "\tany\n" +
                         "\tbabelnet\n" +
                         "\twordnet\n" +
                         "\twiktionary\n\n" +
