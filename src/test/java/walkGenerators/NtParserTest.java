@@ -1,5 +1,8 @@
 package walkGenerators;
 
+import walkGenerators.base.NtParser;
+import walkGenerators.base.WalkGenerator;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

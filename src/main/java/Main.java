@@ -1,5 +1,10 @@
-import walkGenerators.*;
-import walkGenerators.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
+import walkGenerators.base.DBpediaWalkGenerator;
+import walkGenerators.base.IWalkGenerator;
+import walkGenerators.classic.DBnary.DbnaryWalkGenerator;
+import walkGenerators.classic.WalkGeneratorDefault;
+import walkGenerators.classic.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
+import walkGenerators.classic.babelnet.BabelNetWalkGenerator;
+import walkGenerators.classic.wordnet.WordNetWalkGenerator;
 
 import java.util.Scanner;
 
@@ -19,7 +24,7 @@ public class Main {
     private static boolean isUnifyAnonymousNodes;
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("-help")) {
+        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--h") || args[0].equalsIgnoreCase("-help")) {
             System.out.println(getHelp());
             return;
         }
@@ -149,7 +154,7 @@ public class Main {
 
         switch (dataSet.toLowerCase()) {
             case "any":
-                WalkGeneratorClassic classicGenerator = new WalkGeneratorClassic(resourcePath);
+                WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(resourcePath);
                 generatorExecution(classicGenerator);
                 break;
             case "babelnet":

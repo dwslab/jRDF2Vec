@@ -1,6 +1,7 @@
 package walkGenerators.rdf2vecLight;
 
 import org.junit.jupiter.api.Test;
+import walkGenerators.evaluation.TestCase;
 
 import java.util.HashSet;
 
@@ -15,7 +16,6 @@ class TestCaseTest {
             HashSet<String> uris = testCase.getDBpediaUris();
             assertTrue(uris.size() > 0);
         }
-
     }
 
     @Test

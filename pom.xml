@@ -167,9 +167,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons.csv</groupId>
+            <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.0</version>
+            <version>1.7</version>
         </dependency>
 
 

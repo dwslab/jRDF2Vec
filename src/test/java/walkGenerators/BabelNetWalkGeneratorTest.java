@@ -1,6 +1,7 @@
 package walkGenerators;
 
 import org.junit.jupiter.api.Test;
+import walkGenerators.classic.babelnet.BabelNetWalkGenerator;
 
 import static org.junit.jupiter.api.Assertions.*;
 

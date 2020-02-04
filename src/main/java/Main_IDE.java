@@ -1,7 +1,3 @@
-import walkGenerators.BabelNetWalkGenerator;
-import walkGenerators.DbnaryWalkGenerator;
-import walkGenerators.WordNetWalkGenerator;
-
 public class Main_IDE {
 
     public static void main(String[] args) {
