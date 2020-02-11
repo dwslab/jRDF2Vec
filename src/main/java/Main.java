@@ -1,10 +1,11 @@
-import walkGenerators.base.DBpediaWalkGenerator;
+import walkGenerators.classic.DBpedia.DBpediaWalkGenerator;
 import walkGenerators.base.IWalkGenerator;
 import walkGenerators.classic.DBnary.DbnaryWalkGenerator;
 import walkGenerators.classic.WalkGeneratorDefault;
 import walkGenerators.classic.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 import walkGenerators.classic.babelnet.BabelNetWalkGenerator;
 import walkGenerators.classic.wordnet.WordNetWalkGenerator;
+import walkGenerators.light.WalkGeneratorLight;
 
 import java.util.Scanner;
 
@@ -14,6 +15,10 @@ import java.util.Scanner;
 public class Main {
 
     private static String dataSet;
+
+    /**
+     * Triple file or directory with triple files.
+     */
     private static String resourcePath;
     private static boolean isDuplicateFree;
     private static int numberOfThreads;
@@ -23,6 +28,16 @@ public class Main {
     private static String fileToWrite;
     private static boolean isUnifyAnonymousNodes;
 
+    /**
+     * Indicator whether RDF2Vec Light shall be used (only generate walks for certain entities).
+     */
+    private static boolean isRdf2vecLight;
+
+    /**
+     * Path to the file containing the entities for which walks shall be generated. One entity per line. UTF-8 encoding is required for the file.
+     */
+    private static String rdf2vecLightEntityFile;
+
     public static void main(String[] args) throws Exception {
         if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--h") || args[0].equalsIgnoreCase("-help")) {
             System.out.println(getHelp());
@@ -31,24 +46,27 @@ public class Main {
 
         if (args.length == 1 &&
                 (args[0].equalsIgnoreCase("-guided") || args[0].equalsIgnoreCase("--guided"))) {
+
+            // guided mode
+
             Scanner scanner = new Scanner(System.in);
             System.out.println("Welcome to the guided walk generation.");
 
             // data set
-            System.out.println("For which data set do you want to generate walks?");
+            System.out.println("For which data set do you want to generate walks? [any | alod | babelnet | dbpedia | wiktionary | wordnet] (If in doubt, use 'any'.)");
             dataSet = scanner.nextLine();
             if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("any")  || dataSet.equalsIgnoreCase("babelnet") ||
                     dataSet.equalsIgnoreCase("dbpedia") || dataSet.equalsIgnoreCase("wiktionary") ||
                     dataSet.equalsIgnoreCase("wordnet")) {
                 // input ok
             } else {
-                System.out.println("Invalid input. Has to be one of: alod | any | babelnet | dbpedia | wiktionary | wordnet");
+                System.out.println("Invalid input. Has to be one of: any | alod | babelnet | dbpedia | wiktionary | wordnet");
                 System.out.println("Please refer to -help for the documentation.");
                 return;
             }
 
             // resource path
-            System.out.println("Where do the resources reside?");
+            System.out.println("Where does the triple file / the triple directory reside?");
             resourcePath = scanner.nextLine();
 
             // is duplicate free
@@ -83,24 +101,35 @@ public class Main {
             }
 
             if (dataSet.equalsIgnoreCase("babelnet")) {
-                System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false]");
+                System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false] (If in doubt, set 'true'.)");
                 isEnglishOnly = scanner.nextBoolean();
+            }
+
+            if(dataSet.equalsIgnoreCase("any") || dataSet.equalsIgnoreCase("default")){
+                System.out.println("Do you want to run RDF2Vec Light? [true|false] (If in doubt, set 'false'.)");
+                isRdf2vecLight = scanner.nextBoolean();
+                scanner.nextLine();
+                if(isRdf2vecLight){
+                    System.out.println("You selected RDF2Vec Light. Where is the file containing the entities for which walks shall be generated?");
+                    rdf2vecLightEntityFile = scanner.nextLine();
+                }
             }
 
         } else {
 
+            // automatic mode
+
             dataSet = getValue("-set", args);
             if (dataSet == null) {
-                System.out.println("-set <set> not found. Aborting.");
-                return;
+                System.out.println("-set <set> not found. Using default.");
             }
+            dataSet = "default";
 
             String threadsWritten = getValue("-threads", args);
             if (threadsWritten == null) {
-                System.out.println("-threads <number_of_threads> not found. Aborting.");
-                return;
-            }
-            numberOfThreads = Integer.valueOf(threadsWritten);
+                System.out.println("-threads <number_of_threads> not found. Using default (12 threads).");
+                numberOfThreads = 12;
+            } else numberOfThreads = Integer.valueOf(threadsWritten);
 
             String walksWritten = getValue("-walks", args);
             if (threadsWritten == null) {
@@ -140,8 +169,24 @@ public class Main {
             String isEnglishOnlyWritten = getValue("-en", args);
             isEnglishOnly = true;
             if (isEnglishOnlyWritten != null) {
-                if (isEnglishOnlyWritten != null && (isEnglishOnlyWritten.equalsIgnoreCase("true") || isEnglishOnlyWritten.equalsIgnoreCase("false"))) {
+                if ((isEnglishOnlyWritten.equalsIgnoreCase("true") || isEnglishOnlyWritten.equalsIgnoreCase("false"))) {
                     isEnglishOnly = Boolean.valueOf(isEnglishOnlyWritten);
+                }
+            }
+
+            isRdf2vecLight = false;
+            String isRdf2vecLightWritten = getValue("-isRdf2vecLight", args);
+            if (isRdf2vecLightWritten != null) {
+                if ((isRdf2vecLightWritten.equalsIgnoreCase("true") || isRdf2vecLightWritten.equalsIgnoreCase("false"))) {
+                    isRdf2vecLight = Boolean.valueOf(isRdf2vecLightWritten);
+                }
+            }
+
+            rdf2vecLightEntityFile = getValue("-rdf2vecLightEntityFile", args);
+            if (rdf2vecLightEntityFile != null) {
+                if(rdf2vecLightEntityFile.equalsIgnoreCase("true") || rdf2vecLightEntityFile.equalsIgnoreCase("false")){
+                    // given that there is an entity file, assume rdf2vec light = true
+                    isRdf2vecLight = true;
                 }
             }
         }
@@ -154,8 +199,14 @@ public class Main {
 
         switch (dataSet.toLowerCase()) {
             case "any":
-                WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(resourcePath);
-                generatorExecution(classicGenerator);
+            case "default":
+                if(isRdf2vecLight) {
+                    WalkGeneratorLight lightGenerator = new WalkGeneratorLight(resourcePath, rdf2vecLightEntityFile);
+                } else {
+                    // default rdf2vec configuration
+                    WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(resourcePath);
+                    generatorExecution(classicGenerator);
+                }
                 break;
             case "babelnet":
                 BabelNetWalkGenerator babelnetGenerator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
@@ -203,7 +254,11 @@ public class Main {
                 "- number of threads: " + numberOfThreads + "\n" +
                 "- dulplicate free walk generation: " + isDuplicateFree + "\n" +
                 "- walks per entity: " + numberOfWalks + "\n" +
-                "- depth of each walk: " + depth + "\n";
+                "- depth of each walk: " + depth + "\n" +
+                "- rdf2vec LIGHT: " + isRdf2vecLight + "\n";
+        if(isRdf2vecLight){
+            result += "- rdf2vec LIGHT entity file: " + rdf2vecLightEntityFile + "\n";
+        }
 
         if (dataSet.equalsIgnoreCase("babelnet")) {
             result += "- create walks for only English nodes: " + isEnglishOnly + "\n";
@@ -230,6 +285,10 @@ public class Main {
         if (dataSet.equalsIgnoreCase("babelnet")) {
             result += " -en " + isEnglishOnly;
         }
+        result += " -isRdf2vecLight " + isRdf2vecLight;
+        if(isRdf2vecLight) {
+            result += " -rdf2vecLightEntityFile \"" + rdf2vecLightEntityFile + "\"";
+        }
         return result;
     }
 
@@ -254,9 +313,9 @@ public class Main {
     }
 
     /**
-     * Returns a help string.
+     * Returns a help String.
      *
-     * @return
+     * @return Help text as String.
      */
     private static String getHelp() {
         String result =
@@ -265,6 +324,7 @@ public class Main {
                         "-set <set>\n" +
                         "The kind of data set.\n" +
                         "Options for <set>\n" +
+                        "\tany\n" +
                         "\talod\n" +
                         "\tany\n" +
                         "\tbabelnet\n" +
@@ -283,16 +343,28 @@ public class Main {
 
                         // optional values
                         "The following settings are optional:\n\n" +
-                        "-en <bool>\n" +
-                        "Required only for babelnet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
+
+                        "-isRdf2vecLight <bool>\n" +
+                        "Indicator whether RDF2Vec LIGHT shall be used. If this is the case, parameter -rdf2vecLightEntityFile MUST be set.\n" +
                         "Values for <bool>\n" +
                         "\ttrue\n" +
                         "\tfalse\n\n" +
+
+                        "-rdf2vecLightEntityFile <path_to_file>\n" +
+                        "The path to the entity file containing the entities for which walk shall be generated. the file must contain only one entity per line.\n\n" +
+
+                        "-en <bool>\n" +
+                        "Required only for BabelNet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
+                        "Values for <bool>\n" +
+                        "\ttrue\n" +
+                        "\tfalse\n\n" +
+
                         "-duplicateFree <bool>\n" +
                         "Indicator whether the walks shall be duplicate free or not.\n" +
                         "Values for <bool>\n" +
                         "\ttrue\n" +
                         "\tfalse\n\n" +
+
                         "-unifyAnonymousNodes <bool>\n" +
                         "Indicator whether anonymous node ids shall be unified or not. Default: False.\n" +
                         "Values for <bool>\n" +

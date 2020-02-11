@@ -1,7 +1,10 @@
-package walkGenerators.base;
+package walkGenerators.classic.DBpedia;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.base.DuplicateFreeWalkEntityProcessingRunnable;
+import walkGenerators.base.NtParser;
+import walkGenerators.base.WalkGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

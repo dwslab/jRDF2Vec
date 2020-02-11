@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Available Test Cases
@@ -18,6 +19,10 @@ public enum TestCase {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TestCase.class);
 
+    /**
+     * Returns the relative file path of the data files.
+     * @return Relative file path as String.
+     */
     public String getFilePath() {
         String basePath = "./data/";
         switch (this) {
@@ -77,6 +82,60 @@ public enum TestCase {
             }
         }
         return result;
+    }
+
+
+    /**
+     * Writes the given set to a file. The file will be UTF-8 encoded.
+     * @param set Set to write.
+     * @param filePath Path to the file to be written.
+     */
+    private static void writeSetToFile(Set set, String filePath){
+        writeSetToFile(set, new File(filePath));
+    }
+
+    /**
+     * Writes the given set to a file. The file will be UTF-8 encoded.
+     * @param set Set to write.
+     * @param fileToWrite File to be written.
+     */
+    private static void writeSetToFile(Set set, File fileToWrite){
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite), "UTF-8"));
+            set.stream().forEach(x -> {
+                try {
+                    writer.write(x.toString() + "\n");
+                } catch (IOException ioe){
+                    ioe.printStackTrace();
+                }
+            });
+            LOGGER.info("Writing file " + fileToWrite);
+            writer.flush();
+            writer.close();
+        } catch (IOException ioe){
+            LOGGER.error("Problem writing file " + fileToWrite);
+            ioe.printStackTrace();
+        }
+    }
+
+    /**
+     * Writes out all entities of the test cases in the directory {@code ./entities}.
+     */
+    public static void writeAllEntitiesToFiles(){
+        File directory = new File("./entities/");
+        if(!directory.exists()) directory.mkdir();
+        for(TestCase testCase : TestCase.values()){
+            writeSetToFile(testCase.getDBpediaUris(), new File(directory, "" + testCase + "_DBpedia_entities.txt"));
+            writeSetToFile(testCase.getWikidataUris(), new File(directory, "" + testCase + "_wikidata_entities.txt"));
+        }
+    }
+
+    /**
+     * Writes the test case entities to a file.
+     * @param args No args required.
+     */
+    public static void main(String[] args) {
+        writeAllEntitiesToFiles();
     }
 
 }

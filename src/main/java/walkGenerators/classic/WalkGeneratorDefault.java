@@ -39,37 +39,41 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     /**
      * Constructor
-     * @param tripleFile
+     * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
     public WalkGeneratorDefault(File tripleFile){
         String pathToTripleFile = tripleFile.getAbsolutePath();
-        if(tripleFile.isDirectory()){
-            LOGGER.error("You specified a directory, but a file needs to be specified as resource file. ABORT.");
-            return;
-        }
         if(!tripleFile.exists()){
             LOGGER.error("The resource file you specified does not exist. ABORT.");
             return;
         }
-        try {
-            String fileName = tripleFile.getName();
-            if(fileName.toLowerCase().endsWith(".nt")) {
-                this.model = readOntology(pathToTripleFile, "NT");
-                this.parser = new NtParser(pathToTripleFile, this);
-            } else if(fileName.toLowerCase().endsWith(".ttl")) {
-                this.model = readOntology(pathToTripleFile, "TTL");
-                File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length()-3) + "nt");
-                NtParser.saveAsNt(this.model, newResourceFile);
-                this.parser = new NtParser(newResourceFile, this);
-            } else if (fileName.toLowerCase().endsWith(".xml")) {
-                this.model = readOntology(pathToTripleFile, "RDFXML");
-                File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length()-3) + "nt");
-                NtParser.saveAsNt(this.model, newResourceFile);
-                this.parser = new NtParser(newResourceFile, this);
+        if(tripleFile.isDirectory()){
+            LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
+                    "if you use an entity selector that requires one ontology.");
+            this.parser = new NtParser(this);
+            this.parser.readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
+            return;
+        } else {
+            try {
+                String fileName = tripleFile.getName();
+                if (fileName.toLowerCase().endsWith(".nt")) {
+                    this.model = readOntology(pathToTripleFile, "NT");
+                    this.parser = new NtParser(pathToTripleFile, this);
+                } else if (fileName.toLowerCase().endsWith(".ttl")) {
+                    this.model = readOntology(pathToTripleFile, "TTL");
+                    File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
+                    NtParser.saveAsNt(this.model, newResourceFile);
+                    this.parser = new NtParser(newResourceFile, this);
+                } else if (fileName.toLowerCase().endsWith(".xml")) {
+                    this.model = readOntology(pathToTripleFile, "RDFXML");
+                    File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
+                    NtParser.saveAsNt(this.model, newResourceFile);
+                    this.parser = new NtParser(newResourceFile, this);
+                }
+                LOGGER.info("Model read into memory.");
+            } catch (MalformedURLException mue) {
+                LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
             }
-            LOGGER.info("Model read into memory.");
-        } catch (MalformedURLException mue) {
-            LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
         }
     }
 

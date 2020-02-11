@@ -64,6 +64,8 @@ public class NtParser {
 
     /**
      * Default Constructor
+     * @param walkGenerator The walk generator is used to derive a data set specific URI shortener (if desired).
+     *                      Therefore, method {@link WalkGenerator#shortenUri(String)} has to be implemented.
      */
     public NtParser(WalkGenerator walkGenerator) {
         data = new ConcurrentHashMap<>(10000); // one billion is reasonable for babelnet
@@ -167,11 +169,26 @@ public class NtParser {
     /**
      * A new thread will be opened for each file.
      *
-     * @param pathToDirectory
+     * @param pathToDirectory The path to the directory in which the individual data files reside.
+     * @param isWriteOptimizedFile Indicator whether an optimized file shall be written for quick parsing later on
+     *                             (will be written in ./optimized/)
      */
     public void readNtTriplesFromDirectoryMultiThreaded(String pathToDirectory, boolean isWriteOptimizedFile) {
+        this.readNtTriplesFromDirectoryMultiThreaded(new File(pathToDirectory), isWriteOptimizedFile);
+    }
+
+
+
+    /**
+     * A new thread will be opened for each file.
+     *
+     * @param directoryOfDataSets The directory in which the individual data files reside.
+     * @param isWriteOptimizedFile Indicator whether an optimized file shall be written for quick parsing later on
+     *                             (will be written in ./optimized/)
+     */
+    public void readNtTriplesFromDirectoryMultiThreaded(File directoryOfDataSets, boolean isWriteOptimizedFile) {
+        String pathToDirectory = directoryOfDataSets.getAbsolutePath();
         this.isWriteOptimizedFile = isWriteOptimizedFile;
-        File directoryOfDataSets = new File(pathToDirectory);
         if (!directoryOfDataSets.isDirectory()) {
             LOGGER.error("The given pathToDirectory is no directory, aborting. (given: " + pathToDirectory + ")");
             return;
