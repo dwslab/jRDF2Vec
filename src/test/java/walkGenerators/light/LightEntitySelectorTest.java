@@ -18,4 +18,5 @@ class LightEntitySelectorTest {
         assertTrue(result.contains("http://dbpedia.org/resource/State_Bank_of_India"));
         assertFalse(result.contains("http://dbpedia.org/resource/War"));
     }
+
 }

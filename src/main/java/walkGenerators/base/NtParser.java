@@ -22,7 +22,7 @@ import java.util.zip.GZIPOutputStream;
  * A parser for NT files. Mainly implemented to support {@link NtParser#getRandomPredicateObjectForSubject(String)} in
  * an efficient way.
  */
-public class NtParser {
+public class NtParser implements Parser {
 
     /**
      * the actual data structure
@@ -58,7 +58,7 @@ public class NtParser {
     boolean isUnifiyAnonymousNodes = false;
 
     /**
-     * Indicator whether an optimized file shall be written for quick parsing later on (will be written in ./optmized/)
+     * Indicator whether an optimized file shall be written for quick parsing later on (will be written in ./optimized/)
      */
     boolean isWriteOptimizedFile = false;
 
@@ -238,7 +238,8 @@ public class NtParser {
 
 
     /**
-     * Simple Thread
+     * Thread that allows concurrent file parsing (used for data sets that consist of multiple, potentially zipped
+     * files).
      */
     class FileReaderThread extends Thread {
 

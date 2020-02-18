@@ -99,11 +99,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
 
 
     /**
+     * Generate walks for the entities that are free of duplicates (i.e., no walk exists twice in the resulting file).
      *
-     * @param entities
-     * @param numberOfThreads
-     * @param numberOfWalks
-     * @param walkLength
+     * @param entities The entities for which walks shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param numberOfWalks The number of walks to be generated per thread.
+     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
     public void generateDuplicateFreeWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
         File outputFile = new File(filePath);
@@ -139,10 +140,10 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Generate walks for the entities.
      *
-     * @param entities
-     * @param numberOfThreads
-     * @param numberOfWalks
-     * @param walkLength
+     * @param entities The entities for which walks shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param numberOfWalks The number of walks to be generated per thread.
+     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
     public void generateWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
@@ -166,6 +167,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
             pool.execute(th);
         }
         pool.shutdown();
+
         try {
             pool.awaitTermination(10, TimeUnit.DAYS);
         } catch (InterruptedException e) {

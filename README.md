@@ -1,6 +1,7 @@
 # KGvec2go Walks
-This is the implementation of the *KGvec2go* walks that wre used to train embeddings.
-Note that the server that powers *KGvec2go* is located in repository 
+This is the implementation of the walks that were used to train embeddings available on 
+<a href="http://www.kgvec2go.org">http://www.kgvec2go.org</a>.
+Note that the server that powers the *KGvec2go* Web page is located in repository 
 <a href="https://github.com/janothan/kgvec2go-server/">KGvec2go Server</a>. 
 
 The project can be packaged (`mvn package`) and then run as `jar` on a server. You can print the help by running 
@@ -13,7 +14,21 @@ RAM are required. Do not forget to increase the heap space when runnign the prog
 
 You can generate walks for any `NT`, `OWL/XML`, or `TTL` file.
 
-## Example
+## Command Line Interface (CLI)
+
+### Introduction
+To run the CLI, download this repository and generate a jar file (run `mvn clean install` 
+and check the target folder).
+
+You can get the full help menu by running `java -jar <jar_file> -help`.
+
+For convenience, you can start the walk generation with `java -jar <jar_file> -guided` 
+and the program will ask for the required parameters.
+
+Alternatively, you can start the program with given parameters directly (see *Example*) 
+below.
+
+### Example
 To run the walk generation for the <a href="https://protege.stanford.edu/ontologies/pizza/pizza.owl">pizza ontology</a>, 
 build the project and run the following command: 
 

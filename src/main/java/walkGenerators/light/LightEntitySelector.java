@@ -18,7 +18,21 @@ public class LightEntitySelector implements EntitySelector {
     /**
      * The entities for which walks will be generated.
      */
-    HashSet<String> entitiesToProcess;
+    public HashSet<String> entitiesToProcess;
+
+    /**
+     * The file from which the entities will be read.
+     */
+    public File entityFile;
+
+    /**
+     * Constructor
+     * @param pathToEntityFile The path to the file which contains the entities for which walks shall be generated. The file must be UTF-8
+     *                         encoded.
+     */
+    public LightEntitySelector(String pathToEntityFile){
+        this.entityFile = new File(pathToEntityFile);
+    }
 
     /**
      * Constructor
@@ -27,7 +41,7 @@ public class LightEntitySelector implements EntitySelector {
      *                   encoded.
      */
     public LightEntitySelector(File entityFile) {
-
+        this.entityFile = entityFile;
     }
 
     /**
@@ -82,6 +96,10 @@ public class LightEntitySelector implements EntitySelector {
 
     @Override
     public HashSet<String> getEntities(OntModel model) {
-        return this.entitiesToProcess;
+        if(this.entitiesToProcess != null) return this.entitiesToProcess;
+        else {
+            this.entitiesToProcess = readEntitiesFromFile(this.entityFile);
+            return this.entitiesToProcess;
+        }
     }
 }

@@ -5,6 +5,7 @@ import walkGenerators.classic.WalkGeneratorDefault;
 import walkGenerators.classic.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 import walkGenerators.classic.babelnet.BabelNetWalkGenerator;
 import walkGenerators.classic.wordnet.WordNetWalkGenerator;
+import walkGenerators.light.DBpedia.DBpediaWalkGeneratorLight;
 import walkGenerators.light.WalkGeneratorLight;
 
 import java.util.Scanner;
@@ -38,7 +39,7 @@ public class Main {
      */
     private static String rdf2vecLightEntityFile;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--h") || args[0].equalsIgnoreCase("-help")) {
             System.out.println(getHelp());
             return;
@@ -93,7 +94,7 @@ public class Main {
             System.out.println("Into which file shall the walks be written?");
             fileToWrite = scanner.nextLine();
 
-            // anonymous node handling
+            // anonymous node handling (not yet available for any data set)
             if (!dataSet.equalsIgnoreCase("any")) {
                 System.out.println("Do you want to unify anonymous nodes? [true | false] (If in doubt, set 'false'.)");
                 isUnifyAnonymousNodes = scanner.nextBoolean();
@@ -105,7 +106,7 @@ public class Main {
                 isEnglishOnly = scanner.nextBoolean();
             }
 
-            if(dataSet.equalsIgnoreCase("any") || dataSet.equalsIgnoreCase("default")){
+            if(dataSet.equalsIgnoreCase("any") || dataSet.equalsIgnoreCase("default") || dataSet.equalsIgnoreCase("dbpedia")){
                 System.out.println("Do you want to run RDF2Vec Light? [true|false] (If in doubt, set 'false'.)");
                 isRdf2vecLight = scanner.nextBoolean();
                 scanner.nextLine();
@@ -114,10 +115,9 @@ public class Main {
                     rdf2vecLightEntityFile = scanner.nextLine();
                 }
             }
-
+        // end of guided mode
         } else {
-
-            // automatic mode
+            // -> automatic mode
 
             dataSet = getValue("-set", args);
             if (dataSet == null) {
@@ -189,7 +189,7 @@ public class Main {
                     isRdf2vecLight = true;
                 }
             }
-        }
+        } // end of args interpretation
 
         // print configuration for verification
         System.out.println(getConfiguration());
@@ -202,6 +202,7 @@ public class Main {
             case "default":
                 if(isRdf2vecLight) {
                     WalkGeneratorLight lightGenerator = new WalkGeneratorLight(resourcePath, rdf2vecLightEntityFile);
+                    generatorExecution(lightGenerator);
                 } else {
                     // default rdf2vec configuration
                     WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(resourcePath);
@@ -213,8 +214,13 @@ public class Main {
                 generatorExecution(babelnetGenerator);
                 break;
             case "dbpedia":
-                DBpediaWalkGenerator dBpediaWalkGenerator = new DBpediaWalkGenerator(resourcePath);
-                generatorExecution(dBpediaWalkGenerator);
+                if(isRdf2vecLight) {
+                    DBpediaWalkGeneratorLight dBpediaWalkGeneratorLight = new DBpediaWalkGeneratorLight(resourcePath, rdf2vecLightEntityFile);
+                    generatorExecution(dBpediaWalkGeneratorLight);
+                } else {
+                    DBpediaWalkGenerator dBpediaWalkGenerator = new DBpediaWalkGenerator(resourcePath);
+                    generatorExecution(dBpediaWalkGenerator);
+                }
                 break;
             case "wordnet":
                 WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath, false, isUnifyAnonymousNodes);
@@ -233,6 +239,10 @@ public class Main {
         System.out.println("DONE");
     }
 
+    /**
+     * Run the given walk generator with the pre-set static configuration variables.
+     * @param generator The generator to be started.
+     */
     private static void generatorExecution(IWalkGenerator generator) {
         if (isDuplicateFree) {
             if (fileToWrite != null) {
