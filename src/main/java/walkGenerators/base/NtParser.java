@@ -90,6 +90,7 @@ public class NtParser implements Parser {
      * Constructor
      *
      * @param pathToTripleFile The nt file to be read (not zipped).
+     * @param walkGenerator Walk generator to be used.
      */
     public NtParser(String pathToTripleFile, WalkGenerator walkGenerator) {
         this(walkGenerator);
@@ -100,6 +101,7 @@ public class NtParser implements Parser {
      * Constructor
      *
      * @param tripleFile The nt file to be read (not zipped).
+     * @param walkGenerator Walk generator to be used.
      */
     public NtParser(File tripleFile, WalkGenerator walkGenerator) {
         this(walkGenerator);
@@ -598,7 +600,7 @@ public class NtParser implements Parser {
     /**
      * Note that this function will overwrite the skip condition.
      *
-     * @param includeDatatypeProperties
+     * @param includeDatatypeProperties Indicator whether datatype properties shall be included in the walk generation.
      */
     public void setIncludeDatatypeProperties(boolean includeDatatypeProperties) {
         LOGGER.warn("Overwriting skip condition.");

@@ -9,8 +9,9 @@ public class OrigWalkGeneration {
     /**
      * generates the query with the given depth
      *
-     * @param depth
-     * @return
+     * @param depth -
+     * @param numberWalks -
+     * @return -
      */
     public static String generateQuery(int depth, int numberWalks) {
         String selectPart = "SELECT ?p ?o1";

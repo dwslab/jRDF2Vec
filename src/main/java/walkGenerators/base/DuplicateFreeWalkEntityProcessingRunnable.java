@@ -28,8 +28,10 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
     /**
      * Constructor.
      *
+     * @param generator Generator to be used.
      * @param entity        The entity this particular thread shall handle.
      * @param numberOfWalks The number of walks to be performed per entity.
+     * @param walkLength Desired length of the walk.
      */
     public DuplicateFreeWalkEntityProcessingRunnable(WalkGenerator generator, String entity, int numberOfWalks, int walkLength) {
         this.entity = entity;

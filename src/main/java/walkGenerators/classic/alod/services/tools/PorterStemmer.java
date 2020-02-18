@@ -62,11 +62,10 @@ public class PorterStemmer
         i_end = 0;
     }
 
-    /**
-     * Add a character to the word being stemmed.  When you are finished
-     * adding characters, you can call stem(void) to stem the word.
-     */
-
+    //
+    //Add a character to the word being stemmed.  When you are finished
+    //adding characters, you can call stem(void) to stem the word.
+    //
     public void add(char ch)
     {  if (i == b.length)
     {  char[] new_b = new char[i+INC];
@@ -77,11 +76,10 @@ public class PorterStemmer
     }
 
 
-    /** Adds wLen characters to the word being stemmed contained in a portion
-     * of a char[] array. This is like repeated calls of add(char ch), but
-     * faster.
-     */
-
+    // Adds wLen characters to the word being stemmed contained in a portion
+    //of a char[] array. This is like repeated calls of add(char ch), but
+    //faster.
+    //
     public void add(char[] w, int wLen)
     {  if (i+wLen >= b.length)
     {  char[] new_b = new char[i+wLen+INC];
@@ -91,23 +89,23 @@ public class PorterStemmer
         for (int c = 0; c < wLen; c++) b[i++] = w[c];
     }
 
-    /**
-     * After a word has been stemmed, it can be retrieved by toString(),
-     * or a reference to the internal buffer can be retrieved by getResultBuffer
-     * and getResultLength (which is generally more efficient.)
-     */
+    //
+    //After a word has been stemmed, it can be retrieved by toString(),
+    //or a reference to the internal buffer can be retrieved by getResultBuffer
+    //and getResultLength (which is generally more efficient.)
+    //
     public String toString() { return new String(b,0,i_end); }
 
-    /**
-     * Returns the length of the word resulting from the stemming process.
-     */
+    //
+    //Returns the length of the word resulting from the stemming process.
+    //
     public int getResultLength() { return i_end; }
 
-    /**
-     * Returns a reference to a character buffer containing the results of
-     * the stemming process.  You also need to consult getResultLength()
-     * to determine the length of the result.
-     */
+    //
+    //Returns a reference to a character buffer containing the results of
+    //the stemming process.  You also need to consult getResultLength()
+    //to determine the length of the result.
+    //
     public char[] getResultBuffer() { return b; }
 
     /* cons(i) is true <=> b[i] is a consonant. */
@@ -120,17 +118,16 @@ public class PorterStemmer
     }
     }
 
-   /* m() measures the number of consonant sequences between 0 and j. if c is
-      a consonant sequence and v a vowel sequence, and <..> indicates arbitrary
-      presence,
+   // m() measures the number of consonant sequences between 0 and j. if c is
+   // a consonant sequence and v a vowel sequence, and <..> indicates arbitrary
+   // presence,
 
-         <c><v>       gives 0
-         <c>vc<v>     gives 1
-         <c>vcvc<v>   gives 2
-         <c>vcvcvc<v> gives 3
-         ....
-   */
-
+   //    <c><v>       gives 0
+   //    <c>vc<v>     gives 1
+   //    <c>vcvc<v>   gives 2
+   //    <c>vcvcvc<v> gives 3
+   //    ....
+   //
     private final int m()
     {  int n = 0;
         int i = 0;

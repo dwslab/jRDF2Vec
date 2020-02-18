@@ -9,7 +9,7 @@ public class RelationCounter {
 
     /**
      * Returns the total number of relations, i.e. the sum of Hyponyms and Hypernyms.
-     * @return
+     * @return The relation count as integer.
      */
     public int getRelationCount(){
         return isHypernymCount + isHyponymCount;

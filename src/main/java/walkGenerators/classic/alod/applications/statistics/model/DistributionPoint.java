@@ -10,8 +10,8 @@ public class DistributionPoint implements Comparable<DistributionPoint>{
 
     /**
      * Constructor
-     * @param relationCount
-     * @param frequency
+     * @param relationCount Relative count to be set.
+     * @param frequency The frequency to be set.
      */
     public DistributionPoint(int relationCount, int frequency){
         this.relationCount = relationCount;

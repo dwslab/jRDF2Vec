@@ -14,7 +14,7 @@ public interface IWalkGenerator {
     void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth);
 
     /**
-     *
+     * Generates random walks.
      * @param numberOfThreads The number of threads to be run.
      * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
      * @param depth The depth of each walk.
@@ -23,19 +23,19 @@ public interface IWalkGenerator {
     void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten);
 
     /**
-     *
-     * @param numberOfThreads
-     * @param numberOfWalksPerEntity
-     * @param depth
-     * @param filePathOfFileToBeWritten
+     * Generates duplicate free random walks.
+     * @param numberOfThreads The number of threads to be run.
+     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
+     * @param depth The depth of each walk.
+     * @param filePathOfFileToBeWritten The path to the file that shall be written.
      */
     void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten);
 
     /**
-     *
-     * @param numberOfThreads
-     * @param numberOfWalksPerEntity
-     * @param depth
+     * Generates duplicate free random walks.
+     * @param numberOfThreads The number of threads to be run.
+     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
+     * @param depth The depth of each walk.
      */
     void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth);
 }

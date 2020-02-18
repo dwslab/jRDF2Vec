@@ -50,7 +50,7 @@ public class SPARQLservice {
 
     /**
      * Singleton. Getter.
-     * @return
+     * @return The SPARQL service instance.
      */
     public static SPARQLservice getSPARQLservice(){
         if (instance == null){

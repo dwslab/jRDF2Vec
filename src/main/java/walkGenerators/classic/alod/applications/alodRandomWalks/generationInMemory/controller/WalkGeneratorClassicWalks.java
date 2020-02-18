@@ -41,10 +41,10 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
 
 
     /**
-     *
-     * @param numberOfWalks
-     * @param depth
-     * @param numberOfThreads
+     * Generates random walks without duplicates.
+     * @param numberOfWalks Number of walks.
+     * @param depth Depth of the walks.
+     * @param numberOfThreads Number of threads.
      */
     public void generateRandomWalksDuplicateFree(int numberOfWalks, int depth, int numberOfThreads) {
         String walkOutputFileName = "./walks/alod_classic_walks_df_" + numberOfWalks + "_" + depth + "_.gz";
@@ -52,11 +52,11 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
     }
 
     /**
-     *
+     * Generates random walks without duplicates.
      * @param walkOutputFileName
-     * @param numberOfWalks
-     * @param depth
-     * @param numberOfThreads
+     * @param numberOfWalks Number of walks.
+     * @param depth Depth of the walks.
+     * @param numberOfThreads Number of threads.
      */
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalks, int depth, String walkOutputFileName){
         // validity check
@@ -106,10 +106,10 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
     }
 
     /**
-     *
-     * @param numberOfThreads
-     * @param numberOfWalks
-     * @param depth
+     * Generates random walks.
+     * @param numberOfThreads Number of threads.
+     * @param numberOfWalks Number of walks.
+     * @param depth Depth of each walk.
      */
     public void generateRandomWalks(int numberOfThreads, int numberOfWalks, int depth) {
         String walkOutputFileName = "./walks/alod_classic_walks_with_duplicates_" + numberOfWalks + "_" + depth + "_.gz";
@@ -180,7 +180,7 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
 
     /**
      * Will write the hyponyms to a file, one at a line.
-     * @param pathToFileToWrite
+     * @param pathToFileToWrite Path to the file that shall be written.
      */
     public void saveHyponymsToFile(String pathToFileToWrite){
         try {

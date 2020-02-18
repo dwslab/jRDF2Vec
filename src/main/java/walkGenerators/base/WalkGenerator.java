@@ -40,18 +40,18 @@ public abstract class WalkGenerator implements IWalkGenerator {
 
     /**
      *
-     * @param numberOfThreads
-     * @param numberOfWalksPerEntity
-     * @param depth
-     * @param filePathOfFileToBeWritten
+     * @param numberOfThreads The number of threads to be run.
+     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
+     * @param depth The depth of each walk.
+     * @param filePathOfFileToBeWritten The path to the file that shall be written.
      */
     public abstract void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten);
 
     /**
      *
-     * @param numberOfThreads
-     * @param numberOfWalksPerEntity
-     * @param depth
+     * @param numberOfThreads The number of threads to be run.
+     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
+     * @param depth The depth of each walk.
      */
     public abstract void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth);
 
@@ -261,8 +261,8 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Writes the given HashSet to a file.
      *
-     * @param filePath
-     * @param setToWrite
+     * @param filePath The path to the file that shall be written.
+     * @param setToWrite The HashSet that hsall be written to the file.
      */
     public static void writeHashSetToFile(String filePath, HashSet<String> setToWrite) {
         try {
@@ -288,6 +288,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      *
      * @param path of ontology to be read.
      * @return Model instance.
+     * @throws MalformedURLException Exception for malformed URLs.
      */
     public static OntModel readOntology(String path, String language) throws MalformedURLException {
         URL url = new File(path).toURI().toURL();

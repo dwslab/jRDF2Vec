@@ -6,7 +6,7 @@ import walkGenerators.classic.alod.applications.alodRandomWalks.loadEmbeddings.c
 
 /**
  * Load a trained embeddings file into a SQLite database (will be created on the fly).
- * Increase memory to > 6Gb.
+ * Increase memory to &gt; 6Gb.
  */
 public class Embeddings2sqliteDatabaseApplication {
 

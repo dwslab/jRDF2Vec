@@ -32,8 +32,8 @@ public class NumberOfLinesOfFile {
 
     /**
      * Obtain the numbers of a gzipped file if it were unzipped.
-     * @param file
-     * @return
+     * @param file File to be used.
+     * @return Number of lines as long.
      */
     public static long numberOfLinesOfGzippedFile(File file){
         long result = 0;
@@ -52,8 +52,8 @@ public class NumberOfLinesOfFile {
 
     /**
      * Obtain the numbers of a gzipped file if it were unzipped.
-     * @param file
-     * @return
+     * @param file File to be used.
+     * @return Number of lines containing datatype properties as long.
      */
     public static long numberOfLinesOfDatatypeProperties(File file) {
         long result = 0;
@@ -81,8 +81,8 @@ public class NumberOfLinesOfFile {
 
     /**
      * Obtain the numbers of a gzipped file if it were unzipped.
-     * @param file
-     * @return
+     * @param file File to be used.
+     * @return Number of lines that fulfill condition.
      */
     public static long numberOfLinesGivenCondition(File file, IsearchCondition condition) {
         long result = 0;

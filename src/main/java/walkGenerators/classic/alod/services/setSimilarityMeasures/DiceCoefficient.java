@@ -9,9 +9,9 @@ public class DiceCoefficient implements SetSimilarityMeasure{
 
     /**
      * Returns the dice similarity of two sets represented by String Arrays.
-     * @param s1
-     * @param s2
-     * @return
+     * @param s1 Set 1
+     * @param s2 Set 2
+     * @return The similarity.
      */
     @Override
     public double calculateSimilarity(String[] s1, String[] s2) {
