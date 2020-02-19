@@ -10,14 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A parser for HDT files.
  */
-public class HdtParser implements Parser {
+public class HdtParser implements IParser {
 
     /**
      * Default logger.

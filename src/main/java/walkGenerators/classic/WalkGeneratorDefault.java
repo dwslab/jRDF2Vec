@@ -16,7 +16,7 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  * Default Walk Generator.
- * Intended to work on any dataset.
+ * Intended to work on any data set.
  */
 public class WalkGeneratorDefault extends WalkGenerator {
 
@@ -36,6 +36,11 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     public EntitySelector entitySelector = new ClassicEntitySelector();
 
+    /**
+     * If not specified differently, this file will be used to persists walks.
+     */
+    private final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = "./walks/walk_file.gz";
+
 
     /**
      * Constructor
@@ -51,7 +56,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
             LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                     "if you use an entity selector that requires one ontology.");
             this.parser = new NtParser(this);
-            this.parser.readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
+            ((NtParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
             return;
         } else {
             try {
@@ -69,6 +74,8 @@ public class WalkGeneratorDefault extends WalkGenerator {
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                     NtParser.saveAsNt(this.model, newResourceFile);
                     this.parser = new NtParser(newResourceFile, this);
+                } else if (fileName.toLowerCase().endsWith(".hdt")){
+                    this.parser = new HdtParser(pathToTripleFile);
                 }
                 LOGGER.info("Model read into memory.");
             } catch (MalformedURLException mue) {
@@ -87,7 +94,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomWalks(numberOfThreads, numberOfWalksPerEntity, depth, "./walks/walk_file.gz");
+        generateRandomWalks(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
     }
 
     @Override
@@ -104,7 +111,18 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, "./walks/walk_file.gz");
+        generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        this.filePath = filePathOfFileToBeWritten;
+        generateRandomMidWalksForEntities(entitySelector.getEntities(this.model), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
 

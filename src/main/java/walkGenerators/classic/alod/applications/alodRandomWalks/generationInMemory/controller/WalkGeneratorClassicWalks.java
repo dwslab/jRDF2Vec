@@ -39,6 +39,7 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
     private int processedWalks = 0;
     private int newFileCounter = 0;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WalkGeneratorClassicWalks.class);
 
     /**
      * Generates random walks without duplicates.
@@ -49,6 +50,16 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
     public void generateRandomWalksDuplicateFree(int numberOfWalks, int depth, int numberOfThreads) {
         String walkOutputFileName = "./walks/alod_classic_walks_df_" + numberOfWalks + "_" + depth + "_.gz";
         generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkOutputFileName);
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
     }
 
     /**

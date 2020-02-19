@@ -53,7 +53,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
         this.isEnglishEntitiesOnly = isEnglishEntitiesOnly;
 
         // set a search skip condition
-        parser.setSkipCondition(new IsearchCondition() {
+        ((NtParser)this.parser).setSkipCondition(new IsearchCondition() {
             Pattern pattern = Pattern.compile("\".*\"");
             Pattern glossPattern = Pattern.compile("_Gloss[0-9]"); // _Gloss[0-9]
             Matcher matcher;
@@ -71,7 +71,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
                 return false;
             }
         });
-        parser.readNtTriplesFromDirectoryMultiThreaded(pathToNtFiles, true);
+        ((NtParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToNtFiles, true);
     }
 
     @Override
@@ -94,6 +94,16 @@ public class BabelNetWalkGenerator extends WalkGenerator {
     @Override
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, "./walks/babelnet_walks.gz");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
     }
 
 

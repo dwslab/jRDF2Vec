@@ -78,7 +78,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Parser.
      */
-    public NtParser parser;
+    public IParser parser;
 
     /**
      * File writer for all the paths.
@@ -96,6 +96,46 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @return Shortened version of the URI.
      */
     public abstract String shortenUri(String uri);
+
+
+    /**
+     * Generate walks for the entities that are free of duplicates (i.e., no walk exists twice in the resulting file).
+     *
+     * @param entities The entities for which walks shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param numberOfWalks The number of walks to be generated per thread.
+     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
+     */
+    public void generateRandomMidWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
+        File outputFile = new File(filePath);
+        outputFile.getParentFile().mkdirs();
+
+        // initialize the writer
+        try {
+            this.writer = new OutputStreamWriter(new GZIPOutputStream(
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
+        } catch (Exception e1) {
+            LOGGER.error("Could not initialize writer. Aborting process.", e1);
+            return;
+        }
+
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
+                0, TimeUnit.SECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
+
+        for (String entity : entities) {
+            MidWalkEntityProcessingRunnable th = new MidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            pool.execute(th);
+        }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(10, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Interrupted Exception");
+            e.printStackTrace();
+        }
+        this.close();
+    }
 
 
     /**

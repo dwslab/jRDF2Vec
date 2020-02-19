@@ -357,7 +357,6 @@ public class AlodRandomWalkGenerator {
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             int tmpNM = (processedWalks / 3000000);

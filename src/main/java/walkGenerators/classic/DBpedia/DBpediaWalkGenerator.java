@@ -58,7 +58,7 @@ public class DBpediaWalkGenerator extends WalkGenerator {
             //    e.printStackTrace();
             //}
         }
-        this.parser.readNtTriplesFromDirectoryMultiThreaded(pathToDirectory, true);
+        ((NtParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToDirectory, true);
     }
 
 
@@ -167,6 +167,16 @@ public class DBpediaWalkGenerator extends WalkGenerator {
     @Override
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, "./walks/dbpedia_walks_df_" + numberOfWalksPerEntity + "_" + depth + "_.gz");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
     }
 
     @Override

@@ -1,7 +1,6 @@
 package walkGenerators.light;
 
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.tdb.store.Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import walkGenerators.base.EntitySelector;

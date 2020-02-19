@@ -1,3 +1,4 @@
+import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.classic.DBpedia.DBpediaWalkGenerator;
 import walkGenerators.base.IWalkGenerator;
 import walkGenerators.classic.DBnary.DbnaryWalkGenerator;
@@ -21,13 +22,13 @@ public class Main {
      * Triple file or directory with triple files.
      */
     private static String resourcePath;
-    private static boolean isDuplicateFree;
     private static int numberOfThreads;
     private static int numberOfWalks;
     private static int depth;
     private static boolean isEnglishOnly;
     private static String fileToWrite;
     private static boolean isUnifyAnonymousNodes;
+    private static WalkGenerationMode modeOfWalkGeneration;
 
     /**
      * Indicator whether RDF2Vec Light shall be used (only generate walks for certain entities).
@@ -70,10 +71,16 @@ public class Main {
             System.out.println("Where does the triple file / the triple directory reside?");
             resourcePath = scanner.nextLine();
 
-            // is duplicate free
-            System.out.println("Do you want duplicate free walks? [true|false]");
-            isDuplicateFree = scanner.nextBoolean();
-            scanner.nextLine();
+            // walk generation mode
+            String writtenMode;
+            System.out.println("What kind of walks do you want to generate? [" + modeOfWalkGeneration.getOptions() + "]");
+            writtenMode = scanner.nextLine();
+            modeOfWalkGeneration = modeOfWalkGeneration.getMode(writtenMode);
+            if(modeOfWalkGeneration == null){
+                System.out.println("Invalid input. Has to be one of: " + modeOfWalkGeneration.getOptions());
+                System.out.println("Please refer to -help for the documentation.");
+                return;
+            }
 
             // threads
             System.out.println("How many threads shall be used for the walk generation?");
@@ -147,12 +154,6 @@ public class Main {
 
             fileToWrite = getValue("-file", args);
 
-            String isDuplicateFreeWritten = getValue("-duplicateFree", args);
-            isDuplicateFree = true;
-            if (isDuplicateFreeWritten != null && (isDuplicateFreeWritten.equalsIgnoreCase("true") || isDuplicateFreeWritten.equalsIgnoreCase("false"))) {
-                isDuplicateFree = Boolean.valueOf(isDuplicateFreeWritten);
-            }
-
             resourcePath = getValue("-res", args);
             if (resourcePath == null) {
                 System.out.println("ERROR: You have not defined the resource path (parameter '-res <resource path>'). " +
@@ -189,6 +190,9 @@ public class Main {
                     isRdf2vecLight = true;
                 }
             }
+
+            String writtenMode = getValue("-mode", args);
+            modeOfWalkGeneration = modeOfWalkGeneration.getMode(writtenMode);
         } // end of args interpretation
 
         // print configuration for verification
@@ -244,15 +248,22 @@ public class Main {
      * @param generator The generator to be started.
      */
     private static void generatorExecution(IWalkGenerator generator) {
-        if (isDuplicateFree) {
-            if (fileToWrite != null) {
-                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
-            } else
-                generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-        } else {
-            if (fileToWrite != null) {
-                generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-            } else generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+        switch (modeOfWalkGeneration){
+            case RANDOM_DUPLICATE_FREE:
+                if(fileToWrite != null){
+                    generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                } else generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
+                break;
+            case RANDOM_WITH_DUPLICATES:
+                if (fileToWrite != null) {
+                    generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                } else generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
+                break;
+            case MID_WITH_DUPLICATES:
+                if (fileToWrite != null) {
+                    generator.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
+                } else generator.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth);
+                break;
         }
     }
 
@@ -262,10 +273,11 @@ public class Main {
     private static String getConfiguration() {
         String result = "Generating walks for " + dataSet + " with the following configuration:\n" +
                 "- number of threads: " + numberOfThreads + "\n" +
-                "- dulplicate free walk generation: " + isDuplicateFree + "\n" +
                 "- walks per entity: " + numberOfWalks + "\n" +
+                "- mode: " + modeOfWalkGeneration + "\n" +
                 "- depth of each walk: " + depth + "\n" +
                 "- rdf2vec LIGHT: " + isRdf2vecLight + "\n";
+
         if(isRdf2vecLight){
             result += "- rdf2vec LIGHT entity file: " + rdf2vecLightEntityFile + "\n";
         }
@@ -287,8 +299,8 @@ public class Main {
      **/
     private static String getQuickConfiguration() {
         String result = "-set " + dataSet + " -res \"" + resourcePath + "\" -threads " + numberOfThreads + " -walks " + numberOfWalks + " -depth " + depth;
-        result += " -duplicateFree " + isDuplicateFree;
         result += " -unifyAnonymousNodes " + isUnifyAnonymousNodes;
+        result += " -mode " + modeOfWalkGeneration;
         if (fileToWrite != null) {
             result += " -file \"" + fileToWrite + "\"";
         }
@@ -327,7 +339,7 @@ public class Main {
      *
      * @return Help text as String.
      */
-    private static String getHelp() {
+    public static String getHelp() {
         String result =
                 // required values
                 "The following settings are required:\n\n" +
@@ -349,7 +361,13 @@ public class Main {
                         "-depth <desired_sentence_depth>\n" +
                         "The length of each sentence.\n\n" +
                         "-file <file_to_be_written>\n" +
-                        "The path to the file that will be written.\n\n\n" +
+                        "The path to the file that will be written.\n\n" +
+
+                       "-mode <mode_of_walk_generation>\n" +
+                        "Values for <mode_of_walk_generation>\n" +
+                        "\trandom_with_duplicates\n" +
+                        "\trandom_duplicate_free\n" +
+                        "\tmid_with_duplicates\n\n\n" +
 
                         // optional values
                         "The following settings are optional:\n\n" +
@@ -365,12 +383,6 @@ public class Main {
 
                         "-en <bool>\n" +
                         "Required only for BabelNet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
-                        "Values for <bool>\n" +
-                        "\ttrue\n" +
-                        "\tfalse\n\n" +
-
-                        "-duplicateFree <bool>\n" +
-                        "Indicator whether the walks shall be duplicate free or not.\n" +
                         "Values for <bool>\n" +
                         "\ttrue\n" +
                         "\tfalse\n\n" +

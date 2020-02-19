@@ -2,7 +2,6 @@ package walkGenerators.light;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.base.WalkGenerator;
 import walkGenerators.classic.WalkGeneratorDefault;
 
 import java.io.File;

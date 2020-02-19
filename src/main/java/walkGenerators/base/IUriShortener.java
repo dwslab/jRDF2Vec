@@ -1,4 +1,4 @@
 package walkGenerators.base;
 
-public interface UriShortener {
+public interface IUriShortener {
 }

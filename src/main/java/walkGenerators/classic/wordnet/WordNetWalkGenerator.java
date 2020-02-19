@@ -47,13 +47,13 @@ public class WordNetWalkGenerator extends WalkGenerator {
             this.parser = new NtParser(this);
             if (isIncludeDatatypeProperties) {
                 LOGGER.info("[WN setting] isIncludeDatatypeProperties: " + isUnifiyAnonymousNodes);
-                this.parser.setIncludeDatatypeProperties(true);
+                ((NtParser)this.parser).setIncludeDatatypeProperties(true);
             }
             if(isUnifiyAnonymousNodes){
                 LOGGER.info("[WN setting] unify anonymous nodes: " + isUnifiyAnonymousNodes);
-                this.parser.setUnifiyAnonymousNodes(true);
+                ((NtParser)this.parser).setUnifiyAnonymousNodes(true);
             }
-            this.parser.readNTriples(pathToTripleFile);
+            ((NtParser)this.parser).readNTriples(pathToTripleFile);
             LOGGER.info("Model read into memory.");
         } catch (MalformedURLException mue) {
             LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
@@ -81,6 +81,16 @@ public class WordNetWalkGenerator extends WalkGenerator {
     @Override
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, "./walks/wordnet_walks.gz");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
     }
 
 

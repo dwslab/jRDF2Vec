@@ -22,7 +22,7 @@ import java.util.zip.GZIPOutputStream;
  * A parser for NT files. Mainly implemented to support {@link NtParser#getRandomPredicateObjectForSubject(String)} in
  * an efficient way.
  */
-public class NtParser implements Parser {
+public class NtParser implements IParser {
 
     /**
      * the actual data structure

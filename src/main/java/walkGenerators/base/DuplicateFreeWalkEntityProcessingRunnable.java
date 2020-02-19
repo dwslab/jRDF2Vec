@@ -1,9 +1,17 @@
 package walkGenerators.base;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A single task for the thread pool.
  */
 public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
+
+    /**
+     * Default Logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateFreeWalkEntityProcessingRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -44,7 +52,11 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
      * Actual thread execution.
      */
     public void run() {
-        walkGenerator.writeToFile(walkGenerator.parser.generateWalksForEntity(walkGenerator.shortenUri(entity), numberOfWalks, this.walkLength));
+        if(walkGenerator.parser.getClass() == NtParser.class) {
+            walkGenerator.writeToFile(((NtParser)walkGenerator.parser).generateWalksForEntity(walkGenerator.shortenUri(entity), numberOfWalks, this.walkLength));
+        } else {
+            LOGGER.error("NOT YET IMPLEMENTED FOR OTHER PARSER THAN NT_PARSER!");
+        }
     }
 
 }
