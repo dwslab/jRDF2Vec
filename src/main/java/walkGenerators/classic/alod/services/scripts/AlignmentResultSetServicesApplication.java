@@ -70,7 +70,7 @@ public class AlignmentResultSetServicesApplication{
 	
 	/**
 	 * Will return true if Alignment 1 ia a 1:1 alignment.
-	 * @return
+	 * @return True if alignment 1 is a one-to-one alignment, else false.
 	 */
 	public boolean isAlignment1oneToOne() {
 		boolean result = true;
@@ -96,7 +96,7 @@ public class AlignmentResultSetServicesApplication{
 	
 	/**
 	 * Will return true if Alignment 2 ia a 1:1 alignment.
-	 * @return
+	 * @return True if alignment2 is one-to-one, else false.
 	 */
 	public boolean isAlignment2oneToOne() {
 		boolean result = true;

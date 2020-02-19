@@ -36,8 +36,10 @@ public class RandomWalkEntityProcessingRunnable implements Runnable {
     /**
      * Constructor.
      *
+     * @param generator The walk generator to be used.
      * @param entity        The entity this particular thread shall handle.
      * @param numberOfWalks The number of walks to be performed per entity.
+     * @param walkLength The length of the walk.
      */
     public RandomWalkEntityProcessingRunnable(WalkGenerator generator, String entity, int numberOfWalks, int walkLength) {
         this.entity = entity;

@@ -82,6 +82,7 @@ public class NumberOfLinesOfFile {
     /**
      * Obtain the numbers of a gzipped file if it were unzipped.
      * @param file File to be used.
+     * @param condition Condition a line must fulfill in order to be counted.
      * @return Number of lines that fulfill condition.
      */
     public static long numberOfLinesGivenCondition(File file, IsearchCondition condition) {

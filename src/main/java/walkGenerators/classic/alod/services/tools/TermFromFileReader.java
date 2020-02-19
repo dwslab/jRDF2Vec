@@ -69,7 +69,7 @@ public class TermFromFileReader {
 
     /**
      * This method can be called to read additional files not in the files directory.
-     * @param fileToReadFrom
+     * @param fileToReadFrom The file that shall be read.
      */
     public void readResources(File fileToReadFrom){
 

@@ -14,9 +14,9 @@ public class JaccardSimilarity implements SetSimilarityMeasure{
 
     /**
      * Returns the jaccard similarity of two sets represented by two String arrays.
-     * @param set1
-     * @param set2
-     * @return
+     * @param set1 Set 1
+     * @param set2 Set 2
+     * @return Jaccard Similarity
      */
     @Override
     public double calculateSimilarity(String[] set1, String[] set2) {

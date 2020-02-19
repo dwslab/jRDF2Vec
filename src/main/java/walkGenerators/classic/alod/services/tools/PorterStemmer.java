@@ -362,12 +362,12 @@ public class PorterStemmer
         i_end = k+1; i = 0;
     }
 
-    /** Test program for demonstrating the PorterStemmer.  It reads text from a
-     * a list of files, stems each word, and writes the result to standard
-     * output. Note that the word stemmed is expected to be in lower case:
-     * forcing lower case must be done outside the PorterStemmer class.
-     * Usage: PorterStemmer file-name file-name ...
-     */
+    //Test program for demonstrating the PorterStemmer.  It reads text from a
+    //a list of files, stems each word, and writes the result to standard
+    //output. Note that the word stemmed is expected to be in lower case:
+    //forcing lower case must be done outside the PorterStemmer class.
+    //Usage: PorterStemmer file-name file-name ...
+    //
     public static void main(String[] args)
     {
         char[] w = new char[501];

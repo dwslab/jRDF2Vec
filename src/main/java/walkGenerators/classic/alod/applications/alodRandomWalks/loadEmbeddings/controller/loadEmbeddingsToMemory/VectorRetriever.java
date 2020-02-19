@@ -104,7 +104,7 @@ public class VectorRetriever {
 
     /**
      * Just for testing
-     * @param args
+     * @param args No args required.
      */
     public static void main(String[] args) {
         String pathToFile = "C:\\Users\\D060249\\OneDrive - SAP SE\\From Linux\\walks_20_2\\Embeddings\\DB2Vec_sg_200_5_5_15_2_500_java";

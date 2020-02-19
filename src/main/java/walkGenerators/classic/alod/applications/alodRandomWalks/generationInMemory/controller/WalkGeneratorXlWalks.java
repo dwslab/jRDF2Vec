@@ -257,8 +257,8 @@ public class WalkGeneratorXlWalks {
 	 * Remove special characters from a concept in order to: - be more space
 	 * efficient - allow for easier lookup
 	 * 
-	 * @param conceptToClean
-	 * @return
+	 * @param conceptToClean String that is to be cleaned/edited.
+	 * @return Cleaned/edited String.
 	 */
 	public static String cleanConcept(String conceptToClean) {
 

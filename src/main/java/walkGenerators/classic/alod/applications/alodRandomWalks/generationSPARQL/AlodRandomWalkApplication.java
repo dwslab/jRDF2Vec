@@ -11,7 +11,7 @@ public class AlodRandomWalkApplication {
 
     /**
      * Main Method.
-     * @param args
+     * @param args No arguments required.
      */
     public static void main(String[] args) {
 

@@ -51,6 +51,7 @@ public class AlodRandomWalkGenerator {
      * Constructor
      * @param numberOfWalks Number of walks per entity.
      * @param depth Depth of each walk.
+     * @param fileName The file to be written.
      */
     public AlodRandomWalkGenerator(int numberOfWalks, int depth, String fileName){
         this.setNumberOfWalks(numberOfWalks);
@@ -184,6 +185,7 @@ public class AlodRandomWalkGenerator {
     /**
      * Generates the query with the given depth.
      * @param depth Path depth.
+     * @param numberWalks The number of walks.
      * @return Query in String representation.
      */
     public String generateQuery(int depth, int numberWalks) {

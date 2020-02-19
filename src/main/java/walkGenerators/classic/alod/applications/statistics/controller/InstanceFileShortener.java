@@ -16,8 +16,8 @@ public class InstanceFileShortener {
 	
 	/**
 	 * Shortens the given RDF file by only keeping lines that contain hypernymy relations.
-	 * @param fileToReadFrom
-	 * @param fileToWriteTo
+	 * @param fileToReadFrom File path to file to be read.
+	 * @param fileToWriteTo File path to file to be written.
 	 */
     public static void shortenInstanceFile(String fileToReadFrom, String fileToWriteTo) {
         File nquadFile = new File(fileToReadFrom);

@@ -43,7 +43,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
     /**
      * Constructor
      *
-     * @param pathToNtFiles
+     * @param pathToNtFiles The file path to the NT files.
      * @param isEnglishEntitiesOnly Indicator whether only English lemmas shall be considered.
      */
     public BabelNetWalkGenerator(String pathToNtFiles, boolean isEnglishEntitiesOnly) {
@@ -101,6 +101,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
      * Retrieve all babelnet lemon:LexicalEntry instances.
      *
      * @param pathToDirectoryOfGzippedTripleDataSets Path to the BabelNet RDF resources.
+     * @param isWriteOnlyEnglishEntities If true, only English instances will be retrieved.
      * @return All instances in a Hash Set (you need some RAM to do this).
      */
     public HashSet<String> getBabelNetEntities(String pathToDirectoryOfGzippedTripleDataSets, boolean isWriteOnlyEnglishEntities) {
@@ -247,9 +248,10 @@ public class BabelNetWalkGenerator extends WalkGenerator {
     /**
      * Ignore - just for testing.
      *
-     * @param uri
-     * @return
+     * @param uri URI to be used.
+     * @return Shortened URI.
      */
+    @Deprecated
     public static String shortenUri_static(String uri) {
         try {
             Matcher replaceMatcher = replacePattern.matcher(uri);

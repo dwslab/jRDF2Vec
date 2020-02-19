@@ -28,7 +28,7 @@ public class StringOperations {
 	/**
 	 * Function which indicates whether a phrase is in camel case or not.
 	 * 
-	 * @param phrase
+	 * @param phrase The phrase (String) to be checked.
 	 * @return true if phrase is in camel case, else false.
 	 */
 	static public boolean isCamelCase(String phrase) {
@@ -54,7 +54,7 @@ public class StringOperations {
 	/**
 	 * Function which indicates whether a phrase is in underscore case or not.
 	 * 
-	 * @param phrase
+	 * @param phrase The phrase (String) to be checked.
 	 * @return true if phrase is in underscore case, else false.
 	 */
 	static public boolean isUnderscoreCase(String phrase) {
@@ -65,8 +65,8 @@ public class StringOperations {
 	/**
 	 * Function which indicates whether a phrase is space separated or not.
 	 * 
-	 * @param phrase
-	 * @return
+	 * @param phrase The phrase (String) to be checked.
+	 * @return True if space is contained in phrase, else false.
 	 */
 	static public boolean isSpaceCase(String phrase) {
 		phrase = phrase.trim();
@@ -212,7 +212,7 @@ public class StringOperations {
 	/**
 	 * A method which prints the content of a string array to the command line.
 	 * 
-	 * @param stringArray
+	 * @param stringArray Array to be printed on the console.
 	 */
 	public static void printStringArray(String[] stringArray) {
 		Arrays.stream(stringArray).forEach(System.out::println);
@@ -225,6 +225,7 @@ public class StringOperations {
 	 * abbreviations, all combinations are determined if no handler is defined.
 	 * 
 	 * @param phrase The phrase to be tokenized.
+	 * @param handler Handler that defines how to handle abbreviations.
 	 * @return Tokens.
 	 */
 	static public String[] tokenizeBestGuess(String phrase, AbbreviationHandler handler) {
@@ -248,9 +249,9 @@ public class StringOperations {
 	/**
 	 * Tokenize and use camelCase and slashes as tokenization tokens.
 	 * 
-	 * @param phrase
-	 * @param handler
-	 * @return
+	 * @param phrase The phrase (String) to be checked.
+	 * @param handler Handler that defines how to handle abbreviations.
+	 * @return Tokens as String-Array.
 	 */
 	static public String[] tokenizeCamelCaseAndSlash(String phrase, AbbreviationHandler handler) {
 		String[] slashTokens = phrase.split("/");
@@ -282,11 +283,11 @@ public class StringOperations {
 	/**
 	 * Returns the number of tokens that were found in a phrasee.
 	 * 
-	 * @param phrase
+	 * @param phrase The phrase to be checked.
 	 * @param handler defines the handling of abbreviations. Note that
 	 *                AbbreviationHandler.CONSIDER_ALL leads to more tokens than
 	 *                actually exist because combinations are employed.
-	 * @return
+	 * @return Number of tokens given a best-guess approach.
 	 */
 	static public int getNumberOfTokensBestGuess(String phrase, AbbreviationHandler handler) {
 		return tokenizeBestGuess(phrase, handler).length;
@@ -299,17 +300,17 @@ public class StringOperations {
 	 * further that stopword removal is not taken into account. Be careful when
 	 * mixing with stopword removal.
 	 * 
-	 * @param phrase
-	 * @return
+	 * @param phrase Phrase/String to be used.
+	 * @return Number of tokens given best-guess-tokenizations ({@link StringOperations#tokenizeBestGuess(String, AbbreviationHandler)}).
 	 */
 	static public int getNumberOfTokensBestGuess(String phrase) {
 		return tokenizeBestGuess(phrase, AbbreviationHandler.UPPER_CASE_FOLLOWS_ABBREVIATION).length;
 	}
 
 	/**
-	 *
-	 * @param phrase
-	 * @return
+	 * Checks whether the given String contains separating words such as "and" or "of".
+	 * @param phrase Phrase/String to be used.
+	 * @return True if given String contains split words.
 	 */
 	static public boolean containsSplitWords(String phrase) {
 		String[] phraseTokens = phrase.trim().split(" ");
@@ -323,9 +324,9 @@ public class StringOperations {
 	}
 
 	/**
-	 *
-	 * @param phraseTokens
-	 * @return
+	 * Checks whether the given array contains separating words such as "and" or "of".
+	 * @param phraseTokens Tokens
+	 * @return True if a token is a split word (such as and).
 	 */
 	static public boolean containsSplitWords(String[] phraseTokens) {
 		for (String s : phraseTokens) {
@@ -367,8 +368,8 @@ public class StringOperations {
 	/**
 	 * Concatenates a string array to one string separated by spaces.
 	 * 
-	 * @param array
-	 * @return
+	 * @param array Array to be concatenated with spaces.
+	 * @return Space-concatenated array.
 	 */
 	private static String concatArray(String[] array) {
 		StringBuffer resultBuffer = new StringBuffer();
@@ -382,8 +383,8 @@ public class StringOperations {
 	 * This method removes illegal characters of a string when used in a SPARQL
 	 * query.
 	 * 
-	 * @param inputString
-	 * @return
+	 * @param inputString String to be used.
+	 * @return Query-ready String.
 	 */
 	public static String cleanStringForDBpediaQuery(String inputString) {
 
@@ -406,8 +407,8 @@ public class StringOperations {
 	 * This method removes illegal characters of a string when used in a SPARQL
 	 * query.
 	 * 
-	 * @param inputString
-	 * @return
+	 * @param inputString String to be used.
+	 * @return Query-ready String.
 	 */
 	public static String cleanStringForALOD_Query(String inputString) {
 
@@ -425,15 +426,15 @@ public class StringOperations {
 	/**
 	 * Cleans a string from anything that is not a letter.
 	 * 
-	 * @param string
-	 * @return
+	 * @param string String to be used.
+	 * @return Reduced String.
 	 */
 	public static String reduceToLettersOnly(String string) {
 		return string.replaceAll("[^a-zA-Z1-9 ]", "");
 	}
 
 	/**
-	 * This method writes the content of a HashSet<String> to a file.
+	 * This method writes the content of a {@code HashSet<String>} to a file.
 	 * 
 	 * @param fileToWrite    File which will be created and in which the data will
 	 *                       be written.
@@ -509,7 +510,7 @@ public class StringOperations {
 	/**
 	 * Just for Tests
 	 * 
-	 * @param args
+	 * @param args No args required
 	 */
 	public static void main(String[] args) {
 		// playground to test words

@@ -53,10 +53,11 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
 
     /**
      * Generates random walks without duplicates.
-     * @param walkOutputFileName
+     *
      * @param numberOfWalks Number of walks.
      * @param depth Depth of the walks.
      * @param numberOfThreads Number of threads.
+     * @param walkOutputFileName The name of the walk file that shall be written.
      */
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalks, int depth, String walkOutputFileName){
         // validity check
@@ -69,7 +70,7 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
         File fileToWrite = new File(walkOutputFileName);
         fileToWrite.getParentFile().mkdirs();
 
-        // intialize the writer
+        // initialize the writer
         try {
             walkWriter = new OutputStreamWriter(new GZIPOutputStream(
                     new FileOutputStream(walkOutputFileName, false)), "utf-8");
@@ -464,8 +465,8 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
      * Remove special characters from a concept in order to:
      * - be more space efficient
      * - allow for easier lookup
-     * @param conceptToClean
-     * @return
+     * @param conceptToClean That concept that is to be cleaned/edited.
+     * @return The edited/cleaned concepts.
      */
     public static String cleanConcept(String conceptToClean){
 

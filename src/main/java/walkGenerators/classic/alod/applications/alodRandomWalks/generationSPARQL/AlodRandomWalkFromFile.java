@@ -10,11 +10,9 @@ import walkGenerators.classic.alod.services.tools.IOoperations;
  */
 public class AlodRandomWalkFromFile {
 
-    // constants
-
     /**
      * Main Method.
-     * @param args
+     * @param args No arguments required.
      */
     public static void main(String[] args) {
 

@@ -221,8 +221,8 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Reads a HashSet from the file as specified by the file path.
      *
-     * @param filePath
-     * @return
+     * @param filePath The path to the file that is to be read.
+     * @return The parsed file as HashSet.
      */
     public static HashSet<String> readHashSetFromFile(String filePath) {
         return readHashSetFromFile(new File(filePath));
@@ -231,8 +231,8 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Reads a HashSet from the file as specified by the file.
      *
-     * @param file
-     * @return
+     * @param file The file that is to be read.
+     * @return The parsed file as HashSet.
      */
     public static HashSet<String> readHashSetFromFile(File file) {
         HashSet<String> result = new HashSet<>();
@@ -287,6 +287,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * Reads an ontology from a given URL.
      *
      * @param path of ontology to be read.
+     * @param language The syntax format of the ontology file such as {@code "TTL"}, {@code "NT"}, or {@code "RDFXML"}.
      * @return Model instance.
      * @throws MalformedURLException Exception for malformed URLs.
      */

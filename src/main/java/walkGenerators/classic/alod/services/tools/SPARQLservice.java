@@ -125,9 +125,9 @@ public class SPARQLservice {
      * Returns the label of a resource. First, the default language will be used (en), then no language tag will
      * be used. If there are multiple results, only the first one will be returned.
      * This method is also suited for the XL ALOD endpoint.
-     * @param sparqlEndpoint
-     * @param uri
-     * @return
+     * @param sparqlEndpoint The endpoint to be queried.
+     * @param uri The URI for which the label shall be obtained.
+     * @return Found label.
      */
     public String getLabel(String sparqlEndpoint, String uri){
         // buffered convenience call
@@ -515,10 +515,10 @@ public class SPARQLservice {
 
 
     /**
-     * Checks for the existence of braoder concepts given a minimal confidence threshold.
-     * @param uri
-     * @param minConfidence
-     * @return
+     * Checks for the existence of broader concepts given a minimal confidence threshold.
+     * @param uri The URI for which the query shall be performed.
+     * @param minConfidence The minimial confidence that applies.
+     * @return True if there is a broader concept for the given URI, else false.
      */
     public boolean hasBroaderConcepts(String uri, double minConfidence){
         String key = "hasBroader_" + uri + "_mincf_" + minConfidence;
@@ -539,9 +539,9 @@ public class SPARQLservice {
 
     /**
      * Checks for the existence of braoder concepts given a minimal confidence threshold.
-     * @param uri
-     * @param minConfidence
-     * @return
+     * @param uri The URI that shall be used.
+     * @param minConfidence The minimal confidence that applies.
+     * @return True if there is a narrower concept for the given URI, else false.
      */
     public boolean hasNarrowerConcepts(String uri, double minConfidence){
         String key = "hasNarrower_" + uri + "_mincf_" + minConfidence;
@@ -563,8 +563,8 @@ public class SPARQLservice {
     /**
      * When executing queries it sometimes comes to exceptions (most likely http exceptions).
      * This method executes in a safe environment and will retry after some seconds, when the execution fails.
-     * @param queryExecutionInstance
-     * @return
+     * @param queryExecutionInstance The instance.
+     * @return ASK result as boolean.
      */
     public static boolean safeAsk(QueryExecution queryExecutionInstance){
         boolean result;
@@ -765,10 +765,10 @@ public class SPARQLservice {
      * High-performance check of whether B is a hypernym of A.
      * The method recognizes whether the given URI belongs to the Classic ALOD or XL ALOD data set and uses the correct
      * query endpoint.
-     * @param aURI
-     * @param bURI
-     * @param level
-     * @return
+     * @param aURI URI A
+     * @param bURI URI B
+     * @param level Number of upwards jumps to be performed.
+     * @return True if B is broader concept of A, else false.
      */
     public boolean aHasBroaderConceptB(String aURI, String bURI, int level) {
         String sparqlEndpoint;
@@ -827,12 +827,12 @@ public class SPARQLservice {
      * Checks whether B is a hypernym of A.
      * The method recognizes whether the given URI belongs to the Classic ALOD or XL ALOD data set and uses the correct
      * query endpoint.
-     * @param aURI
-     * @param bURI
-     * @param level
-     * @param minimalConfidence
-     * @param limit
-     * @return
+     * @param aURI URI A
+     * @param bURI URI B
+     * @param level Level
+     * @param minimalConfidence Minimal confidence that applies.
+     * @param limit Limit
+     * @return True if A has broader concept B.
      */
     public boolean aHasBroaderConceptB(String aURI, String bURI, int level, double minimalConfidence, int limit){
         HashSet<String> allBroaderConcepts = new HashSet<>();
@@ -1323,7 +1323,7 @@ public class SPARQLservice {
 
     /**
      * A query which will return the number of common narrower concepts of uri1 and uri2 on any desirable level in an efficient way.
-     * Leads to a timeout for levels > 1.
+     * Leads to a timeout for levels &gt; 1.
      * @param uri1 URI 1
      * @param uri2 URI 2
      * @param level The level up to which it shall be looked for.

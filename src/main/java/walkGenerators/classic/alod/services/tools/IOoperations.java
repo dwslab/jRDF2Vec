@@ -17,7 +17,8 @@ public class IOoperations {
 
 
     /**
-     * Prints overlapping parts of two string arrays..
+     * Prints overlapping parts of two string arrays.
+     * @param <T> Type of iterable.
      * @param s1 Array 1.
      * @param s2 Array 2.
      */
