@@ -4,13 +4,12 @@ import org.semanticweb.yars.nx.Node;
 import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.dataStructure.TripleDataSetMemory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * Parser built with the <a href="https://github.com/nxparser">nxparser framework</a>.
@@ -29,7 +28,7 @@ public class NxMemoryParser extends MemoryParser {
      */
     public NxMemoryParser(WalkGenerator walkGenerator){
         this.specificWalkGenerator = walkGenerator;
-        data = new HashMap<>(100000);
+        data = new TripleDataSetMemory();
     }
 
     /**
@@ -69,8 +68,7 @@ public class NxMemoryParser extends MemoryParser {
                     subject = specificWalkGenerator.shortenUri(removeTags(nx[0].toString()));
                     predicate = specificWalkGenerator.shortenUri(removeTags(nx[1].toString()));
                     object = specificWalkGenerator.shortenUri(removeTags(nx[2].toString()));
-
-                    addToDataThreadSafe(subject, predicate, object);
+                    data.add(subject, predicate, object);
                 }
             } catch (FileNotFoundException fnfe){
                 LOGGER.error("Could not find file " + fileToReadFrom.getAbsolutePath(), fnfe);

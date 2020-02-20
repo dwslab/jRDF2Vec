@@ -4,6 +4,7 @@ import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scripts.IsearchCondition;
+import walkGenerators.dataStructure.TripleDataSetMemory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +17,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * A parser for NT files. Mainly implemented to support {@link NtMemoryParser#getRandomPredicateObjectForSubject(String)} in
+ * A parser for NT files. Mainly implemented to support {@link NtMemoryParser#getRandomTripleForSubject(String)} in
  * an efficient way.
  */
 public class NtMemoryParser extends MemoryParser {
@@ -43,7 +44,7 @@ public class NtMemoryParser extends MemoryParser {
      *                      Therefore, method {@link WalkGenerator#shortenUri(String)} has to be implemented.
      */
     public NtMemoryParser(WalkGenerator walkGenerator) {
-        data = new ConcurrentHashMap<>(10000); // one billion is reasonable for babelnet
+        data = new TripleDataSetMemory();
 
         specificWalkGenerator = walkGenerator;
         skipCondition = new IsearchCondition() {
@@ -281,7 +282,7 @@ public class NtMemoryParser extends MemoryParser {
                     String subject = parsed[0];
                     String predicate = parsed[1];
                     String object = parsed[2];
-                    addToDataThreadSafe(subject, predicate, object);
+                    data.add(subject, predicate, object);
                 }
             }
         } catch (IOException ioe) {
@@ -357,13 +358,14 @@ public class NtMemoryParser extends MemoryParser {
                         for (String token : spo) {
                             LOGGER.error("Token " + i++ + ": " + token);
                         }
+                        LOGGER.error("Line is ignored. Parsing continues.");
                         continue nextLine;
                     }
                     String subject = specificWalkGenerator.shortenUri(removeTags(spo[0])).intern();
                     String predicate = specificWalkGenerator.shortenUri(removeTags(spo[1]).intern());
                     String object = specificWalkGenerator.shortenUri(removeTags(spo[2])).intern();
 
-                    addToDataThreadSafe(subject, predicate, object);
+                    data.add(subject, predicate, object);
 
                     if (isWriteOptimizedFile) {
                         writer.write(subject + " " + predicate + " " + object + "\n");
@@ -375,7 +377,7 @@ public class NtMemoryParser extends MemoryParser {
                     LOGGER.error("The problem occured in the following line:\n" + readLine);
                 }
             } // end of while loop
-            LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.size() + " subjects loaded.");
+            LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.getSize() + " subjects loaded.");
             if (isWriteOptimizedFile) {
                 writer.flush();
                 writer.close();

@@ -1,5 +1,7 @@
 package walkGenerators.base;
 
+import walkGenerators.dataStructure.Triple;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +77,7 @@ public class RandomWalkEntityProcessingRunnable implements Runnable {
             currentDepth = 0;
             while (currentDepth < walkLength) {
                 currentDepth++;
-                PredicateObject po = ((NtMemoryParser)walkGenerator.parser).getRandomPredicateObjectForSubjectWithoutTags(lastObject);
+                Triple po = ((MemoryParser) walkGenerator.parser).getRandomTripleForSubjectWithoutTags(lastObject);
                 if(po != null){
                     currentWalk += " " + walkGenerator.shortenUri(po.predicate) + " " + walkGenerator.shortenUri(po.object);
                     lastObject = po.object;

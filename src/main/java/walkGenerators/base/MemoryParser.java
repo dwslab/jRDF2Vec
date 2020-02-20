@@ -2,14 +2,14 @@ package walkGenerators.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.dataStructure.Triple;
+import walkGenerators.dataStructure.TripleDataSetMemory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Memory based parser using the {@link walkGenerators.base.PredicateObject} data structure.
+ * Memory based parser using the {@link TripleDataSetMemory} data structure.
  * These kind of parsers load the complete model into memory.
  */
 public abstract class MemoryParser implements IParser {
@@ -17,7 +17,7 @@ public abstract class MemoryParser implements IParser {
     /**
      * the actual data structure
      */
-    Map<String, ArrayList<PredicateObject>> data;
+    TripleDataSetMemory data;
 
     /**
      * Default logger
@@ -41,16 +41,127 @@ public abstract class MemoryParser implements IParser {
      */
     boolean isUnifiyAnonymousNodes = false;
 
+
     /**
-     * Obtain a predicate and object for the given subject.
+     * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     *
+     * @param entity        The entity for which a walk shall be generated.
+     * @param depth         The depth of each walk.
+     * @param numberOfWalks The number of walks to be generated.
+     * @return List where every item is a walk separated by spaces.
+     */
+    public List<String> generateMidWalksForEntity(String entity, int depth, int numberOfWalks) {
+        return convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
+    }
+
+    public List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
+        List<String> result = new ArrayList<>();
+        for (List<String> individualWalk : dataStructureToConvert) {
+            String walk = "";
+            boolean isFirst = true;
+            for (String walkComponent : individualWalk) {
+                if (isFirst) {
+                    isFirst = false;
+                    walk = walkComponent;
+                } else {
+                    walk += " " + walkComponent;
+                }
+            }
+            result.add(walk);
+        }
+        return result;
+    }
+
+    public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks) {
+        List<List<String>> result = new ArrayList<>();
+        for (int i = 0; i < numberOfWalks; i++) {
+            result.add(generateMidWalkForEntity(entity, depth));
+        }
+        return result;
+    }
+
+
+    /**
+     * Generates a single walk for the given entity with the given depth.
+     *
+     * @param entity The entity for which a walk shall be generated.
+     * @param depth  The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
+     * @return One walk as list where each element is a walk component.
+     */
+    public List<String> generateMidWalkForEntity(String entity, int depth) {
+
+        LinkedList<String> result = new LinkedList<>();
+
+        String nextElementPredecessor = entity;
+        String nextElementSuccessor = entity;
+
+        // initialize result
+        result.add(entity);
+
+        // variable to store the number of iterations performed so far
+        int currentDepth = 0;
+
+        while (currentDepth < depth) {
+            currentDepth++;
+
+            // randomly decide whether to use predecessors or successors
+            int randomPickZeroOne = ThreadLocalRandom.current().nextInt(2);
+
+            if (randomPickZeroOne == 0) {
+                // predecessor
+                ArrayList<Triple> candidates = data.getTriplesInvolvingObject(nextElementPredecessor);
+
+                if (candidates.size() > 0) {
+                    Triple drawnTriple = randomDrawFromList(candidates);
+
+                    // add walks from the front (walk started before entity)
+                    result.addFirst(drawnTriple.predicate);
+                    result.addFirst(drawnTriple.subject);
+                    nextElementPredecessor = drawnTriple.subject;
+                }
+
+
+            } else {
+                // successor
+                ArrayList<Triple> candidates = data.getTriplesInvolvingSubject(nextElementSuccessor);
+                if (candidates != null && candidates.size() > 0) {
+                    Triple tripleToAdd = randomDrawFromList(candidates);
+
+                    // add next walk iteration
+                    result.addLast(tripleToAdd.predicate);
+                    result.addLast(tripleToAdd.object);
+                    nextElementSuccessor = tripleToAdd.object;
+                }
+
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Draw a random value from a List. This method is thread-safe.
+     *
+     * @param listToDrawFrom The list from which shall be drawn.
+     * @param <T>            Type
+     * @return Drawn value of type T.
+     */
+    public static <T> T randomDrawFromList(List<T> listToDrawFrom) {
+        int randomNumber = ThreadLocalRandom.current().nextInt(listToDrawFrom.size());
+        return listToDrawFrom.get(randomNumber);
+    }
+
+
+    /**
+     * Obtain a triple for the given subject.
      *
      * @param subject The subject for which a random predicate and object shall be found.
-     * @return Predicate and object, randomly obtained for the given subject.
+     * @return Triple, randomly obtained for the given subject.
      */
-    public PredicateObject getRandomPredicateObjectForSubject(String subject) {
+    public Triple getRandomTripleForSubject(String subject) {
         if (subject == null) return null;
         subject = specificWalkGenerator.shortenUri(removeTags(subject));
-        ArrayList<PredicateObject> queryResult = data.get(subject);
+        ArrayList<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
             return null;
@@ -67,21 +178,22 @@ public abstract class MemoryParser implements IParser {
      * @param entity        The entity for which walks shall be generated.
      * @param numberOfWalks The number of walks to be generated.
      * @param depth         The number of hops to nodes (!).
-     * @return A list of walks.
+     * @return A list of walks where each element in the list represents a walk. The walk elements are separated by
+     * spaces.
      */
     public List<String> generateDuplicateFreeRandomWalksForEntity(String entity, int numberOfWalks, int depth) {
         List<String> result = new ArrayList<>();
-        List<List<PredicateObject>> walks = new ArrayList();
+        List<List<Triple>> walks = new ArrayList();
         boolean isFirstIteration = true;
         for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
             // initialize with first node
             if (isFirstIteration) {
-                ArrayList<PredicateObject> neighbours = data.get(entity);
+                ArrayList<Triple> neighbours = data.getTriplesInvolvingSubject(entity);
                 if (neighbours == null || neighbours.size() == 0) {
                     return result;
                 }
-                for (PredicateObject neighbour : neighbours) {
-                    ArrayList<PredicateObject> individualWalk = new ArrayList<>();
+                for (Triple neighbour : neighbours) {
+                    ArrayList<Triple> individualWalk = new ArrayList<>();
                     individualWalk.add(neighbour);
                     walks.add(individualWalk);
                 }
@@ -89,18 +201,18 @@ public abstract class MemoryParser implements IParser {
             }
 
             // create a copy
-            List<List<PredicateObject>> walks_tmp = new ArrayList<>();
+            List<List<Triple>> walks_tmp = new ArrayList<>();
             walks_tmp.addAll(walks);
 
             // loop over current walks
-            for (List<PredicateObject> walk : walks_tmp) {
+            for (List<Triple> walk : walks_tmp) {
                 // get last entity
-                PredicateObject lastPredicateObject = walk.get(walk.size() - 1);
-                ArrayList<PredicateObject> nextIteration = data.get(lastPredicateObject.object);
+                Triple lastTriple = walk.get(walk.size() - 1);
+                ArrayList<Triple> nextIteration = data.getTriplesInvolvingSubject(lastTriple.object);
                 if (nextIteration != null) {
                     walks.remove(walk); // check whether this works
-                    for (PredicateObject nextStep : nextIteration) {
-                        List<PredicateObject> newWalk = new ArrayList<>(walk);
+                    for (Triple nextStep : nextIteration) {
+                        List<Triple> newWalk = new ArrayList<>(walk);
                         newWalk.add(nextStep);
                         walks.add(newWalk);
                     }
@@ -115,10 +227,10 @@ public abstract class MemoryParser implements IParser {
         } // depth loop
 
         // now we need to translate our walks into strings
-        for (List<PredicateObject> walk : walks) {
+        for (List<Triple> walk : walks) {
             String finalSentence = entity;
             if (this.isUnifiyAnonymousNodes()) {
-                for (PredicateObject po : walk) {
+                for (Triple po : walk) {
                     String object = po.object;
                     if (isAnonymousNode(object)) {
                         object = "ANode";
@@ -126,7 +238,7 @@ public abstract class MemoryParser implements IParser {
                     finalSentence += " " + po.predicate + " " + object;
                 }
             } else {
-                for (PredicateObject po : walk) {
+                for (Triple po : walk) {
                     finalSentence += " " + po.predicate + " " + po.object;
                 }
             }
@@ -149,36 +261,18 @@ public abstract class MemoryParser implements IParser {
         } else return false;
     }
 
-    /**
-     * Add data in a thread safe way.
-     *
-     * @param subject   The subject to be added.
-     * @param predicate The predicate to be added.
-     * @param object    The object to be added.
-     */
-    synchronized void addToDataThreadSafe(String subject, String predicate, String object) {
-        if (data.get(subject) == null) {
-            ArrayList<PredicateObject> list = new ArrayList<>();
-            list.add(new PredicateObject(predicate, object));
-            data.put(subject, list);
-        } else {
-            ArrayList<PredicateObject> list = data.get(subject);
-            list.add(new PredicateObject(predicate, object));
-        }
-    }
-
 
     /**
-     * Faster version of {@link NtMemoryParser#getRandomPredicateObjectForSubject(String)}.
+     * Faster version of {@link NtMemoryParser#getRandomTripleForSubject(String)}.
      * Note that there cannot be any leading less-than or trailing greater-than signs around the subject.
      * The subject URI should already be shortened.
      *
      * @param subject The subject for which a random predicate and object shall be found.
      * @return Predicate and object, randomly obtained for the given subject.
      */
-    public PredicateObject getRandomPredicateObjectForSubjectWithoutTags(String subject) {
+    public Triple getRandomTripleForSubjectWithoutTags(String subject) {
         if (subject == null) return null;
-        ArrayList<PredicateObject> queryResult = data.get(subject);
+        ArrayList<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
             return null;

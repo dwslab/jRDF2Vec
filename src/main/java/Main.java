@@ -123,6 +123,9 @@ public class Main {
                 }
             }
         // end of guided mode
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("-main")) {
+            Main_IDE.main(new String[1]); // args not really required
+            return;
         } else {
             // -> automatic mode
 

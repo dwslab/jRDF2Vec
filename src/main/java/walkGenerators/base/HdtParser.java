@@ -8,8 +8,7 @@ import org.rdfhdt.hdt.triples.TripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -190,7 +189,34 @@ public class HdtParser implements IParser {
     }
 
 
-
-
+    /**
+     * Writes the given hdt data set as nt file.
+     * @param dataSet Set to read.
+     * @param fileToWrite File to write
+     */
+    public static void serializeDataSetAsNtFile(HDT dataSet, File fileToWrite) {
+        try {
+            IteratorTripleString iterator = dataSet.search("", "", "");
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite), "UTF-8"));
+            while (iterator.hasNext()) {
+                TripleString ts = iterator.next();
+                if(ts.getObject().toString().startsWith("\"")){
+                writer.write("<" + ts.getSubject().toString() + "> <" + ts.getPredicate().toString() + "> " + ts.getObject().toString() + " .\n");
+                } else {
+                    writer.write("<" + ts.getSubject().toString() + "> <" + ts.getPredicate().toString() + "> <" + ts.getObject().toString() + "> .\n");
+                }
+            }
+            writer.flush();
+            writer.close();
+        } catch (NotFoundException nfe) {
+            LOGGER.error("Could not write file.", nfe);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Could not write file.", e);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Could not write file.", e);
+        } catch (IOException e) {
+            LOGGER.error("Could not write file.", e);
+        }
+    }
 
 }

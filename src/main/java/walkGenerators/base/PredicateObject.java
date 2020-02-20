@@ -4,6 +4,7 @@ package walkGenerators.base;
  * Data structure used by parsers.
  * Just a data structure, no functionality here.
  */
+@Deprecated
 class PredicateObject {
     String predicate;
     String object;
