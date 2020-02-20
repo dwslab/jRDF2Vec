@@ -3,7 +3,7 @@ package walkGenerators.classic.DBpedia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import walkGenerators.base.DuplicateFreeWalkEntityProcessingRunnable;
-import walkGenerators.base.NtParser;
+import walkGenerators.base.NtMemoryParser;
 import walkGenerators.base.WalkGenerator;
 
 import java.io.*;
@@ -35,7 +35,7 @@ public class DBpediaWalkGenerator extends WalkGenerator {
             LOGGER.error("Resources directory is not a directory. ABORTING.");
             return;
         }
-        this.parser = new NtParser(this);
+        this.parser = new NtMemoryParser(this);
 
         for(File f : resourcesDirectory.listFiles()){
             // labels file handling
@@ -58,7 +58,7 @@ public class DBpediaWalkGenerator extends WalkGenerator {
             //    e.printStackTrace();
             //}
         }
-        ((NtParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToDirectory, true);
+        ((NtMemoryParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToDirectory, true);
     }
 
 

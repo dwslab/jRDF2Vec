@@ -7,6 +7,7 @@ import walkGenerators.base.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.util.HashSet;
@@ -41,6 +42,11 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     private final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = "./walks/walk_file.gz";
 
+    /**
+     * Can be set to false if there are problems with the parser to make sure that generation functions do not
+     * start.
+     */
+    private boolean parserIsOk = true;
 
     /**
      * Constructor
@@ -55,27 +61,32 @@ public class WalkGeneratorDefault extends WalkGenerator {
         if(tripleFile.isDirectory()){
             LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                     "if you use an entity selector that requires one ontology.");
-            this.parser = new NtParser(this);
-            ((NtParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
+            this.parser = new NtMemoryParser(this);
+            ((NtMemoryParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
             return;
         } else {
             try {
                 String fileName = tripleFile.getName();
                 if (fileName.toLowerCase().endsWith(".nt")) {
                     this.model = readOntology(pathToTripleFile, "NT");
-                    this.parser = new NtParser(pathToTripleFile, this);
+                    this.parser = new NtMemoryParser(pathToTripleFile, this);
                 } else if (fileName.toLowerCase().endsWith(".ttl")) {
                     this.model = readOntology(pathToTripleFile, "TTL");
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
-                    NtParser.saveAsNt(this.model, newResourceFile);
-                    this.parser = new NtParser(newResourceFile, this);
+                    NtMemoryParser.saveAsNt(this.model, newResourceFile);
+                    this.parser = new NtMemoryParser(newResourceFile, this);
                 } else if (fileName.toLowerCase().endsWith(".xml")) {
                     this.model = readOntology(pathToTripleFile, "RDFXML");
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
-                    NtParser.saveAsNt(this.model, newResourceFile);
-                    this.parser = new NtParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".hdt")){
-                    this.parser = new HdtParser(pathToTripleFile);
+                    NtMemoryParser.saveAsNt(this.model, newResourceFile);
+                    this.parser = new NtMemoryParser(newResourceFile, this);
+                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")){
+                    LOGGER.info("HDT file detected. Using HDT parser.");
+                        try {
+                            this.parser = new HdtParser(pathToTripleFile);
+                        } catch (IOException ioe){
+                            LOGGER.error("Propagated HDT Initializer Exception", ioe);
+                        }
                 }
                 LOGGER.info("Model read into memory.");
             } catch (MalformedURLException mue) {
@@ -121,6 +132,14 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        if(this.parser == null){
+            LOGGER.error("Parser not initilized. Aborting program");
+            return;
+        }
+        if(!parserIsOk){
+            LOGGER.error("Will not execute walk generation due to parser initialization error.");
+            return;
+        }
         this.filePath = filePathOfFileToBeWritten;
         generateRandomMidWalksForEntities(entitySelector.getEntities(this.model), numberOfThreads, numberOfWalksPerEntity, depth);
     }

@@ -13,7 +13,7 @@ import java.util.HashSet;
 public class WalkGeneratorLight extends WalkGeneratorDefault {
 
     /**
-     * Logger
+     * Default Logger
      */
     private static Logger LOGGER = LoggerFactory.getLogger(WalkGeneratorLight.class);
 

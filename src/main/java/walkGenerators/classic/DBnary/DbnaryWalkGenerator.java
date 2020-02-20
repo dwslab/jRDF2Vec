@@ -4,7 +4,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.base.NtParser;
+import walkGenerators.base.NtMemoryParser;
 import walkGenerators.base.RandomWalkEntityProcessingRunnable;
 import walkGenerators.base.WalkGenerator;
 
@@ -55,7 +55,7 @@ public class DbnaryWalkGenerator extends WalkGenerator {
         }
         try {
             this.model = readOntology(pathToTripleFile, "NT");
-            this.parser = new NtParser(pathToTripleFile, this);
+            this.parser = new NtMemoryParser(pathToTripleFile, this);
             LOGGER.info("Model read into memory.");
         } catch (MalformedURLException mue) {
             LOGGER.error("Path seems to be invalid. Generator not functional.", mue);

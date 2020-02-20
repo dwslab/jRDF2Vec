@@ -3,7 +3,7 @@ package walkGenerators.classic.babelnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scripts.IsearchCondition;
-import walkGenerators.base.NtParser;
+import walkGenerators.base.NtMemoryParser;
 import walkGenerators.base.WalkGenerator;
 
 import java.io.*;
@@ -48,12 +48,12 @@ public class BabelNetWalkGenerator extends WalkGenerator {
      */
     public BabelNetWalkGenerator(String pathToNtFiles, boolean isEnglishEntitiesOnly) {
         this.babelnetEntities = getBabelNetEntities(pathToNtFiles, isEnglishEntitiesOnly);
-        this.parser = new NtParser(this);
+        this.parser = new NtMemoryParser(this);
         this.pathToNtDirectory = pathToNtFiles;
         this.isEnglishEntitiesOnly = isEnglishEntitiesOnly;
 
         // set a search skip condition
-        ((NtParser)this.parser).setSkipCondition(new IsearchCondition() {
+        ((NtMemoryParser)this.parser).setSkipCondition(new IsearchCondition() {
             Pattern pattern = Pattern.compile("\".*\"");
             Pattern glossPattern = Pattern.compile("_Gloss[0-9]"); // _Gloss[0-9]
             Matcher matcher;
@@ -71,7 +71,7 @@ public class BabelNetWalkGenerator extends WalkGenerator {
                 return false;
             }
         });
-        ((NtParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToNtFiles, true);
+        ((NtMemoryParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToNtFiles, true);
     }
 
     @Override

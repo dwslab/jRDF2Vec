@@ -33,12 +33,14 @@ public class HdtParser implements IParser {
      * Constructor
      *
      * @param hdtFilePath Path to the HDT file.
+     * @exception IOException IOException
      */
-    public HdtParser(String hdtFilePath) {
+    public HdtParser(String hdtFilePath) throws IOException {
         try {
             hdtDataSet = HDTManager.loadHDT(hdtFilePath);
         } catch (IOException e) {
             LOGGER.error("Failed to load HDT file: " + hdtFilePath + "\nProgramm will fail.", e);
+            throw e;
         }
     }
 
@@ -46,8 +48,9 @@ public class HdtParser implements IParser {
      * Constructor
      *
      * @param hdtFile HDT file to be used.
+     * @exception IOException IOException
      */
-    public HdtParser(File hdtFile) {
+    public HdtParser(File hdtFile) throws IOException {
         this(hdtFile.getAbsolutePath());
     }
 

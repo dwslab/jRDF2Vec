@@ -10,8 +10,8 @@ class PredicateObject {
 
     /**
      * Constructor
-     * @param predicate
-     * @param object
+     * @param predicate Predicate of triple (Subject, Predicate, Object)
+     * @param object Object of triple (Subject, Predicate, Object)
      */
     public PredicateObject(String predicate, String object){
         this.predicate = predicate;

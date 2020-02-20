@@ -80,6 +80,7 @@ public class LightEntitySelector implements EntitySelector {
         } catch (IOException e) {
             LOGGER.error("Failed to read file.", e);
         }
+        LOGGER.info("Number of read entities: " + result.size());
         return result;
     }
 

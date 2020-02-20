@@ -52,8 +52,8 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
      * Actual thread execution.
      */
     public void run() {
-        if(walkGenerator.parser.getClass() == NtParser.class) {
-            walkGenerator.writeToFile(((NtParser)walkGenerator.parser).generateWalksForEntity(walkGenerator.shortenUri(entity), numberOfWalks, this.walkLength));
+        if(walkGenerator.parser.getClass() == NtMemoryParser.class) {
+            walkGenerator.writeToFile(((NtMemoryParser)walkGenerator.parser).generateDuplicateFreeRandomWalksForEntity(walkGenerator.shortenUri(entity), numberOfWalks, this.walkLength));
         } else {
             LOGGER.error("NOT YET IMPLEMENTED FOR OTHER PARSER THAN NT_PARSER!");
         }

@@ -75,7 +75,7 @@ public class RandomWalkEntityProcessingRunnable implements Runnable {
             currentDepth = 0;
             while (currentDepth < walkLength) {
                 currentDepth++;
-                PredicateObject po = ((NtParser)walkGenerator.parser).getRandomPredicateObjectForSubjectWithoutTags(lastObject);
+                PredicateObject po = ((NtMemoryParser)walkGenerator.parser).getRandomPredicateObjectForSubjectWithoutTags(lastObject);
                 if(po != null){
                     currentWalk += " " + walkGenerator.shortenUri(po.predicate) + " " + walkGenerator.shortenUri(po.object);
                     lastObject = po.object;

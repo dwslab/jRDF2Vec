@@ -1,3 +1,5 @@
+import walkGenerators.light.WalkGeneratorLight;
+
 public class Main_IDE {
 
     public static void main(String[] args) {
@@ -12,6 +14,8 @@ public class Main_IDE {
         //DbnaryWalkGenerator walkGenerator = new DbnaryWalkGenerator("./dbnary_eng.nt");
         //walkGenerator.generateRandomWalksDuplicateFree(80, 500, 4, "./walks/dbnary_500_4_pages_df/dbnary_500_4_pages_df.gz");
 
+        WalkGeneratorLight generatorLight = new WalkGeneratorLight("./src/test/resources/swdf-2012-11-28.hdt", "./entities/FORBES_DBpedia_entities.txt");
+        generatorLight.generateRandomMidWalks(4, 100, 4);
     }
 
 }

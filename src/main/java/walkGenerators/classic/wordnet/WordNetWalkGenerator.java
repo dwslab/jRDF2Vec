@@ -4,7 +4,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.base.NtParser;
+import walkGenerators.base.NtMemoryParser;
 import walkGenerators.base.WalkGenerator;
 
 import java.io.*;
@@ -44,16 +44,16 @@ public class WordNetWalkGenerator extends WalkGenerator {
     public WordNetWalkGenerator(String pathToTripleFile, boolean isIncludeDatatypeProperties, boolean isUnifiyAnonymousNodes) {
         try {
             this.model = readOntology(pathToTripleFile, "NT");
-            this.parser = new NtParser(this);
+            this.parser = new NtMemoryParser(this);
             if (isIncludeDatatypeProperties) {
                 LOGGER.info("[WN setting] isIncludeDatatypeProperties: " + isUnifiyAnonymousNodes);
-                ((NtParser)this.parser).setIncludeDatatypeProperties(true);
+                ((NtMemoryParser)this.parser).setIncludeDatatypeProperties(true);
             }
             if(isUnifiyAnonymousNodes){
                 LOGGER.info("[WN setting] unify anonymous nodes: " + isUnifiyAnonymousNodes);
-                ((NtParser)this.parser).setUnifiyAnonymousNodes(true);
+                ((NtMemoryParser)this.parser).setUnifiyAnonymousNodes(true);
             }
-            ((NtParser)this.parser).readNTriples(pathToTripleFile);
+            ((NtMemoryParser)this.parser).readNTriples(pathToTripleFile);
             LOGGER.info("Model read into memory.");
         } catch (MalformedURLException mue) {
             LOGGER.error("Path seems to be invalid. Generator not functional.", mue);

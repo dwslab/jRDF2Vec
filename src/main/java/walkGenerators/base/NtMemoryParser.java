@@ -9,53 +9,28 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * A parser for NT files. Mainly implemented to support {@link NtParser#getRandomPredicateObjectForSubject(String)} in
+ * A parser for NT files. Mainly implemented to support {@link NtMemoryParser#getRandomPredicateObjectForSubject(String)} in
  * an efficient way.
  */
-public class NtParser implements IParser {
-
-    /**
-     * the actual data structure
-     */
-    private Map<String, ArrayList<PredicateObject>> data;
+public class NtMemoryParser extends MemoryParser {
 
     /**
      * Default logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(NtParser.class);
-
-    /**
-     * Walk generator that uses the parser.
-     */
-    private WalkGenerator specificWalkGenerator;
+    private static final Logger LOGGER = LoggerFactory.getLogger(NtMemoryParser.class);
 
     /**
      * returns true if a triple shall be excluded.
      */
     private IsearchCondition skipCondition;
 
-    /**
-     * Include datatype properties into walk generation.
-     * Default false.
-     */
-    boolean isIncludeDatatypeProperties = false;
-
-
-    /**
-     * Indicator whether anonymous nodes shall be handled as if they were just one node.
-     * E.g. _:genid413438 is handled like -> ANODE
-     */
-    boolean isUnifiyAnonymousNodes = false;
 
     /**
      * Indicator whether an optimized file shall be written for quick parsing later on (will be written in ./optimized/)
@@ -67,7 +42,7 @@ public class NtParser implements IParser {
      * @param walkGenerator The walk generator is used to derive a data set specific URI shortener (if desired).
      *                      Therefore, method {@link WalkGenerator#shortenUri(String)} has to be implemented.
      */
-    public NtParser(WalkGenerator walkGenerator) {
+    public NtMemoryParser(WalkGenerator walkGenerator) {
         data = new ConcurrentHashMap<>(10000); // one billion is reasonable for babelnet
 
         specificWalkGenerator = walkGenerator;
@@ -92,7 +67,7 @@ public class NtParser implements IParser {
      * @param pathToTripleFile The nt file to be read (not zipped).
      * @param walkGenerator Walk generator to be used.
      */
-    public NtParser(String pathToTripleFile, WalkGenerator walkGenerator) {
+    public NtMemoryParser(String pathToTripleFile, WalkGenerator walkGenerator) {
         this(walkGenerator);
         readNTriples(pathToTripleFile);
     }
@@ -103,7 +78,7 @@ public class NtParser implements IParser {
      * @param tripleFile The nt file to be read (not zipped).
      * @param walkGenerator Walk generator to be used.
      */
-    public NtParser(File tripleFile, WalkGenerator walkGenerator) {
+    public NtMemoryParser(File tripleFile, WalkGenerator walkGenerator) {
         this(walkGenerator);
         readNTriples(tripleFile, false);
     }
@@ -180,7 +155,6 @@ public class NtParser implements IParser {
     }
 
 
-
     /**
      * A new thread will be opened for each file.
      *
@@ -245,7 +219,7 @@ public class NtParser implements IParser {
      */
     class FileReaderThread extends Thread {
 
-        public FileReaderThread(NtParser parser, File fileToRead, boolean gzipped, boolean optimized) {
+        public FileReaderThread(NtMemoryParser parser, File fileToRead, boolean gzipped, boolean optimized) {
             this.fileToRead = fileToRead;
             this.parser = parser;
             this.isGzipped = gzipped;
@@ -253,7 +227,7 @@ public class NtParser implements IParser {
         }
 
         private boolean isOptimizedFile;
-        private NtParser parser;
+        private NtMemoryParser parser;
         private File fileToRead;
         private boolean isGzipped;
 
@@ -272,7 +246,7 @@ public class NtParser implements IParser {
 
 
     /**
-     * Read the given nt file into memory. This method will add the data in the file to the existing {@link NtParser#data} store.
+     * Read the given nt file into memory. This method will add the data in the file to the existing {@link NtMemoryParser#data} store.
      *
      * @param pathToFile    Path to the file.
      * @param isGzippedFile Indicator whether the given file is gzipped.
@@ -283,6 +257,10 @@ public class NtParser implements IParser {
     }
 
 
+    /**
+     * read form an optimized file.
+     * @param fileToReadFrom Optimized file.
+     */
     public void readNTriplesOptimized(File fileToReadFrom) {
         if (!fileToReadFrom.exists()) {
             LOGGER.error("File does not exist. Cannot parse.");
@@ -293,9 +271,9 @@ public class NtParser implements IParser {
             BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
 
             String readLine;
-            int lineNumber = 0;
+            //int lineNumber = 0;
             while ((readLine = reader.readLine()) != null) {
-                lineNumber += 1;
+                //lineNumber += 1;
                 String[] parsed = readLine.split(" ");
                 if (parsed.length != 3) {
                     LOGGER.error("Problem with line: \n" + readLine);
@@ -313,26 +291,7 @@ public class NtParser implements IParser {
 
 
     /**
-     * Add data in a thread safe way.
-     *
-     * @param subject   The subject to be added.
-     * @param predicate The predicate to be added.
-     * @param object    The object to be added.
-     */
-    private synchronized void addToDataThreadSafe(String subject, String predicate, String object) {
-        if (data.get(subject) == null) {
-            ArrayList<PredicateObject> list = new ArrayList<>();
-            list.add(new PredicateObject(predicate, object));
-            data.put(subject, list);
-        } else {
-            ArrayList<PredicateObject> list = data.get(subject);
-            list.add(new PredicateObject(predicate, object));
-        }
-    }
-
-
-    /**
-     * Read the given nt file into memory. This method will add the data in the file to the existing {@link NtParser#data} store.
+     * Read the given nt file into memory. This method will add the data in the file to the existing {@link NtMemoryParser#data} store.
      *
      * @param fileToReadFrom the file.
      * @param isGzippedFile  Indicator whether the given file is gzipped.
@@ -427,130 +386,6 @@ public class NtParser implements IParser {
         }
     }
 
-
-    /**
-     * Obtain a predicate and object for the given subject.
-     *
-     * @param subject The subject for which a random predicate and object shall be found.
-     * @return Predicate and object, randomly obtained for the given subject.
-     */
-    public PredicateObject getRandomPredicateObjectForSubject(String subject) {
-        if (subject == null) return null;
-        subject = specificWalkGenerator.shortenUri(removeTags(subject));
-        ArrayList<PredicateObject> queryResult = data.get(subject);
-        if (queryResult == null) {
-            // no triple found
-            return null;
-        }
-        int randomNumber = ThreadLocalRandom.current().nextInt(queryResult.size());
-        LOGGER.info("(" + Thread.currentThread().getName() + ") " + randomNumber);
-        return queryResult.get(randomNumber);
-    }
-
-
-    /**
-     * Generates duplicate-free walks for the given entity.
-     *
-     * @param entity        The entity for which walks shall be generated.
-     * @param numberOfWalks The number of walks to be generated.
-     * @param depth         The number of hops to nodes (!).
-     * @return A list of walks.
-     */
-    public List<String> generateWalksForEntity(String entity, int numberOfWalks, int depth) {
-        List<String> result = new ArrayList<>();
-        List<List<PredicateObject>> walks = new ArrayList();
-        boolean isFirstIteration = true;
-        for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
-            // initialize with first node
-            if (isFirstIteration) {
-                ArrayList<PredicateObject> neighbours = data.get(entity);
-                if (neighbours == null || neighbours.size() == 0) {
-                    return result;
-                }
-                for (PredicateObject neighbour : neighbours) {
-                    ArrayList<PredicateObject> individualWalk = new ArrayList<>();
-                    individualWalk.add(neighbour);
-                    walks.add(individualWalk);
-                }
-                isFirstIteration = false;
-            }
-
-            // create a copy
-            List<List<PredicateObject>> walks_tmp = new ArrayList<>();
-            walks_tmp.addAll(walks);
-
-            // loop over current walks
-            for (List<PredicateObject> walk : walks_tmp) {
-                // get last entity
-                PredicateObject lastPredicateObject = walk.get(walk.size() - 1);
-                ArrayList<PredicateObject> nextIteration = data.get(lastPredicateObject.object);
-                if (nextIteration != null) {
-                    walks.remove(walk); // check whether this works
-                    for (PredicateObject nextStep : nextIteration) {
-                        List<PredicateObject> newWalk = new ArrayList<>(walk);
-                        newWalk.add(nextStep);
-                        walks.add(newWalk);
-                    }
-                }
-            } // loop over walks
-
-            // trim the list
-            while (walks.size() > numberOfWalks) {
-                int randomNumber = ThreadLocalRandom.current().nextInt(walks.size());
-                walks.remove(randomNumber);
-            }
-        } // depth loop
-
-        // now we need to translate our walks into strings
-        for (List<PredicateObject> walk : walks) {
-            String finalSentence = entity;
-            if (this.isUnifiyAnonymousNodes()) {
-                for (PredicateObject po : walk) {
-                    String object = po.object;
-                    if (isAnonymousNode(object)) {
-                        object = "ANode";
-                    }
-                    finalSentence += " " + po.predicate + " " + object;
-                }
-            } else {
-                for (PredicateObject po : walk) {
-                    finalSentence += " " + po.predicate + " " + po.object;
-                }
-            }
-            result.add(finalSentence);
-        }
-        return result;
-    }
-
-
-    /**
-     * Faster version of {@link NtParser#getRandomPredicateObjectForSubject(String)}.
-     * Note that there cannot be any leading less-than or trailing greater-than signs around the subject.
-     * The subject URI should already be shortened.
-     *
-     * @param subject The subject for which a random predicate and object shall be found.
-     * @return Predicate and object, randomly obtained for the given subject.
-     */
-    public PredicateObject getRandomPredicateObjectForSubjectWithoutTags(String subject) {
-        if (subject == null) return null;
-        ArrayList<PredicateObject> queryResult = data.get(subject);
-        if (queryResult == null) {
-            // no triple found
-            return null;
-        }
-        int randomNumber = ThreadLocalRandom.current().nextInt(queryResult.size());
-        //System.out.println("(" + Thread.currentThread().getName() + ") " + randomNumber + "[" + queryResult.size() + "]");
-        return queryResult.get(randomNumber);
-    }
-
-    public WalkGenerator getSpecificWalkGenerator() {
-        return specificWalkGenerator;
-    }
-
-    public void setSpecificWalkGenerator(WalkGenerator specificWalkGenerator) {
-        this.specificWalkGenerator = specificWalkGenerator;
-    }
-
     public IsearchCondition getSkipCondition() {
         return skipCondition;
     }
@@ -572,30 +407,6 @@ public class NtParser implements IParser {
         return stringToBeEdited;
     }
 
-    public boolean isIncludeDatatypeProperties() {
-        return isIncludeDatatypeProperties;
-    }
-
-    /**
-     * Returns true if the given parameter follows the schema of an anonymous node
-     *
-     * @param uriString The URI string to be checked.
-     * @return True if anonymous node.
-     */
-    public boolean isAnonymousNode(String uriString) {
-        uriString = uriString.trim();
-        if (uriString.startsWith("_:genid")) {
-            return true;
-        } else return false;
-    }
-
-    public boolean isUnifiyAnonymousNodes() {
-        return isUnifiyAnonymousNodes;
-    }
-
-    public void setUnifiyAnonymousNodes(boolean unifiyAnonymousNodes) {
-        isUnifiyAnonymousNodes = unifiyAnonymousNodes;
-    }
 
     /**
      * Note that this function will overwrite the skip condition.
