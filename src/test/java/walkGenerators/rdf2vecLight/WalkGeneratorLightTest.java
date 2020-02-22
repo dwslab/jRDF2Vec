@@ -5,12 +5,52 @@ import walkGenerators.classic.WalkGeneratorDefault;
 import walkGenerators.light.WalkGeneratorLight;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WalkGeneratorLightTest {
+
+    /**
+     * Requires a working internet connection.
+     */
+    @Test
+    void fullRunWithDBpedia(){
+        String resourceFile = getClass().getResource("/sample_dbpedia_nt_file.nt").getFile();
+        String entityFile = getClass().getResource("/sample_dbpedia_entity_file.txt").getFile();
+        WalkGeneratorLight generatorLight = new WalkGeneratorLight(resourceFile, entityFile);
+        generatorLight.generateRandomMidWalks(2, 10, 3);
+        File fileToReadFrom = new File("./walks/walk_file.gz");
+        GZIPInputStream gzip;
+        try {
+            gzip = new GZIPInputStream(new FileInputStream(fileToReadFrom));
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
+        String readLine;
+
+        HashSet<String> entities = new HashSet<>();
+        entities.add("http://dbpedia.org/resource/Illinois_Tool_Works");
+        entities.add("http://dbpedia.org/resource/Host_Hotels_&_Resorts");
+        entities.add("http://dbpedia.org/resource/State_Bank_of_India");
+        entities.add("http://dbpedia.org/resource/Amp");
+        entities.add("http://dbpedia.org/resource/SQM");
+        while((readLine = reader.readLine()) != null){
+            String[] tokens = readLine.split(" ");
+            assertTrue(tokens.length <= 7);
+            for(String token : tokens){
+                entities.remove(token);
+            }
+        }
+        assertTrue(entities.size() == 0, "Not all entities occurred in the walks.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Problem occurred while reading the walk file.", e);
+        }
+        // cleaning up
+        fileToReadFrom.delete();
+    }
 
     @Test
     void generateRandomWalksDuplicateFreeTtlWithSelector() {

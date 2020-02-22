@@ -3,6 +3,7 @@ package walkGenerators.base;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -333,9 +334,14 @@ public abstract class WalkGenerator implements IWalkGenerator {
      */
     public static OntModel readOntology(String path, String language) throws MalformedURLException {
         URL url = new File(path).toURI().toURL();
-        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-        model.read(url.toString(), language);
-        return model;
+        try {
+            OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+            model.read(url.toString(), language);
+            return model;
+        } catch (RiotException re){
+            LOGGER.error("Could not parse: " + path + "\nin jena.", re);
+            return null;
+        }
     }
 
 

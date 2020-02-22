@@ -138,11 +138,13 @@ class HdtParserTest {
         try {
             HdtParser parser = new HdtParser(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
-            List<String> walks1 = parser.generateMidWalksForEntity(concept, 10, 12);
+            int numberOfWalks = 12;
+            int depth = 10;
+            List<String> walks1 = parser.generateMidWalksForEntity(concept, numberOfWalks, depth);
             assertNotNull(walks1);
 
             // check number of generated walks
-            assertTrue(walks1.size() == 12);
+            assertTrue(walks1.size() == numberOfWalks);
 
             nextWalk:
             for (String walk : walks1) {

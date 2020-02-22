@@ -65,6 +65,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
             ((NtMemoryParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
             return;
         } else {
+            // decide on parser depending on
             try {
                 String fileName = tripleFile.getName();
                 if (fileName.toLowerCase().endsWith(".nt")) {

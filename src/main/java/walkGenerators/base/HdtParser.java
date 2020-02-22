@@ -56,12 +56,12 @@ public class HdtParser implements IParser {
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     * @param numberOfWalks The number of walks to be generated.
      * @param entity The entity for which a walk shall be generated.
      * @param depth The depth of each walk.
-     * @param numberOfWalks The number of walks to be generated.
      * @return List where every item is a walk separated by spaces.
      */
-    public List<String> generateMidWalksForEntity(String entity, int depth, int numberOfWalks){
+    public List<String> generateMidWalksForEntity(String entity, int numberOfWalks, int depth){
         return convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 

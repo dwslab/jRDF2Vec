@@ -111,7 +111,7 @@ public abstract class MemoryParser implements IParser {
                 // predecessor
                 ArrayList<Triple> candidates = data.getTriplesInvolvingObject(nextElementPredecessor);
 
-                if (candidates.size() > 0) {
+                if (candidates != null && candidates.size() > 0) {
                     Triple drawnTriple = randomDrawFromList(candidates);
 
                     // add walks from the front (walk started before entity)
