@@ -132,8 +132,8 @@ public class Main {
             dataSet = getValue("-set", args);
             if (dataSet == null) {
                 System.out.println("-set <set> not found. Using default.");
+                dataSet = "default";
             }
-            dataSet = "default";
 
             String threadsWritten = getValue("-threads", args);
             if (threadsWritten == null) {
@@ -362,7 +362,8 @@ public class Main {
                         "-walks <number_of_walks_per_entity>\n" +
                         "The number of walks per entity.\n\n" +
                         "-depth <desired_sentence_depth>\n" +
-                        "The length of each sentence.\n\n" +
+                        "The number of hops to other nodes for each walk. The total length of a sentence " +
+                        "(counting all tokens) consequently equals: 1 + 2*n. \n\n" +
                         "-file <file_to_be_written>\n" +
                         "The path to the file that will be written.\n\n" +
 

@@ -33,30 +33,35 @@ public class Main_IDE {
         String pathToEntitesFile = "./entities/AAUP_DBpedia_entities.txt";
         String fileToBeWritten = "./dbpedia_aaup/walks/walks_aaup.txt.gz";
         DBpediaWalkGeneratorLight generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // Forbes
         fileToBeWritten = "./dbpedia_forbes/walks/walks_forbes.txt.gz";
         pathToEntitesFile = "./entities/FORBES_DBpedia_entities.txt";
-        generatorLight.entitySelector = new DBpediaLightEntitySelector(pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // METACRITIC Albums
         fileToBeWritten = "./dbpedia_metacritic_albums/walks/walks_albums.txt.gz";
         pathToEntitesFile = "./entities/METACRITIC_ALBUMS_DBpedia_entities.txt";
-        generatorLight.entitySelector = new DBpediaLightEntitySelector(pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // METACRITIC Movies
         fileToBeWritten = "./dbpedia_metacritic_movies/walks/walks_movies.txt.gz";
         pathToEntitesFile = "./entities/METACRITIC_MOVIES_DBpedia_entities.txt";
-        generatorLight.entitySelector = new DBpediaLightEntitySelector(pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // CITIES
         fileToBeWritten = "./dbpedia_cities/walks/walks_cities.txt.gz";
         pathToEntitesFile = "./entities/CITIES_DBpedia_entities.txt";
-        generatorLight.entitySelector = new DBpediaLightEntitySelector(pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
     }

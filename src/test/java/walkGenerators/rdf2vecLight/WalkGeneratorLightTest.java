@@ -43,7 +43,7 @@ class WalkGeneratorLightTest {
                 entities.remove(token);
             }
         }
-        assertTrue(entities.size() == 0, "Not all entities occurred in the walks.");
+        assertTrue(entities.size() == 1, "Not all 4 entities occurred in the walks (note that Amp cannot be found).");
         } catch (IOException e) {
             e.printStackTrace();
             fail("Problem occurred while reading the walk file.", e);

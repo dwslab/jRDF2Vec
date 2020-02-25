@@ -28,13 +28,11 @@ class NtMemoryParserTest {
         assertEquals("http://www.w3.org/ns/lemon/ontolex#LexicalEntry", NtMemoryParser.removeTags("<http://www.w3.org/ns/lemon/ontolex#LexicalEntry"));
     }
 
-
     @org.junit.jupiter.api.Test
     void generateWalkForEntity(){
         testWalkForEntity(getClass().getResource("/dummyGraph.nt").getFile());
         testWalkForEntity(getClass().getResource("/dummyGraph_2.nt").getFile());
     }
-
 
     /**
      * For repeated tests.
@@ -59,6 +57,52 @@ class NtMemoryParserTest {
         System.out.println("\nWalks 3");
         for(String s : result_3) System.out.println(s);
         assertEquals(7, result_3.size());
+    }
+
+    @Test
+    void testDepthForRandomWalks(){
+        String graphPath = getClass().getResource("/dummyGraph_3.nt").getFile();
+        NtMemoryParser parser = new NtMemoryParser(graphPath, new DummyWalkGenerator());
+        List<String> result_1 = parser.generateDuplicateFreeRandomWalksForEntity("A", 100, 8);
+        System.out.println("Walks 1");
+        for(String s : result_1) System.out.println(s);
+        assertEquals(3, result_1.size());
+        for(String s : result_1){
+            assertTrue(s.equals("A P4 E P5 D") || s.equals("A P4 E P6 F") || s.equals("A P1 B P2 C P3 D"));
+        }
+
+        List<String> result_2 = parser.generateDuplicateFreeRandomWalksForEntity("Z", 3, 8);
+        System.out.println("\nWalks 2");
+        for(String s : result_2) System.out.println(s);
+        assertEquals(3, result_2.size());
+
+
+        List<String> result_3 = parser.generateDuplicateFreeRandomWalksForEntity("W", 100, 8);
+        System.out.println("\nWalks 3");
+        for(String s : result_3) System.out.println(s);
+
+        int maxLengh = 0;
+        for(String s : result_3){
+            int length = s.split(" ").length;
+            if(length > maxLengh) maxLengh = length;
+        }
+
+        assertEquals(1 + 2 * 8, maxLengh);
+
+
+        List<String> result_4 = parser.generateDuplicateFreeRandomWalksForEntity("W", 100, 1);
+        System.out.println("\nWalks 4");
+        for(String s : result_4) System.out.println(s);
+
+        maxLengh = 0;
+        for(String s : result_4){
+            int length = s.split(" ").length;
+            if(length > maxLengh) maxLengh = length;
+        }
+
+        assertEquals(3, maxLengh);
+
+
     }
 
 

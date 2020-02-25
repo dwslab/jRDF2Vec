@@ -72,10 +72,21 @@ public abstract class MemoryParser implements IParser {
         return result;
     }
 
+
+    /**
+     * Walks of length 1, i.e., walks that contain only one node, are ignored.
+     * @param entity The entity for which walks shall be generated.
+     * @param depth The depth of each walk (where the depth is the number of hops).
+     * @param numberOfWalks The number of walks to be performed.
+     * @return A data structure describing the walks.
+     */
     public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks) {
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < numberOfWalks; i++) {
-            result.add(generateMidWalkForEntity(entity, depth));
+            List<String> walk = generateMidWalkForEntity(entity, depth);
+            if(walk.size() > 1) {
+                result.add(walk);
+            }
         }
         return result;
     }
@@ -198,26 +209,26 @@ public abstract class MemoryParser implements IParser {
                     walks.add(individualWalk);
                 }
                 isFirstIteration = false;
-            }
+            } else {
+                // create a copy
+                List<List<Triple>> walks_tmp = new ArrayList<>();
+                walks_tmp.addAll(walks);
 
-            // create a copy
-            List<List<Triple>> walks_tmp = new ArrayList<>();
-            walks_tmp.addAll(walks);
-
-            // loop over current walks
-            for (List<Triple> walk : walks_tmp) {
-                // get last entity
-                Triple lastTriple = walk.get(walk.size() - 1);
-                ArrayList<Triple> nextIteration = data.getTriplesInvolvingSubject(lastTriple.object);
-                if (nextIteration != null) {
-                    walks.remove(walk); // check whether this works
-                    for (Triple nextStep : nextIteration) {
-                        List<Triple> newWalk = new ArrayList<>(walk);
-                        newWalk.add(nextStep);
-                        walks.add(newWalk);
+                // loop over current walks
+                for (List<Triple> walk : walks_tmp) {
+                    // get last entity
+                    Triple lastTriple = walk.get(walk.size() - 1);
+                    ArrayList<Triple> nextIteration = data.getTriplesInvolvingSubject(lastTriple.object);
+                    if (nextIteration != null) {
+                        walks.remove(walk); // check whether this works
+                        for (Triple nextStep : nextIteration) {
+                            List<Triple> newWalk = new ArrayList<>(walk);
+                            newWalk.add(nextStep);
+                            walks.add(newWalk);
+                        }
                     }
-                }
-            } // loop over walks
+                } // loop over walks
+            }
 
             // trim the list
             while (walks.size() > numberOfWalks) {

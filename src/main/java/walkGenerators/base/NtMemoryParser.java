@@ -376,7 +376,7 @@ public class NtMemoryParser extends MemoryParser {
                 } catch (Exception e) {
                     // it is important that the parsing continues no matter what happens
                     LOGGER.error("A problem occurred while parsing line number " + lineNumber + " of file " + fileToReadFrom.getName(), e);
-                    LOGGER.error("The problem occured in the following line:\n" + readLine);
+                    LOGGER.error("The problem occurred in the following line:\n" + readLine);
                 }
             } // end of while loop
             LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.getSize() + " subjects loaded.");
@@ -415,7 +415,7 @@ public class NtMemoryParser extends MemoryParser {
     /**
      * Note that this function will overwrite the skip condition.
      *
-     * @param includeDatatypeProperties Indicator whether datatype properties shall be included in the walk generation.
+     * @param includeDatatypeProperties Indicator whether data type properties shall be included in the walk generation.
      */
     public void setIncludeDatatypeProperties(boolean includeDatatypeProperties) {
         LOGGER.warn("Overwriting skip condition.");

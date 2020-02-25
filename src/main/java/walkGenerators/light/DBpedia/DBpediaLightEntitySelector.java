@@ -13,7 +13,6 @@ import java.util.HashSet;
 
 public class DBpediaLightEntitySelector extends LightEntitySelector {
 
-
     /**
      * Default logger.
      */

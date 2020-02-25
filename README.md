@@ -10,7 +10,8 @@ rather than running the `jar` with many option parameters, you can execute the p
 
 Note that depending on the data set the 
 computing requirements might be high. For BabelNet, the largest graph supported by this framework, more than 350 GB of 
-RAM are required. Do not forget to increase the heap space when running the program (`-Xmx` and `-Xmx`).
+RAM are required. Do not forget to increase the heap space when running the program (`-Xmx` and `-Xms` – place this 
+before the `-jar` command).
 
 You can generate walks for any `NT`, `OWL/XML`, or `TTL` file.
 For the lightweigt generation, [`RDF HDT`](http://www.rdfhdt.org/) is also supported.

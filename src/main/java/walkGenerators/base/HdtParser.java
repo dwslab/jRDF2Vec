@@ -65,6 +65,12 @@ public class HdtParser implements IParser {
         return convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
+    /**
+     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
+     * into a list of strings where a walk is one string (and the elements are separated by spaces).
+     * @param dataStructureToConvert The data structure that shall be converted.
+     * @return Data structure converted to string list.
+     */
     public List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
         List<String> result = new ArrayList<>();
         for (List<String> individualWalk : dataStructureToConvert){
@@ -83,10 +89,20 @@ public class HdtParser implements IParser {
         return result;
     }
 
+    /**
+     * Walks of length 1, i.e., walks that contain only one node, are ignored.
+     * @param entity The entity for which walks shall be generated.
+     * @param depth The depth of each walk (where the depth is the number of hops).
+     * @param numberOfWalks The number of walks to be performed.
+     * @return A data structure describing the walks.
+     */
     public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks){
         List<List<String>>  result = new ArrayList<>();
         for(int i = 0; i < numberOfWalks; i++){
-            result.add(generateMidWalkForEntity(entity, depth));
+            List<String> walk = generateMidWalkForEntity(entity, depth);
+            if(walk.size() > 1) {
+                result.add(walk);
+            }
         }
         return result;
     }
