@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
@@ -35,7 +35,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
     /**
      * Inject default entity selector.
      */
-    public EntitySelector entitySelector = new ClassicEntitySelector();
+    public EntitySelector entitySelector;
 
     /**
      * If not specified differently, this file will be used to persists walks.
@@ -47,6 +47,8 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * start.
      */
     private boolean parserIsOk = true;
+
+
 
     /**
      * Constructor
@@ -69,15 +71,17 @@ public class WalkGeneratorDefault extends WalkGenerator {
             try {
                 String fileName = tripleFile.getName();
                 if (fileName.toLowerCase().endsWith(".nt")) {
-                    this.model = readOntology(pathToTripleFile, "NT");
                     this.parser = new NtMemoryParser(pathToTripleFile, this);
+                    this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
                 } else if (fileName.toLowerCase().endsWith(".ttl")) {
                     this.model = readOntology(pathToTripleFile, "TTL");
+                    this.entitySelector = new OntModelEntitySelector(this.model);
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                     NtMemoryParser.saveAsNt(this.model, newResourceFile);
                     this.parser = new NtMemoryParser(newResourceFile, this);
                 } else if (fileName.toLowerCase().endsWith(".xml")) {
                     this.model = readOntology(pathToTripleFile, "RDFXML");
+                    this.entitySelector = new OntModelEntitySelector(this.model);
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                     NtMemoryParser.saveAsNt(this.model, newResourceFile);
                     this.parser = new NtMemoryParser(newResourceFile, this);
@@ -112,13 +116,13 @@ public class WalkGeneratorDefault extends WalkGenerator {
     @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         this.filePath = filePathOfFileToBeWritten;
-        generateWalksForEntities(entitySelector.getEntities(this.model), numberOfThreads, numberOfWalksPerEntity, depth);
+        generateWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     @Override
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         this.filePath = filePathOfFileToBeWritten;
-        generateDuplicateFreeWalksForEntities(entitySelector.getEntities(this.model), numberOfThreads, numberOfWalksPerEntity, depth);
+        generateDuplicateFreeWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     @Override
@@ -142,7 +146,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
             return;
         }
         this.filePath = filePathOfFileToBeWritten;
-        generateRandomMidWalksForEntities(entitySelector.getEntities(this.model), numberOfThreads, numberOfWalksPerEntity, depth);
+        generateRandomMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
 
@@ -154,7 +158,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * @param numberOfWalks The number of walks to be generated per entity.
      * @param walkLength The length of each walk.
      */
-    public void generateWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
+    public void generateWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
         outputFile.getParentFile().mkdirs();
 

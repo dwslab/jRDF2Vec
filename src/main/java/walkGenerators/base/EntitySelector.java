@@ -1,12 +1,15 @@
 package walkGenerators.base;
 
-import org.apache.jena.ontology.OntModel;
-
-import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Select the entities for which walks shall be generated.
  */
 public interface EntitySelector {
-    HashSet<String> getEntities(OntModel model);
+
+    /**
+     * Obtain all entities for which walks shall be generated.
+     * @return The entities to be returned.
+     */
+    Set<String> getEntities();
 }

@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
@@ -107,7 +108,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param numberOfWalks The number of walks to be generated per thread.
      * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
-    public void generateRandomMidWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
+    public void generateRandomMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
         File outputFile = new File(filePath);
         outputFile.getParentFile().mkdirs();
 
@@ -147,7 +148,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param numberOfWalks The number of walks to be generated per thread.
      * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
-    public void generateDuplicateFreeWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
+    public void generateDuplicateFreeWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
         File outputFile = new File(filePath);
         outputFile.getParentFile().mkdirs();
 

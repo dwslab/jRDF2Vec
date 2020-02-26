@@ -95,7 +95,7 @@ public class LightEntitySelector implements EntitySelector {
     }
 
     @Override
-    public HashSet<String> getEntities(OntModel model) {
+    public HashSet<String> getEntities() {
         if(this.entitiesToProcess != null) return this.entitiesToProcess;
         else {
             this.entitiesToProcess = readEntitiesFromFile(this.entityFile);

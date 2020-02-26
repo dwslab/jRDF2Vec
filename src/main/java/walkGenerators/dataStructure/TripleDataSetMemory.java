@@ -3,6 +3,7 @@ package walkGenerators.dataStructure;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * For reasons of performance, deletions are not possible currently.
@@ -82,6 +83,14 @@ public class TripleDataSetMemory {
      */
     public long getSize(){
         return size;
+    }
+
+    /**
+     * Obtain a set of all subjects.
+     * @return Subject set.
+     */
+    public Set<String> getUniqueSubjects(){
+        return subjectToTriple.keySet();
     }
 
 }

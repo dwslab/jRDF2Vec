@@ -1,3 +1,5 @@
+![Java CI](https://github.com/janothan/kgvec2go-walks/workflows/Java%20CI/badge.svg)
+
 # KGvec2go Walks
 This is the implementation of the walks that were used to train embeddings available on 
 <a href="http://www.kgvec2go.org">http://www.kgvec2go.org</a>.

@@ -87,7 +87,7 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
 
 
     @Override
-    public HashSet<String> getEntities(OntModel model) {
+    public HashSet<String> getEntities() {
         if(entitiesToProcess != null) return this.entitiesToProcess;
         else {
             entitiesToProcess = readEntitiesFromFile(this.entityFile);

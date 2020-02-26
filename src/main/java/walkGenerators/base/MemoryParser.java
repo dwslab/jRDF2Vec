@@ -329,4 +329,7 @@ public abstract class MemoryParser implements IParser {
         this.specificWalkGenerator = specificWalkGenerator;
     }
 
+    public TripleDataSetMemory getData() {
+        return data;
+    }
 }

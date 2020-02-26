@@ -5,8 +5,20 @@ import org.apache.jena.query.*;
 
 import java.util.HashSet;
 
-public class ClassicEntitySelector implements EntitySelector {
+public class OntModelEntitySelector implements EntitySelector {
 
+    /**
+     * Constructor
+     * @param model Model to be used
+     */
+    public OntModelEntitySelector(OntModel model){
+        this.model = model;
+    }
+
+    /**
+     * Jena Model to be used.
+     */
+    OntModel model;
 
     @Override
     /**
@@ -15,7 +27,7 @@ public class ClassicEntitySelector implements EntitySelector {
      *
      * @return Entities as String.
      */
-    public HashSet<String> getEntities(OntModel model) {
+    public HashSet<String> getEntities() {
         HashSet<String> result = new HashSet<>(100000);
 
         // NOTE: it is sufficient to do a query only for subjects b/c walks for concepts that appear only as object
