@@ -1,0 +1,7 @@
+http://dbpedia.org/resource/SQM
+http://dbpedia.org/resource/BPI
+http://dbpedia.org/resource/Host_Hotels_&_Resorts
+http://dbpedia.org/resource/Illinois_Tool_Works
+http://dbpedia.org/resource/Amp
+http://dbpedia.org/resource/Grupa_Lotos
+http://dbpedia.org/resource/State_Bank_of_India
