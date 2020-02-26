@@ -15,17 +15,17 @@ public class NxParserTest {
 
     @Test
     public void testNxParserBehavior() {
-        testExecutionNx(playground.NxParserTest.class.getClassLoader().getResource("pizza.owl.nt").getPath());
+        testExecutionNx(NxParserTest.class.getClassLoader().getResource("pizza.owl.nt").getPath());
     }
 
     @Test
     public void testXmlParserBehavior(){
-        testExecutionXml(playground.NxParserTest.class.getClassLoader().getResource("pizza.owl.xml").getPath());
+        testExecutionXml(NxParserTest.class.getClassLoader().getResource("pizza.owl.xml").getPath());
     }
 
     @Test
     public void testTtlParserBehavior(){
-        testExecutionTtl(playground.NxParserTest.class.getClassLoader().getResource("pizza.ttl").getPath());
+        testExecutionTtl(NxParserTest.class.getClassLoader().getResource("pizza.ttl").getPath());
     }
 
 
@@ -107,5 +107,24 @@ public class NxParserTest {
         }
     }
 
+
+    /**
+     * For experiments...
+     * @param args Not required.
+     * @throws Exception For manual experiments, no handling required here.
+     */
+    public static void main(String[] args) throws Exception {
+        String filePath = "/src/test/resources/pizza.owl.nt‚";
+        filePath = NxParserTest.class.getClassLoader().getResource("pizza.owl.nt").getPath();
+        NxParser nxp = new NxParser();
+        nxp.parse(new FileInputStream(new File(filePath)));
+
+        for (Node[] nx : nxp) {
+            // prints the subject, eg. <http://example.org/>
+            System.out.println(nx[0]);
+            System.out.println(nx[1]);
+            System.out.println(nx[2]);
+        }
+    }
 
 }
