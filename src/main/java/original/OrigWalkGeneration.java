@@ -1,5 +1,9 @@
 package original;
 
+/**
+ * Not intended for use - just for reference.
+ */
+@Deprecated
 public class OrigWalkGeneration {
 
     public static void main(String[] args) {

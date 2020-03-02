@@ -17,3 +17,5 @@ jobs:
         run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+      - name: Coveralls
+        run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}

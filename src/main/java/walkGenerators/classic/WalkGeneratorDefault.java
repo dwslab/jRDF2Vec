@@ -71,8 +71,15 @@ public class WalkGeneratorDefault extends WalkGenerator {
             try {
                 String fileName = tripleFile.getName();
                 if (fileName.toLowerCase().endsWith(".nt")) {
-                    this.parser = new NtMemoryParser(pathToTripleFile, this);
-                    this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
+                    try {
+                        LOGGER.info("Using NxParser.");
+                        this.parser = new NxMemoryParser(pathToTripleFile, this);
+                        this.entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
+                    } catch (Exception e){
+                        LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
+                        this.parser = new NtMemoryParser(pathToTripleFile, this);
+                        this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
+                    }
                 } else if (fileName.toLowerCase().endsWith(".ttl")) {
                     this.model = readOntology(pathToTripleFile, "TTL");
                     this.entitySelector = new OntModelEntitySelector(this.model);

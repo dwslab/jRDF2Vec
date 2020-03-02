@@ -3,6 +3,7 @@ package walkGenerators.base;
 /**
  * Data structure used by parsers.
  * Just a data structure, no functionality here.
+ * Replaced by {@link walkGenerators.dataStructure.Triple} to allow for reverse walks.
  */
 @Deprecated
 class PredicateObject {

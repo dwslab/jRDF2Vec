@@ -1,3 +1,7 @@
+import org.semanticweb.yars.nx.parser.NxParser;
+import walkGenerators.base.DummyWalkGenerator;
+import walkGenerators.base.NxMemoryParser;
+import walkGenerators.classic.WalkGeneratorDefault;
 import walkGenerators.light.DBpedia.DBpediaLightEntitySelector;
 import walkGenerators.light.DBpedia.DBpediaWalkGeneratorLight;
 import walkGenerators.light.LightEntitySelector;
@@ -5,12 +9,37 @@ import walkGenerators.light.WalkGeneratorLight;
 
 /**
  * Can be started in CLI using {@code -main} option.
+ * Put the code here that you want to run.
  */
 public class Main_IDE {
 
     public static void main(String[] args) {
+        walkGenerationForWikidata();
+    }
 
 
+
+    public static void checkNxParser(){
+        String filePath = "/work/jportisc/wikidata_2020_02_11/wikidata_truthy_2020_02_11.nt";
+        NxMemoryParser parser = new NxMemoryParser(filePath,new DummyWalkGenerator());
+        System.out.println("done");
+    }
+
+    public static void walkGenerationForWikidata(){
+        // run on dws-07
+        String pathToTripleFile = "/work/jportisc/wikidata_2020_02_11/wikidata_truthy_2020_02_11.nt";
+        String fileToWrite = "./wikidata_walks_200_4/wikidata_200_4_.gz";
+        int threads = 35;
+        WalkGeneratorDefault walkGeneratorDefault = new WalkGeneratorDefault(pathToTripleFile);
+        walkGeneratorDefault.generateRandomWalksDuplicateFree(threads, 200, 4, fileToWrite);
+    }
+
+    public static void walkGenerationForLightWikidata(){
+        // TODO
+    }
+
+
+    public static void walkGenerationForLightDBpedia(){
         //BabelNetWalkGenerator walkGenerator = new BabelNetWalkGenerator();
 
 
@@ -27,43 +56,43 @@ public class Main_IDE {
         int numberOfWalksPerEntity = 500;
         int depth = 4;
 
-        String pathTotripleFile = "/work/jportisc/dbpedia_rdf/unzipped_nt";
+        String pathToTripleFile = "/work/jportisc/dbpedia_rdf/unzipped_nt";
 
         // AAUP
         String pathToEntitesFile = "./entities/AAUP_DBpedia_entities.txt";
         String fileToBeWritten = "./dbpedia_aaup/walks/walks_aaup.txt.gz";
-        DBpediaWalkGeneratorLight generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        DBpediaWalkGeneratorLight generatorLight = new DBpediaWalkGeneratorLight(pathToTripleFile, pathToEntitesFile);
         generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // Forbes
         fileToBeWritten = "./dbpedia_forbes/walks/walks_forbes.txt.gz";
         pathToEntitesFile = "./entities/FORBES_DBpedia_entities.txt";
-        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathToTripleFile, pathToEntitesFile);
         generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // METACRITIC Albums
         fileToBeWritten = "./dbpedia_metacritic_albums/walks/walks_albums.txt.gz";
         pathToEntitesFile = "./entities/METACRITIC_ALBUMS_DBpedia_entities.txt";
-        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathToTripleFile, pathToEntitesFile);
         generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // METACRITIC Movies
         fileToBeWritten = "./dbpedia_metacritic_movies/walks/walks_movies.txt.gz";
         pathToEntitesFile = "./entities/METACRITIC_MOVIES_DBpedia_entities.txt";
-        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathToTripleFile, pathToEntitesFile);
         generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
 
         // CITIES
         fileToBeWritten = "./dbpedia_cities/walks/walks_cities.txt.gz";
         pathToEntitesFile = "./entities/CITIES_DBpedia_entities.txt";
-        generatorLight = new DBpediaWalkGeneratorLight(pathTotripleFile, pathToEntitesFile);
+        generatorLight = new DBpediaWalkGeneratorLight(pathToTripleFile, pathToEntitesFile);
         generatorLight.entitySelector = new LightEntitySelector(pathToEntitesFile);
         generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, fileToBeWritten);
-
     }
+
 
 }
