@@ -7,8 +7,6 @@ import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.base.NtMemoryParser;
-import walkGenerators.base.WalkGenerator;
 
 import java.io.File;
 import java.io.IOException;
