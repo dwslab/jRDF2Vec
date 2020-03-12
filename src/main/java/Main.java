@@ -3,7 +3,7 @@ import walkGenerators.classic.DBpedia.DBpediaWalkGenerator;
 import walkGenerators.base.IWalkGenerator;
 import walkGenerators.classic.DBnary.DbnaryWalkGenerator;
 import walkGenerators.classic.WalkGeneratorDefault;
-import walkGenerators.classic.alod.applications.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
+import walkGenerators.classic.alod.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
 import walkGenerators.classic.babelnet.BabelNetWalkGenerator;
 import walkGenerators.classic.wordnet.WordNetWalkGenerator;
 import walkGenerators.light.DBpedia.DBpediaWalkGeneratorLight;

@@ -17,13 +17,7 @@ import static walkGenerators.classic.alod.services.testTools.TestOperations.isSa
 public class StringOperations {
 
 	// signal words that separate entities
-	private static final HashSet<String> separatingWords = new HashSet<String>(Arrays.asList("of", "Of", "and", "And")); // further:
-																															// "under",
-																															// "on",
-																															// "beneath",
-																															// "below"
-	private static HashSet<String> stopwords;
-	private static final String PATH_TO_STOPWORD_FILE = "./stopwords/stopwords.txt";
+	private static final HashSet<String> separatingWords = new HashSet<String>(Arrays.asList("of", "Of", "and", "And"));
 
 	/**
 	 * Function which indicates whether a phrase is in camel case or not.
@@ -581,23 +575,6 @@ public class StringOperations {
 		}
 		return isSameArrayContent(sArray1, sArray2);
 	}
-
-
-
-	/**
-	 * Wrapping of Porter's Stemming Code.
-	 * 
-	 * @param word Word to be stemmed.
-	 * @return Stemmed word.
-	 */
-	public static String stemPorter(String word) {
-		PorterStemmer s = new PorterStemmer();
-		char[] charsequence = word.toCharArray();
-		s.add(charsequence, charsequence.length);
-		s.stem();
-		return s.toString();
-	}
-
 
 
 	/**
