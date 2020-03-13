@@ -131,7 +131,6 @@ public abstract class MemoryParser implements IParser {
                     nextElementPredecessor = drawnTriple.subject;
                 }
 
-
             } else {
                 // successor
                 ArrayList<Triple> candidates = data.getTriplesInvolvingSubject(nextElementSuccessor);
@@ -331,5 +330,9 @@ public abstract class MemoryParser implements IParser {
 
     public TripleDataSetMemory getData() {
         return data;
+    }
+
+    public long getDataSize(){
+        return data.getSize();
     }
 }

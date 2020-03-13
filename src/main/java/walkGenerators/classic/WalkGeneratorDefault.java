@@ -40,14 +40,13 @@ public class WalkGeneratorDefault extends WalkGenerator {
     /**
      * If not specified differently, this file will be used to persists walks.
      */
-    private final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = "./walks/walk_file.gz";
+    public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = "./walks/walk_file.gz";
 
     /**
      * Can be set to false if there are problems with the parser to make sure that generation functions do not
      * start.
      */
     private boolean parserIsOk = true;
-
 
 
     /**
@@ -76,6 +75,11 @@ public class WalkGeneratorDefault extends WalkGenerator {
                         this.parser = new NxMemoryParser(pathToTripleFile, this);
                         this.entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
                     } catch (Exception e){
+                        LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
+                        this.parser = new NtMemoryParser(pathToTripleFile, this);
+                        this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
+                    }
+                    if(((MemoryParser) parser).getDataSize() == 0L){
                         LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
                         this.parser = new NtMemoryParser(pathToTripleFile, this);
                         this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());

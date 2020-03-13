@@ -17,7 +17,6 @@ public class WalkGeneratorLight extends WalkGeneratorDefault {
      */
     private static Logger LOGGER = LoggerFactory.getLogger(WalkGeneratorLight.class);
 
-
     /**
      * Constructor
      * @param pathToTripleFile Path to the data file.

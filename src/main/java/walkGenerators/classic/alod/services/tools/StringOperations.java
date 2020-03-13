@@ -1,14 +1,9 @@
 package walkGenerators.classic.alod.services.tools;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static walkGenerators.classic.alod.services.testTools.TestOperations.isSameArrayContent;
 
 
 /**
@@ -17,7 +12,11 @@ import static walkGenerators.classic.alod.services.testTools.TestOperations.isSa
 public class StringOperations {
 
 	// signal words that separate entities
-	private static final HashSet<String> separatingWords = new HashSet<String>(Arrays.asList("of", "Of", "and", "And"));
+	private static final HashSet<String> separatingWords = new HashSet<String>(Arrays.asList("of", "Of", "and", "And")); // further:
+																															// "under",
+																															// "on",
+																															// "beneath",
+																															// "below"
 
 	/**
 	 * Function which indicates whether a phrase is in camel case or not.
@@ -417,51 +416,6 @@ public class StringOperations {
 		return outputString;
 	}
 
-	/**
-	 * Cleans a string from anything that is not a letter.
-	 * 
-	 * @param string String to be used.
-	 * @return Reduced String.
-	 */
-	public static String reduceToLettersOnly(String string) {
-		return string.replaceAll("[^a-zA-Z1-9 ]", "");
-	}
-
-	/**
-	 * This method writes the content of a {@code HashSet<String>} to a file.
-	 * 
-	 * @param fileToWrite    File which will be created and in which the data will
-	 *                       be written.
-	 * @param hashSetToWrite HashSet whose content will be written into fileToWrite.
-	 */
-	public static void writeHashSetToFile(File fileToWrite, HashSet<String> hashSetToWrite) {
-
-		System.out.println("Start writing HashSet to File " + fileToWrite.getName());
-		Iterator<String> iterator = hashSetToWrite.iterator();
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(fileToWrite));
-			String line = "";
-			boolean firstLine = true;
-
-			while (iterator.hasNext()) {
-				line = iterator.next();
-				if (!(line.equals("") || line.equals("\n"))) { // do not write empty lines or just line breaks
-					if (firstLine) {
-						writer.write(line);
-						firstLine = false;
-					} else {
-						writer.write("\n");
-						writer.write(line);
-					}
-				}
-			} // end while
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-	}
 
 	/**
 	 * Converts a string to a tag. Example: "Hagrid" will be converted to
@@ -502,20 +456,6 @@ public class StringOperations {
 	}
 
 	/**
-	 * Just for Tests
-	 * 
-	 * @param args No args required
-	 */
-	public static void main(String[] args) {
-		// playground to test words
-		String phrase = "ISO3CountryCode";
-		AbbreviationHandler handler = AbbreviationHandler.UPPER_CASE_FOLLOWS_ABBREVIATION;
-
-		// Arrays.stream(tokenizeBestGuess("ISO3CountryCode", handler)).forEach((token)
-		// -> System.out.println(token));
-	}
-
-	/**
 	 * Removes the language annotation from a string. If the string does not have a
 	 * language annotation, the string will be returned unchanged. Example:
 	 * "Hagrid@en" will be changed to "Hagrid".
@@ -552,43 +492,5 @@ public class StringOperations {
 	}
 
 
-	/**
-	 * This method checks whether two Strings are very similar by performing simple
-	 * string operations. Stopwords are retained.
-	 * 
-	 * @param s1 String 1
-	 * @param s2 String 2
-	 * @return boolean
-	 */
-	public static boolean isSameString(String s1, String s2) {
-		if (s1.equalsIgnoreCase(s2)) {
-			return true;
-		}
-		String[] sArray1 = tokenizeBestGuess(s1, AbbreviationHandler.UPPER_CASE_FOLLOWS_ABBREVIATION);
-		String[] sArray2 = tokenizeBestGuess(s2, AbbreviationHandler.UPPER_CASE_FOLLOWS_ABBREVIATION);
-
-		for (int i = 0; i < sArray1.length; i++) {
-			sArray1[i] = sArray1[i].toLowerCase();
-		}
-		for (int i = 0; i < sArray2.length; i++) {
-			sArray2[i] = sArray2[i].toLowerCase();
-		}
-		return isSameArrayContent(sArray1, sArray2);
-	}
-
-
-	/**
-	 * Checks whether a fragment is meaningful by counting the number of digits.
-	 * 
-	 * @param fragment The fragment for which relevance shall be checked.
-	 * @return Returns false if at least haf of the fragment is composed of digits.
-	 */
-	public static boolean isMeaningfulFragment(String fragment) {
-		if (fragment.length() / 2.0 > fragment.replaceAll("\\D", "").length()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 }

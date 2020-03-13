@@ -51,12 +51,15 @@ public class NxMemoryParser extends MemoryParser {
     }
 
 
+    /**
+     * Read n-triples from the given file.
+     * @param fileToReadFrom File from which will be read.
+     */
     public void readNtriples(File fileToReadFrom){
         if (!fileToReadFrom.exists()) {
             LOGGER.error("File does not exist. Cannot parse.");
             return;
         }
-
         if(fileToReadFrom.getName().endsWith(".nt") || fileToReadFrom.getName().endsWith(".ttl")){
             NxParser parser = new NxParser();
             try {

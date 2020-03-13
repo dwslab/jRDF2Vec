@@ -1,321 +1,203 @@
-import walkGenerators.base.WalkGenerationMode;
-import walkGenerators.classic.DBpedia.DBpediaWalkGenerator;
-import walkGenerators.base.IWalkGenerator;
-import walkGenerators.classic.DBnary.DbnaryWalkGenerator;
-import walkGenerators.classic.WalkGeneratorDefault;
-import walkGenerators.classic.alod.alodRandomWalks.generationInMemory.controller.WalkGeneratorClassicWalks;
-import walkGenerators.classic.babelnet.BabelNetWalkGenerator;
-import walkGenerators.classic.wordnet.WordNetWalkGenerator;
-import walkGenerators.light.DBpedia.DBpediaWalkGeneratorLight;
-import walkGenerators.light.WalkGeneratorLight;
 
-import java.util.Scanner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import training.Word2VecConfiguration;
+
+import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Mini command line tool for server application.
  */
 public class Main {
 
-    private static String dataSet;
+    /**
+     * Default logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /**
-     * Triple file or directory with triple files.
+     * word2vec configuration (not just CBOW/SG but contains also all other parameters)
      */
-    private static String resourcePath;
-    private static int numberOfThreads;
-    private static int numberOfWalks;
-    private static int depth;
-    private static boolean isEnglishOnly;
-    private static String fileToWrite;
-    private static boolean isUnifyAnonymousNodes;
-    private static WalkGenerationMode modeOfWalkGeneration;
+    private static Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
 
     /**
-     * Indicator whether RDF2Vec Light shall be used (only generate walks for certain entities).
+     * File for leightweight generation
      */
-    private static boolean isRdf2vecLight;
+    private static File lightEntityFile = null;
 
     /**
-     * Path to the file containing the entities for which walks shall be generated. One entity per line. UTF-8 encoding is required for the file.
+     * File to the knowledge graph
      */
-    private static String rdf2vecLightEntityFile;
+    private static File knowledgeGraphFile = null;
+
+    /**
+     * The number of threads to be used for the walk generation and for the training.
+     */
+    private static int threads = -1;
+
+    /**
+     * Dimensions for the vectors.
+     */
+    private static int dimensions = -1;
+
+    /**
+     * Depth for the walks to be generated.
+     */
+    private static int depth = -1;
+
+    /**
+     * The number of walks to be generated for each node.
+     */
+    private static int numberOfWalks = -1;
+
+    /**
+     * The file to which the python resources shall be copied.
+     */
+    private static File resourcesDirectory;
+
+    /**
+     * Where the walks will be persisted (directory).
+     */
+    private static File walkDirectory = null;
 
     public static void main(String[] args) {
-        if (args.length == 0 || args[0].equalsIgnoreCase("-h") || args[0].equalsIgnoreCase("--h") || args[0].equalsIgnoreCase("-help")) {
-            System.out.println(getHelp());
-            return;
+
+        if(args.length == 0){
+            LOGGER.error("Not enough arguments.");
         }
 
-        if (args.length == 1 &&
-                (args[0].equalsIgnoreCase("-guided") || args[0].equalsIgnoreCase("--guided"))) {
+        String lightEntityFilePath = getValue("-light", args);
+        if(lightEntityFilePath != null){
+            lightEntityFile = new File(lightEntityFilePath);
+            if(!lightEntityFile.exists()){
+                LOGGER.error("The given file does not exist: " + lightEntityFilePath);
+            }
+        }
 
-            // guided mode
+        String knowledgeGraphFilePath = getValue("-graph", args);
+        if(knowledgeGraphFilePath != null){
+            knowledgeGraphFile = new File(knowledgeGraphFilePath);
+            if(!knowledgeGraphFile.exists()){
+                LOGGER.error("The given file does not exist: " + knowledgeGraphFilePath);
+            }
+        }
 
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Welcome to the guided walk generation.");
+        String walkDirectoryPath = getValue("-walkDir", args);
+        walkDirectoryPath = (walkDirectoryPath == null) ? getValue("-walkDirectory", args) : walkDirectoryPath;
+        if(walkDirectoryPath != null){
+            walkDirectory = new File(walkDirectoryPath);
+            if(!walkDirectory.isDirectory()){
+                System.out.println("Walk directory is no directory! Using default.");
+                walkDirectory = null;
+            }
+        }
 
-            // data set
-            System.out.println("For which data set do you want to generate walks? [any | alod | babelnet | dbpedia | wiktionary | wordnet] (If in doubt, use 'any'.)");
-            dataSet = scanner.nextLine();
-            if (dataSet.equalsIgnoreCase("alod") || dataSet.equalsIgnoreCase("any")  || dataSet.equalsIgnoreCase("babelnet") ||
-                    dataSet.equalsIgnoreCase("dbpedia") || dataSet.equalsIgnoreCase("wiktionary") ||
-                    dataSet.equalsIgnoreCase("wordnet")) {
-                // input ok
+        String threadsText = getValue("-threads", args);
+        if(threadsText != null){
+            try {
+                threads = Integer.parseInt(threadsText);
+            } catch (NumberFormatException nfe){
+                System.out.println("Could not parse the number of threads. Using default.");
+            }
+        }
+
+        String dimensionText = getValue("-dimension", args);
+        dimensionText = (dimensionText == null) ? getValue("-dimensions", args) : dimensionText;
+        if(dimensionText != null){
+            try {
+                dimensions = Integer.parseInt(dimensionText);
+            } catch (NumberFormatException nfe){
+                System.out.println("Could not parse the number of dimensions. Using default.");
+            }
+        }
+
+        String depthText = getValue("-depth", args);
+        if(depthText != null){
+            try {
+                depth = Integer.parseInt(depthText);
+            } catch (NumberFormatException nfe){
+                System.out.println("Could not parse the depth. Using default.");
+            }
+        }
+
+        String numberOfWalksText = getValue("-numberOfWalks", args);
+        numberOfWalksText = (numberOfWalksText == null) ? getValue("-numOfWalks", args) : numberOfWalksText;
+        if(numberOfWalksText != null){
+            try {
+                numberOfWalks = Integer.parseInt(numberOfWalksText);
+            } catch (NumberFormatException nfe){
+                System.out.println("Could not parse the number of walks. Using default.");
+            }
+        }
+
+        String resourcesDirectroyPath = getValue("-serverResourcesDir", args);
+        if(resourcesDirectroyPath != null){
+            File f = new File(resourcesDirectroyPath);
+            if(f.isDirectory()){
+                resourcesDirectory = f;
             } else {
-                System.out.println("Invalid input. Has to be one of: any | alod | babelnet | dbpedia | wiktionary | wordnet");
-                System.out.println("Please refer to -help for the documentation.");
-                return;
+                System.out.println("The specified directory for the python resources is not a directory. Using default.");
             }
+        }
 
-            // resource path
-            System.out.println("Where does the triple file / the triple directory reside?");
-            resourcePath = scanner.nextLine();
+        // determining the configuration for the rdf2vec training
+        String trainingModeText = getValue("-trainingMode", args);
+        trainingModeText = (trainingModeText == null) ? getValue("-trainMode", args) : trainingModeText;
+        if(trainingModeText != null){
+            if(trainingModeText.equalsIgnoreCase("sg")){
+                configuration = Word2VecConfiguration.SG;
+            } else configuration = Word2VecConfiguration.CBOW;
+        } else configuration = Word2VecConfiguration.CBOW;
 
-            // walk generation mode
-            String writtenMode;
-            System.out.println("What kind of walks do you want to generate? [" + modeOfWalkGeneration.getOptions() + "]");
-            writtenMode = scanner.nextLine();
-            modeOfWalkGeneration = modeOfWalkGeneration.getMode(writtenMode);
-            if(modeOfWalkGeneration == null){
-                System.out.println("Invalid input. Has to be one of: " + modeOfWalkGeneration.getOptions());
-                System.out.println("Please refer to -help for the documentation.");
-                return;
-            }
+        // setting training threads
+        if(threads > 0) configuration.setNumberOfThreads(threads);
 
-            // threads
-            System.out.println("How many threads shall be used for the walk generation?");
-            numberOfThreads = scanner.nextInt();
-            scanner.nextLine();
+        // setting dimensions
+        if(dimensions > 0) configuration.setVectorDimension(dimensions);
 
-            // walks
-            System.out.println("How many walks shall be generated per entity?");
-            numberOfWalks = scanner.nextInt();
-            scanner.nextLine();
 
-            // depth
-            System.out.println("What is the desired maximal depth of each walk?");
-            depth = scanner.nextInt();
-            scanner.nextLine();
+        // ------------------
+        //  actual execution
+        // ------------------
 
-            // file to write
-            System.out.println("Into which file shall the walks be written?");
-            fileToWrite = scanner.nextLine();
-
-            // anonymous node handling (not yet available for any data set)
-            if (!dataSet.equalsIgnoreCase("any")) {
-                System.out.println("Do you want to unify anonymous nodes? [true | false] (If in doubt, set 'false'.)");
-                isUnifyAnonymousNodes = scanner.nextBoolean();
-                scanner.nextLine();
-            }
-
-            if (dataSet.equalsIgnoreCase("babelnet")) {
-                System.out.println("Do you only want to generate walks for English babelnet lemmas? [true | false] (If in doubt, set 'true'.)");
-                isEnglishOnly = scanner.nextBoolean();
-            }
-
-            if(dataSet.equalsIgnoreCase("any") || dataSet.equalsIgnoreCase("default") || dataSet.equalsIgnoreCase("dbpedia")){
-                System.out.println("Do you want to run RDF2Vec Light? [true|false] (If in doubt, set 'false'.)");
-                isRdf2vecLight = scanner.nextBoolean();
-                scanner.nextLine();
-                if(isRdf2vecLight){
-                    System.out.println("You selected RDF2Vec Light. Where is the file containing the entities for which walks shall be generated?");
-                    rdf2vecLightEntityFile = scanner.nextLine();
-                }
-            }
-        // end of guided mode
-        } else if (args.length == 1 && args[0].equalsIgnoreCase("-main")) {
-            Main_IDE.main(new String[1]); // args not really required
-            return;
+        if(lightEntityFile == null){
+            // TODO run classic
         } else {
-            // -> automatic mode
+            RDF2VecLight rdf2VecLight;
+            if(walkDirectory == null) rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile);
+            else rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile, walkDirectory);
 
-            dataSet = getValue("-set", args);
-            if (dataSet == null) {
-                System.out.println("-set <set> not found. Using default.");
-                dataSet = "default";
-            }
+            // setting threads
+            if(threads > 0) rdf2VecLight.setNumberOfThreads(threads);
 
-            String threadsWritten = getValue("-threads", args);
-            if (threadsWritten == null) {
-                System.out.println("-threads <number_of_threads> not found. Using default (12 threads).");
-                numberOfThreads = 12;
-            } else numberOfThreads = Integer.valueOf(threadsWritten);
+            // setting depth
+            if(depth > 0) rdf2VecLight.setDepth(depth);
 
-            String walksWritten = getValue("-walks", args);
-            if (threadsWritten == null) {
-                System.out.println("-walks <number_of_walks> not found. Aborting.");
-                return;
-            }
-            numberOfWalks = Integer.valueOf(walksWritten);
+            // setting the number of walks
+            if(numberOfWalks > 0) rdf2VecLight.setNumberOfWalksPerEntity(numberOfWalks);
 
-            String depthWritten = getValue("-depth", args);
-            if (depthWritten == null) {
-                System.out.println("-depth <sentence_length> not found. Aborting.");
-                return;
-            }
-            depth = Integer.valueOf(depthWritten);
+            // set resource directory
+            if(resourcesDirectory != null) rdf2VecLight.setResourceDirectory(resourcesDirectory);
 
-            fileToWrite = getValue("-file", args);
-
-            resourcePath = getValue("-res", args);
-            if (resourcePath == null) {
-                System.out.println("ERROR: You have not defined the resource path (parameter '-res <resource path>'). " +
-                        "However, this is a required parameter." +
-                        "The program execution will stop now.");
-            }
-
-            String isUnifyAnonymousNodesWritten = getValue("-unifyAnonymousNodes", args);
-            isUnifyAnonymousNodes = false;
-            if (isUnifyAnonymousNodesWritten != null && (isUnifyAnonymousNodesWritten.equalsIgnoreCase("true") || isUnifyAnonymousNodesWritten.equalsIgnoreCase("false"))) {
-                isUnifyAnonymousNodes = Boolean.valueOf(isUnifyAnonymousNodesWritten);
-            }
-
-            String isEnglishOnlyWritten = getValue("-en", args);
-            isEnglishOnly = true;
-            if (isEnglishOnlyWritten != null) {
-                if ((isEnglishOnlyWritten.equalsIgnoreCase("true") || isEnglishOnlyWritten.equalsIgnoreCase("false"))) {
-                    isEnglishOnly = Boolean.valueOf(isEnglishOnlyWritten);
-                }
-            }
-
-            isRdf2vecLight = false;
-            String isRdf2vecLightWritten = getValue("-isRdf2vecLight", args);
-            if (isRdf2vecLightWritten != null) {
-                if ((isRdf2vecLightWritten.equalsIgnoreCase("true") || isRdf2vecLightWritten.equalsIgnoreCase("false"))) {
-                    isRdf2vecLight = Boolean.valueOf(isRdf2vecLightWritten);
-                }
-            }
-
-            rdf2vecLightEntityFile = getValue("-rdf2vecLightEntityFile", args);
-            if (rdf2vecLightEntityFile != null) {
-                if(rdf2vecLightEntityFile.equalsIgnoreCase("true") || rdf2vecLightEntityFile.equalsIgnoreCase("false")){
-                    // given that there is an entity file, assume rdf2vec light = true
-                    isRdf2vecLight = true;
-                }
-            }
-
-            String writtenMode = getValue("-mode", args);
-            modeOfWalkGeneration = modeOfWalkGeneration.getMode(writtenMode);
-        } // end of args interpretation
-
-        // print configuration for verification
-        System.out.println(getConfiguration());
-        System.out.println("\nYour quick configuration for next time:");
-        System.out.println(getQuickConfiguration());
-        System.out.println();
-
-        switch (dataSet.toLowerCase()) {
-            case "any":
-            case "default":
-                if(isRdf2vecLight) {
-                    WalkGeneratorLight lightGenerator = new WalkGeneratorLight(resourcePath, rdf2vecLightEntityFile);
-                    generatorExecution(lightGenerator);
-                } else {
-                    // default rdf2vec configuration
-                    WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(resourcePath);
-                    generatorExecution(classicGenerator);
-                }
-                break;
-            case "babelnet":
-                BabelNetWalkGenerator babelnetGenerator = new BabelNetWalkGenerator(resourcePath, isEnglishOnly);
-                generatorExecution(babelnetGenerator);
-                break;
-            case "dbpedia":
-                if(isRdf2vecLight) {
-                    DBpediaWalkGeneratorLight dBpediaWalkGeneratorLight = new DBpediaWalkGeneratorLight(resourcePath, rdf2vecLightEntityFile);
-                    generatorExecution(dBpediaWalkGeneratorLight);
-                } else {
-                    DBpediaWalkGenerator dBpediaWalkGenerator = new DBpediaWalkGenerator(resourcePath);
-                    generatorExecution(dBpediaWalkGenerator);
-                }
-                break;
-            case "wordnet":
-                WordNetWalkGenerator wordNetWalkGenerator = new WordNetWalkGenerator(resourcePath, false, isUnifyAnonymousNodes);
-                generatorExecution(wordNetWalkGenerator);
-                break;
-            case "wiktionary":
-            case "dbnary":
-                DbnaryWalkGenerator wiktionaryGenerator = new DbnaryWalkGenerator(resourcePath);
-                generatorExecution(wiktionaryGenerator);
-                break;
-            case "alod":
-                WalkGeneratorClassicWalks alodGenerator = new WalkGeneratorClassicWalks();
-                alodGenerator.load(resourcePath);
-                generatorExecution(alodGenerator);
-        }
-        System.out.println("DONE");
-    }
-
-    /**
-     * Run the given walk generator with the pre-set static configuration variables.
-     * @param generator The generator to be started.
-     */
-    private static void generatorExecution(IWalkGenerator generator) {
-        switch (modeOfWalkGeneration){
-            case RANDOM_DUPLICATE_FREE:
-                if(fileToWrite != null){
-                    generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                } else generator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth);
-                break;
-            case RANDOM_WITH_DUPLICATES:
-                if (fileToWrite != null) {
-                    generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                } else generator.generateRandomWalks(numberOfThreads, numberOfWalks, depth);
-                break;
-            case MID_WITH_DUPLICATES:
-                if (fileToWrite != null) {
-                    generator.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, fileToWrite);
-                } else generator.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth);
-                break;
+            rdf2VecLight.setConfiguration(configuration);
+            Instant before = Instant.now();
+            rdf2VecLight.train();
+            Instant after = Instant.now();
+            long days = Duration.between(before, after).toDaysPart();
+            long hours = Duration.between(before, after).toHoursPart();
+            long minutesPart = Duration.between(before, after).toMinutesPart();
+            long seconds = Duration.between(before, after).toSecondsPart();
+            System.out.println("Training completed.");
+            System.out.println("Days: " + days);
+            System.out.println("Hours: " + hours);
+            System.out.println("Minutes: " + minutesPart);
+            System.out.println("Seconds: " + seconds);
         }
     }
 
-    /**
-     * Prints the current configuration.
-     */
-    private static String getConfiguration() {
-        String result = "Generating walks for " + dataSet + " with the following configuration:\n" +
-                "- number of threads: " + numberOfThreads + "\n" +
-                "- walks per entity: " + numberOfWalks + "\n" +
-                "- mode: " + modeOfWalkGeneration + "\n" +
-                "- depth of each walk: " + depth + "\n" +
-                "- rdf2vec LIGHT: " + isRdf2vecLight + "\n";
-
-        if(isRdf2vecLight){
-            result += "- rdf2vec LIGHT entity file: " + rdf2vecLightEntityFile + "\n";
-        }
-
-        if (dataSet.equalsIgnoreCase("babelnet")) {
-            result += "- create walks for only English nodes: " + isEnglishOnly + "\n";
-        }
-
-        if (fileToWrite.equals("")) {
-            result += "- writing files to default directory (./walks/)";
-        } else {
-            result += "- writing walks to directory: " + fileToWrite;
-        }
-        return result;
-    }
-
-    /**
-     * Prints the current quick start configuration.
-     **/
-    private static String getQuickConfiguration() {
-        String result = "-set " + dataSet + " -res \"" + resourcePath + "\" -threads " + numberOfThreads + " -walks " + numberOfWalks + " -depth " + depth;
-        result += " -unifyAnonymousNodes " + isUnifyAnonymousNodes;
-        result += " -mode " + modeOfWalkGeneration;
-        if (fileToWrite != null) {
-            result += " -file \"" + fileToWrite + "\"";
-        }
-        if (dataSet.equalsIgnoreCase("babelnet")) {
-            result += " -en " + isEnglishOnly;
-        }
-        result += " -isRdf2vecLight " + isRdf2vecLight;
-        if(isRdf2vecLight) {
-            result += " -rdf2vecLightEntityFile \"" + rdf2vecLightEntityFile + "\"";
-        }
-        return result;
-    }
 
     /**
      * Helper method.
@@ -337,65 +219,9 @@ public class Main {
         } else return null;
     }
 
-    /**
-     * Returns a help String.
-     *
-     * @return Help text as String.
-     */
-    public static String getHelp() {
-        String result =
-                // required values
-                "The following settings are required:\n\n" +
-                        "-set <set>\n" +
-                        "The kind of data set.\n" +
-                        "Options for <set>\n" +
-                        "\tany\n" +
-                        "\talod\n" +
-                        "\tany\n" +
-                        "\tbabelnet\n" +
-                        "\twordnet\n" +
-                        "\twiktionary\n\n" +
-                        "-res <resource>\n" +
-                        "Path to data set file or directory.\n\n" +
-                        "-threads <number_of_threads>\n" +
-                        "The number of desired threads.\n\n" +
-                        "-walks <number_of_walks_per_entity>\n" +
-                        "The number of walks per entity.\n\n" +
-                        "-depth <desired_sentence_depth>\n" +
-                        "The number of hops to other nodes for each walk. The total length of a sentence " +
-                        "(counting all tokens) consequently equals: 1 + 2*n. \n\n" +
-                        "-file <file_to_be_written>\n" +
-                        "The path to the file that will be written.\n\n" +
 
-                       "-mode <mode_of_walk_generation>\n" +
-                        "Values for <mode_of_walk_generation>\n" +
-                        "\trandom_with_duplicates\n" +
-                        "\trandom_duplicate_free\n" +
-                        "\tmid_with_duplicates\n\n\n" +
-
-                        // optional values
-                        "The following settings are optional:\n\n" +
-
-                        "-isRdf2vecLight <bool>\n" +
-                        "Indicator whether RDF2Vec LIGHT shall be used. If this is the case, parameter -rdf2vecLightEntityFile MUST be set.\n" +
-                        "Values for <bool>\n" +
-                        "\ttrue\n" +
-                        "\tfalse\n\n" +
-
-                        "-rdf2vecLightEntityFile <path_to_file>\n" +
-                        "The path to the entity file containing the entities for which walk shall be generated. the file must contain only one entity per line.\n\n" +
-
-                        "-en <bool>\n" +
-                        "Required only for BabelNet. Indicator whether only English lemmas shall be used for the walk generation.\n" +
-                        "Values for <bool>\n" +
-                        "\ttrue\n" +
-                        "\tfalse\n\n" +
-
-                        "-unifyAnonymousNodes <bool>\n" +
-                        "Indicator whether anonymous node ids shall be unified or not. Default: False.\n" +
-                        "Values for <bool>\n" +
-                        "\ttrue\n" +
-                        "\tfalse\n\n";
-        return result;
+    public static String getHelp(){
+        return "TODO";
     }
+
 }
