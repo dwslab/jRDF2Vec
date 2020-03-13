@@ -25,7 +25,7 @@ jobs:
           python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Install python dependencies
-        run: pip install -r ./python_server/requirements.txt
+        run: pip install -r ./src/main/resources/requirements.txt
       - name: Install Dependencies
         run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install
       - name: Build with Maven
