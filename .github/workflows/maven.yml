@@ -9,18 +9,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 13
+      - name: Set up JDK 1.9
         uses: actions/setup-java@v1
         with:
-          java-version: '13'
+          java-version: 1.9
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-jrdf2vec-m2
+          restore-keys: ${{ runner.os }}-m2
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+      - name: Install python dependencies
+        run: pip install -r ./python_server/requirements.txt
       - name: Install Dependencies
-        run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install -DskipTests
+        run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Coveralls

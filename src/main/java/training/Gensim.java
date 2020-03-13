@@ -70,14 +70,19 @@ public class Gensim {
 
     /**
      * Indicates whether the shutdown hook has been initialized.
-     * This flag is required in order to have only one hook despite multiple reinitializations.
+     * This flag is required in order to have only one hook despite multiple re-initializations.
      */
     private boolean isHookStarted = false;
 
     /**
+     * Default resources directory (where the python files will be copied to by default).
+     */
+    private static final String DEFAULT_RESOURCES_DIRECTORY = "./python-server/";
+
+    /**
      * The directory where the python files will be copied to.
      */
-    private File resourcesDirectory = new File("./melt-resources/");
+    private File resourcesDirectory = new File(DEFAULT_RESOURCES_DIRECTORY);
 
 
     /**
@@ -444,24 +449,24 @@ public class Gensim {
      */
     private void startServer() {
 
-        File meltResourceDirectory = this.resourcesDirectory;
-        meltResourceDirectory.mkdirs();
+        File serverResourceDirectory = this.resourcesDirectory;
+        serverResourceDirectory.mkdirs();
 
-        exportResource(meltResourceDirectory, "python_server.py");
-        exportResource(meltResourceDirectory, "requirements.txt");
+        exportResource(serverResourceDirectory, "python_server.py");
+        exportResource(serverResourceDirectory, "requirements.txt");
 
         httpClient = HttpClients.createDefault(); // has to be re-instantiated
         String canonicalPath;
-        File serverFile = new File(meltResourceDirectory, "python_server.py");
+        File serverFile = new File(serverResourceDirectory, "python_server.py");
         try {
             if (!serverFile.exists()) {
                 LOGGER.error("Server File does not exist. Cannot start server. ABORTING. Please make sure that " +
-                        "the 'python_server.py' file is placed in directory '/melt-resources/'.");
+                        "the 'python_server.py' file is placed in directory '" + DEFAULT_RESOURCES_DIRECTORY + "'.");
                 return;
             }
             canonicalPath = serverFile.getCanonicalPath();
         } catch (IOException e) {
-            LOGGER.error("Server File ('melt-resources/python_server.py') does not exist. " +
+            LOGGER.error("Server File (" + serverFile.getAbsolutePath() + ") does not exist. " +
                     "Cannot start server. ABORTING.", e);
             return;
         }
@@ -652,9 +657,10 @@ public class Gensim {
      * @param resourcesDirectory Must be a directory.
      */
     public void setResourcesDirectory(File resourcesDirectory) {
+        if(!resourcesDirectory.exists()) resourcesDirectory.mkdir();
         if(!resourcesDirectory.isDirectory()){
-            LOGGER.error("The specified directory is no directory. Using default: './melt-resources/'");
-            resourcesDirectory = new File("./melt-resources/");
+            LOGGER.error("The specified directory is no directory. Using default: '" + DEFAULT_RESOURCES_DIRECTORY + "'");
+            resourcesDirectory = new File(DEFAULT_RESOURCES_DIRECTORY);
         }
         this.resourcesDirectory = resourcesDirectory;
     }
