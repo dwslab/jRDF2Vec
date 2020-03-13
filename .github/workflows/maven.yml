@@ -18,7 +18,7 @@ jobs:
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          restore-keys: ${{ runner.os }}-jrdf2vec-m2
       - name: Install Dependencies
         run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install
       - name: Build with Maven
