@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-jrdf2vec-m2
       - name: Install Dependencies
-        run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install
+        run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install -DskipTests
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Coveralls
