@@ -71,6 +71,8 @@ log.txt.5
 *.nt
 # binaries
 bin/
+/ext/*
+/python-server/*
 
 # exceptions/
 !/jars/*

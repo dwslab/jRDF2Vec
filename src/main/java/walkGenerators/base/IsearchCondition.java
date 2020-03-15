@@ -1,4 +1,4 @@
-package scripts;
+package walkGenerators.base;
 
 public interface IsearchCondition {
     boolean isHit(String input);
