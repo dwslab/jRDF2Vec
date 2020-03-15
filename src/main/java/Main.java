@@ -186,10 +186,12 @@ public class Main {
             Instant before = Instant.now();
             rdf2VecLight.train();
             Instant after = Instant.now();
+
             long days = Duration.between(before, after).toDaysPart();
             long hours = Duration.between(before, after).toHoursPart();
             long minutesPart = Duration.between(before, after).toMinutesPart();
             long seconds = Duration.between(before, after).toSecondsPart();
+
             System.out.println("Training completed.");
             System.out.println("Days: " + days);
             System.out.println("Hours: " + hours);
