@@ -1,6 +1,7 @@
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Word2VecConfiguration;
+import walkGenerators.classic.WalkGeneratorDefault;
 
 import java.io.File;
 import java.time.Duration;
@@ -99,8 +100,10 @@ public class Main {
                 threads = Integer.parseInt(threadsText);
             } catch (NumberFormatException nfe){
                 System.out.println("Could not parse the number of threads. Using default.");
+                threads = Runtime.getRuntime().availableProcessors() / 2;
             }
-        }
+        } else threads = Runtime.getRuntime().availableProcessors() / 2;
+        System.out.println("Using " + threads + " threads for walk generation and training.");
 
         String dimensionText = getValue("-dimension", args);
         dimensionText = (dimensionText == null) ? getValue("-dimensions", args) : dimensionText;
@@ -109,8 +112,10 @@ public class Main {
                 dimensions = Integer.parseInt(dimensionText);
             } catch (NumberFormatException nfe){
                 System.out.println("Could not parse the number of dimensions. Using default.");
+                dimensions = 200;
             }
-        }
+        } else dimensions = 200;
+        System.out.println("Using vector dimension: " + dimensions);
 
         String depthText = getValue("-depth", args);
         if(depthText != null){
@@ -118,8 +123,10 @@ public class Main {
                 depth = Integer.parseInt(depthText);
             } catch (NumberFormatException nfe){
                 System.out.println("Could not parse the depth. Using default.");
+                depth = 4;
             }
-        }
+        } else depth = 4;
+        System.out.println("Using depth " + depth);
 
         String numberOfWalksText = getValue("-numberOfWalks", args);
         numberOfWalksText = (numberOfWalksText == null) ? getValue("-numOfWalks", args) : numberOfWalksText;
@@ -162,8 +169,11 @@ public class Main {
         // ------------------
 
         if(lightEntityFile == null){
-            // TODO run classic
+            //System.out.println("RDF2Vec Classic");
+            //WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile);
+            //classicGenerator.generateRandomWalksDuplicateFree(threads, numberOfWalks, depth);
         } else {
+            System.out.println("RDF2Vec Light Mode");
             RDF2VecLight rdf2VecLight;
             if(walkDirectory == null) rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile);
             else rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile, walkDirectory);

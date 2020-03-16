@@ -42,6 +42,7 @@ This parameter controls the depth of each walk. Depth is defined as the number o
 number. A depth of 1 leads to a sentence in the form `<s p o>`.
 - `-trainingMode <cbow|sg>` (default: `cbow`) <br/>
 This parameter controls the mode to be used for the word2vec training. Allowed values are `cbow` and `sg`.
-- `-numberOfWalks <number>` (default: `100`)
+- `-numberOfWalks <number>` (default: `100`)<br/>
+The number of walks to be performed per entity.
 
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.

@@ -1,10 +1,17 @@
+import com.google.common.collect.Sets;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import training.Word2VecConfiguration;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +27,31 @@ class MainTest {
      * Logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTest.class);
+
+    @Test
+    public void trainLight(){
+        File lightWalks = new File("./mainLightWalks/");
+        lightWalks.mkdir();
+        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
+        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/"};
+        Main.main(args);
+
+        assertTrue(lightWalks.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(lightWalks.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("model.txt"));
+        assertTrue(files.contains("walk_file.gz"));
+
+        try {
+            FileUtils.deleteDirectory(lightWalks);
+        } catch (IOException ioe){
+            LOGGER.error("Failed to clean up after test.", ioe);
+        }
+    }
 
     @Test
     public void getHelp(){
