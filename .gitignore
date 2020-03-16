@@ -38,6 +38,8 @@ hs_err_pid*
 # intellij
 /.idea/
 *.iml
+*.ipr
+*.iws
 
 # eclipse
 /.classpath
@@ -69,10 +71,14 @@ log.txt.5
 /cache/*
 *.txt
 *.nt
+/ext/*
+/extClassic/*
+/extLight/*
+/python-server/*
+/mainWalks/*
+
 # binaries
 bin/
-/ext/*
-/python-server/*
 
 # exceptions/
 !/jars/*

@@ -1,6 +1,5 @@
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Word2VecConfiguration;
@@ -10,40 +9,37 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class RDF2VecLightTest {
+class RDF2VecTest {
 
     /**
      * Logger
      */
-    private static Logger LOGGER = LoggerFactory.getLogger(RDF2VecLightTest.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(RDF2Vec.class);
 
     @Test
     void getWalkFilePath() {
-        File entityFilePath = new File(this.getClass().getClassLoader().getResource("emptyFile.nt").getFile());
         File graphFilePath = new File(this.getClass().getClassLoader().getResource("emptyFile.txt").getPath());
-        RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
-        assertEquals("./walks/walk_file.gz", light.getWalkFilePath());
-        assertTrue(light.getWalkFileDirectoryPath().endsWith("/walks/"), "Directory path: " + light.getWalkFileDirectoryPath());
+        RDF2Vec rdf2vec = new RDF2Vec(graphFilePath);
+        assertEquals("./walks/walk_file.gz", rdf2vec.getWalkFilePath());
+        assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith("/walks/"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
     }
 
     @Test
     void train() {
-        File entityFilePath = new File(this.getClass().getClassLoader().getResource("dummyEntities.txt").getFile());
         File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
-        RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
+        RDF2Vec classic = new RDF2Vec(graphFilePath);
         Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
         configuration.setVectorDimension(10);
-        light.train();
+        classic.train();
     }
 
     @Test
     void trainWithExternalResourcesDirectory(){
-        File entityFilePath = new File(this.getClass().getClassLoader().getResource("dummyEntities.txt").getFile());
         File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
-        File externalResourcesDirectory = new File("./extLight/");
+        File externalResourcesDirectory = new File("./extClassic/");
         externalResourcesDirectory.deleteOnExit();
         externalResourcesDirectory.mkdirs();
-        RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
+        RDF2Vec light = new RDF2Vec(graphFilePath);
         light.setResourceDirectory(externalResourcesDirectory);
         Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
         configuration.setVectorDimension(10);
@@ -51,7 +47,7 @@ class RDF2VecLightTest {
         File serverFile = new File(externalResourcesDirectory, "python_server.py");
         assertTrue(serverFile.exists());
         try {
-            FileUtils.deleteDirectory(externalResourcesDirectory.getCanonicalFile());
+            FileUtils.forceDelete(externalResourcesDirectory.getCanonicalFile());
         } catch (IOException e) {
             LOGGER.info("Cleanup failed.");
             e.printStackTrace();

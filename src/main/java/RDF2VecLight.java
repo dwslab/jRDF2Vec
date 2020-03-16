@@ -11,7 +11,7 @@ import static walkGenerators.classic.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_B
 /**
  * This class allows to generate walks and train embeddings for RDF2Vec Light.
  */
-public class RDF2VecLight {
+public class RDF2VecLight implements IRDF2Vec {
 
     /**
      * File containing the entities for which an embedding shall be trained.
@@ -208,14 +208,6 @@ public class RDF2VecLight {
         this.configuration = configuration;
     }
 
-    public static void main(String[] args) {
-        File knowledgeGraphFile = new File("/Users/janportisch/Documents/Research/DBpedia/dbpedia_merged.hdt");
-        File walkDirectory = new File("/Users/janportisch/PycharmProjects/EmbeddingServer/jRDF2Vec/models/1025/walks/");
-        File lightEntityFile = new File("/Users/janportisch/TMP/test_entities.txt");
-        RDF2VecLight rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile, walkDirectory);
-        rdf2VecLight.train();
-    }
-
     public File getResourceDirectory() {
         return resourceDirectory;
     }
@@ -224,3 +216,4 @@ public class RDF2VecLight {
         this.resourceDirectory = resourceDirectory;
     }
 }
+

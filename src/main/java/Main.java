@@ -1,7 +1,4 @@
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import training.Word2VecConfiguration;
-import walkGenerators.classic.WalkGeneratorDefault;
 
 import java.io.File;
 import java.time.Duration;
@@ -52,6 +49,11 @@ public class Main {
      * The file to which the python resources shall be copied.
      */
     private static File resourcesDirectory;
+
+    /**
+     * Orchestration instance
+     */
+    private static IRDF2Vec rdf2VecInstance;
 
     /**
      * Where the walks will be persisted (directory).
@@ -169,9 +171,33 @@ public class Main {
         // ------------------
 
         if(lightEntityFile == null){
-            //System.out.println("RDF2Vec Classic");
-            //WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile);
-            //classicGenerator.generateRandomWalksDuplicateFree(threads, numberOfWalks, depth);
+            System.out.println("RDF2Vec Classic");
+
+            RDF2Vec rdf2vec;
+            if(walkDirectory == null) rdf2vec = new RDF2Vec(knowledgeGraphFile);
+            else rdf2vec = new RDF2Vec(knowledgeGraphFile, walkDirectory);
+
+            // setting threads
+            if(threads > 0) rdf2vec.setNumberOfThreads(threads);
+
+            // setting depth
+            if(depth > 0) rdf2vec.setDepth(depth);
+
+            // setting the number of walks
+            if(numberOfWalks > 0) rdf2vec.setNumberOfWalksPerEntity(numberOfWalks);
+
+            // set resource directory
+            if(resourcesDirectory != null) rdf2vec.setResourceDirectory(resourcesDirectory);
+
+            rdf2vec.setConfiguration(configuration);
+            Instant before = Instant.now();
+            rdf2vec.train();
+            Instant after = Instant.now();
+            System.out.println("Training completed.");
+            System.out.println(getDeltaTimeString(before, after));
+
+            // setting the instance to allow for better testability
+            rdf2VecInstance = rdf2vec;
         } else {
             System.out.println("RDF2Vec Light Mode");
             RDF2VecLight rdf2VecLight;
@@ -196,6 +222,9 @@ public class Main {
             Instant after = Instant.now();
             System.out.println("Training completed.");
             System.out.println(getDeltaTimeString(before, after));
+
+            // setting the instance to allow for better testability
+            rdf2VecInstance = rdf2VecLight;
         }
     }
 
@@ -256,11 +285,34 @@ public class Main {
 
 
     /**
+     * Get the instance for testing.
+     * @return RDF2Vec instance.
+     */
+    public static IRDF2Vec getRdf2VecInstance() {
+        return rdf2VecInstance;
+    }
+
+    /**
      * Get the help text on how to use the CLI.
      * @return Help text as String.
      */
     public static String getHelp(){
         return "TODO";
+    }
+
+    /**
+     * Reset parameters (required for testing)
+     */
+    public static void reset(){
+        configuration = Word2VecConfiguration.CBOW;
+        lightEntityFile = null;
+        knowledgeGraphFile = null;
+        threads = -1;
+        dimensions = -1;
+        depth = -1;
+        numberOfWalks = -1;
+        resourcesDirectory = null;
+        rdf2VecInstance = null;
     }
 
 }
