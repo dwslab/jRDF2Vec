@@ -37,7 +37,7 @@ class MainTest {
             // simple case
 
             Instant before = Instant.now();
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(3);
             Instant after = Instant.now();
             String result = Main.getDeltaTimeString(before, after);
 

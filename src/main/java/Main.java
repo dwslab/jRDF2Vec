@@ -1,5 +1,3 @@
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Word2VecConfiguration;
@@ -13,11 +11,6 @@ import java.util.concurrent.TimeUnit;
  * Mini command line tool for server application.
  */
 public class Main {
-
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /**
      * word2vec configuration (not just CBOW/SG but contains also all other parameters)
@@ -67,22 +60,26 @@ public class Main {
     public static void main(String[] args) {
 
         if(args.length == 0){
-            LOGGER.error("Not enough arguments.");
+            System.out.println("Not enough arguments.");
         }
 
         String lightEntityFilePath = getValue("-light", args);
         if(lightEntityFilePath != null){
             lightEntityFile = new File(lightEntityFilePath);
             if(!lightEntityFile.exists()){
-                LOGGER.error("The given file does not exist: " + lightEntityFilePath);
+                System.out.println("The given file does not exist: " + lightEntityFilePath);
             }
         }
 
         String knowledgeGraphFilePath = getValue("-graph", args);
+        if(knowledgeGraphFilePath == null){
+            System.out.println("Required parameter '-graph <kg_file>' not set - program cannot be started. " +
+                    "Call '-help' to learn more about the CLI.");
+        }
         if(knowledgeGraphFilePath != null){
             knowledgeGraphFile = new File(knowledgeGraphFilePath);
             if(!knowledgeGraphFile.exists()){
-                LOGGER.error("The given file does not exist: " + knowledgeGraphFilePath);
+                System.out.println("The given file does not exist: " + knowledgeGraphFilePath);
             }
         }
 
@@ -248,6 +245,10 @@ public class Main {
     }
 
 
+    /**
+     * Get the help text on how to use the CLI.
+     * @return Help text as String.
+     */
     public static String getHelp(){
         return "TODO";
     }
