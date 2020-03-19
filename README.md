@@ -30,7 +30,7 @@ The file containing the knowledge graph for which you want to generate embedding
 configuration</a> design paradigm to increase usability. You can overwrite the default values by setting one or more
 optional parameters.
 - `-light <entity_file>`<br/>
-If you intend to use RDF2Vec Light, you have to use this switch followed by the file path ot the describing the entities
+If you intend to use *RDF2Vec Light*, you have to use this switch followed by the file path ot the describing the entities
 for which you require an embedding space. The file should contain one entity (full URI) per line.
 - `-threads <number_of_threads>` (default: `(# of available processors) / 2`)<br/>
 This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the 

@@ -1,9 +1,7 @@
 import training.Word2VecConfiguration;
 
 import java.io.File;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Mini command line tool for server application.
@@ -267,10 +265,29 @@ public class Main {
 
     /**
      * Get the help text on how to use the CLI.
+     * Developer note: Also add new commands to the README.
      * @return Help text as String.
      */
     public static String getHelp(){
-        return "TODO";
+
+        return "jRDF2Vec Help\n" +
+                "-------------\n\n" +
+                "Required Parameters:\n\n"+
+                "    -graph <graph_file>\n" +
+                "    The file containing the knowledge graph for which you want to generate embeddings.\n\n" +
+                "Optional Parameters:\n\n" +
+                "    -light <entity_file>\n" +
+                "    If you intend to use RDF2Vec Light, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.\n\n" +
+                "    -threads <number_of_threads> (default: (# of available processors) / 2)\n" +
+                "    This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.\n\n" +
+                "    -dimension <size_of_vector> (default: 200)\n" +
+                "    This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).\n\n" +
+                "    -depth <depth> (default: 4)\n" +
+                "    This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form <s p o>.\n\n" +
+                "    -trainingMode <cbow|sg> (default: cbow)\n" +
+                "    This parameter controls the mode to be used for the word2vec training. Allowed values are cbow and sg.\n\n" +
+                "    -numberOfWalks <number> (default: 100)\n" +
+                "    The number of walks to be performed per entity.\n";
     }
 
     /**

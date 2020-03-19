@@ -90,7 +90,7 @@ class RDF2VecLightTest {
             e.printStackTrace();
         }
         try {
-            FileUtils.deleteDirectory(new File("./extClassic"));
+            FileUtils.deleteDirectory(new File("./extLight"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./extLight/).");
             e.printStackTrace();
