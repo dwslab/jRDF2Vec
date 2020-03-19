@@ -5,6 +5,7 @@ import training.Word2VecConfiguration;
 import walkGenerators.classic.WalkGeneratorDefault;
 
 import java.io.File;
+import java.time.Instant;
 
 import static walkGenerators.classic.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
@@ -64,6 +65,15 @@ public class RDF2Vec implements IRDF2Vec {
         this(knowledgeGraphFile, null);
     }
 
+    /**
+     * Variable which saves the time it took to generate walks as String (for the last run).
+     */
+    private String requiredTimeForLastWalkGenerationString = null;
+
+    /**
+     * Variable which saves the time ti took to train a model as String (for the last run).
+     */
+    private String requiredTimeForLastTrainingString = null;
 
     /**
      * Constructor
@@ -92,9 +102,13 @@ public class RDF2Vec implements IRDF2Vec {
             return;
         }
 
+        Instant before = Instant.now();
         WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile);
         classicGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, getWalkFilePath());
+        Instant after = Instant.now();
+        this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
 
+        before = Instant.now();
         Gensim gensim;
         if(this.resourceDirectory != null) {
             gensim = Gensim.getInstance(this.resourceDirectory);
@@ -103,6 +117,8 @@ public class RDF2Vec implements IRDF2Vec {
         String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
         gensim.trainWord2VecModel(fileToWrite, getWalkFilePath(), this.configuration);
         gensim.shutDown();
+        after = Instant.now();
+        this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);
     }
 
 
@@ -194,5 +210,23 @@ public class RDF2Vec implements IRDF2Vec {
 
     public void setResourceDirectory(File resourceDirectory) {
         this.resourceDirectory = resourceDirectory;
+    }
+
+    /**
+     * This method returns the time it took to generate walks for the last run as String.
+     * @return The time it took to generate walks for the last run as String. Will never be null.
+     */
+    public String getRequiredTimeForLastWalkGenerationString() {
+        if (this.requiredTimeForLastWalkGenerationString == null) return "<training time not yet set>";
+        else return requiredTimeForLastWalkGenerationString;
+    }
+
+    /**
+     * This method returns he time it took to train the model for the last run as String.
+     * @return The time it took to train the model for the last run as String. Will never be null.
+     */
+    public String getRequiredTimeForLastTrainingString() {
+        if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
+        else return requiredTimeForLastTrainingString;
     }
 }

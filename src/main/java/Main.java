@@ -170,6 +170,8 @@ public class Main {
         //  actual execution
         // ------------------
 
+        Instant before, after;
+
         if(lightEntityFile == null){
             System.out.println("RDF2Vec Classic");
 
@@ -190,11 +192,9 @@ public class Main {
             if(resourcesDirectory != null) rdf2vec.setResourceDirectory(resourcesDirectory);
 
             rdf2vec.setConfiguration(configuration);
-            Instant before = Instant.now();
+            before = Instant.now();
             rdf2vec.train();
-            Instant after = Instant.now();
-            System.out.println("Training completed.");
-            System.out.println(getDeltaTimeString(before, after));
+            after = Instant.now();
 
             // setting the instance to allow for better testability
             rdf2VecInstance = rdf2vec;
@@ -217,15 +217,22 @@ public class Main {
             if(resourcesDirectory != null) rdf2VecLight.setResourceDirectory(resourcesDirectory);
 
             rdf2VecLight.setConfiguration(configuration);
-            Instant before = Instant.now();
+            before = Instant.now();
             rdf2VecLight.train();
-            Instant after = Instant.now();
-            System.out.println("Training completed.");
-            System.out.println(getDeltaTimeString(before, after));
+            after = Instant.now();
 
             // setting the instance to allow for better testability
             rdf2VecInstance = rdf2VecLight;
         }
+
+        System.out.println("\nTotal Time:");
+        System.out.println(Util.getDeltaTimeString(before, after));
+
+        System.out.println("\nWalk Generation Time:");
+        System.out.println(rdf2VecInstance.getRequiredTimeForLastWalkGenerationString());
+
+        System.out.println("\nTraining Time:");
+        System.out.println(rdf2VecInstance.getRequiredTimeForLastTrainingString());
     }
 
 
@@ -247,40 +254,6 @@ public class Main {
         if (positionSet != -1 && arguments.length >= positionSet + 1) {
             return arguments[positionSet + 1];
         } else return null;
-    }
-
-    /**
-     * Helper method. Formats the time delta between {@code before} and {@code after} to a string with human readable
-     * time difference in days, hours, minutes, and seconds.
-     * @param before Start time instance.
-     * @param after End time instance.
-     * @return Human-readable string.
-     */
-    public static String getDeltaTimeString(Instant before, Instant after){
-
-        // unfortunately Java 1.9 which is currently incompatible with coveralls maven plugin...
-        //long days = Duration.between(before, after).toDaysPart();
-        //long hours = Duration.between(before, after).toHoursPart();
-        //long minutes = Duration.between(before, after).toMinutesPart();
-        //long seconds = Duration.between(before, after).toSecondsPart();
-
-        Duration delta = Duration.between(before, after);
-
-        long days = delta.toDays();
-        long hours = days > 0 ? delta.toHours() % (days * 24) : delta.toHours();
-
-
-        long minutesModuloPart = days * 24 * 60 + hours * 60;
-        long minutes = minutesModuloPart > 0 ? delta.toMinutes() % (minutesModuloPart) : delta.toMinutes();
-
-        long secondsModuloPart = days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60;
-        long seconds = secondsModuloPart > 0 ? TimeUnit.MILLISECONDS.toSeconds(delta.toMillis()) % (secondsModuloPart) : TimeUnit.MILLISECONDS.toSeconds(delta.toMillis());
-
-        String result = "Days: " + days + "\n";
-        result += "Hours: " + hours + "\n";
-        result += "Minutes: " + minutes + "\n";
-        result += "Seconds: " + seconds + "\n";
-        return result;
     }
 
 
