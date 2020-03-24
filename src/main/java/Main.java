@@ -14,7 +14,7 @@ public class Main {
     private static Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
 
     /**
-     * File for leightweight generation
+     * File for leight-weight generation
      */
     private static File lightEntityFile = null;
 
@@ -64,6 +64,11 @@ public class Main {
             System.out.println("Not enough arguments.");
         }
 
+        if(containsIgnoreCase("-help", args) || containsIgnoreCase("--help", args) || containsIgnoreCase("-h", args)){
+            System.out.println(getHelp());
+            return;
+        }
+
         String lightEntityFilePath = getValue("-light", args);
         if(lightEntityFilePath != null){
             lightEntityFile = new File(lightEntityFilePath);
@@ -76,11 +81,15 @@ public class Main {
         if(knowledgeGraphFilePath == null){
             System.out.println("Required parameter '-graph <kg_file>' not set - program cannot be started. " +
                     "Call '-help' to learn more about the CLI.");
+            // stop program execution
+            return;
         }
         if(knowledgeGraphFilePath != null){
             knowledgeGraphFile = new File(knowledgeGraphFilePath);
             if(!knowledgeGraphFile.exists()){
                 System.out.println("The given file does not exist: " + knowledgeGraphFilePath);
+                // stop program execution
+                return;
             }
         }
 
@@ -254,6 +263,18 @@ public class Main {
         } else return null;
     }
 
+    /**
+     * Check whether {@code element} is contained in {@code array}.
+     * @param element The element that shall be looked for.
+     * @param array The array in which shall be looked for the element.
+     * @return True if {@code element} is contained in {@code array}, else false.
+     */
+    public static boolean containsIgnoreCase(String element, String[] array){
+        for(String s : array){
+            if(element.equalsIgnoreCase(s)) return true;
+        }
+        return false;
+    }
 
     /**
      * Get the instance for testing.

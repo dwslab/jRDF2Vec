@@ -85,5 +85,15 @@ class MainTest {
 
         // print the help for manual inspection
         System.out.println(result);
+
+        // just making sure there is no exception thrown etc. and the program is not running after calling help.
+        Main.main(new String[]{"-help"});
+    }
+
+    @Test
+    public void containsIgnoreCase(){
+        assertTrue(Main.containsIgnoreCase("hello", new String[]{"hello", "world"}));
+        assertTrue(Main.containsIgnoreCase("HELLO", new String[]{"hello", "world"}));
+        assertFalse(Main.containsIgnoreCase("Europa", new String[]{"hello", "world"}));
     }
 }
