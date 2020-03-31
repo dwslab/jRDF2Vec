@@ -108,7 +108,7 @@ def train_word_2_vec():
         if cbow_or_sg == 'sg':
             model = models.Word2Vec(min_count=1, size=int(vector_dimension), workers=int(number_of_threads), window=int(window_size), sg=1, negative=int(negatives), iter=int(iterations))
         else:
-            model = models.Word2Vec(min_count=1, size=int(vector_dimension), workers=int(number_of_threads), window=int(window_size), sg=0, cbow_mean=1, alpha = 0.05, negative=int(negatives), iter=int(iterations))
+            model = models.Word2Vec(min_count=1, size=int(vector_dimension), workers=int(number_of_threads), window=int(window_size), sg=0, cbow_mean=1, negative=int(negatives), iter=int(iterations))
 
         logging.info("Model object initialized. Building Vocabulary...")
         model.build_vocab(sentences)

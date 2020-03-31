@@ -1,0 +1,5 @@
+http://data.semanticweb.org/person/amelie-cordier
+http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member
+http://data.semanticweb.org/organization/universitaet-mannheim-institut-fuer-informatik
+http://data.semanticweb.org/person/heiner-stuckenschmidt
+http://data.semanticweb.org/person/heiko-paulheim

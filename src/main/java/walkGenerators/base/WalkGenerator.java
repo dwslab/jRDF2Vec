@@ -106,7 +106,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param entities The entities for which walks shall be generated.
      * @param numberOfThreads The number of threads to be used.
      * @param numberOfWalks The number of walks to be generated per thread.
-     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
+     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
      */
     public void generateRandomMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
         File outputFile = new File(filePath);

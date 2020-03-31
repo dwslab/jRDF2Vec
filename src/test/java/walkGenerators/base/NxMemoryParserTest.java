@@ -20,9 +20,9 @@ class NxMemoryParserTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(NxMemoryParserTest.class);
 
     /**
-     * Remark: dummyGraph.nt not parseable.
+     * Remark: dummyGraph.nt not parsable.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     void generateWalkForEntity(){
         NxMemoryParser parser = new NxMemoryParser(getClass().getResource("/dummyGraph_2.nt").getFile(), new DummyWalkGenerator());
         List<String> result_1 = parser.generateDuplicateFreeRandomWalksForEntity("A", 100, 8);
@@ -94,7 +94,6 @@ class NxMemoryParserTest {
             } catch (NotFoundException e) {
                 fail("No exception should occur.", e);
             }
-
 
             fileToUse.delete();
         } catch (IOException e) {

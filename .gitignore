@@ -76,6 +76,8 @@ log.txt.5
 /extLight/*
 /python-server/*
 /mainWalks/*
+/data/*
+/walksOnly/*
 
 # binaries
 bin/

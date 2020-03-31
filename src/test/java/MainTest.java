@@ -1,13 +1,17 @@
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.rdfhdt.hdt.hdt.HDT;
+import org.rdfhdt.hdt.hdt.HDTManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.base.HdtParser;
 
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashSet;
+import java.util.zip.GZIPInputStream;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +27,7 @@ class MainTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTest.class);
 
     @Test
-    public void trainClassic(){
+    public void trainClassic() {
         String walkPath = "./mainWalks/";
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();
@@ -43,7 +47,7 @@ class MainTest {
 
         try {
             FileUtils.forceDelete(walkDirectory);
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             LOGGER.error("Failed to clean up after test.", ioe);
             fail();
         }
@@ -51,7 +55,7 @@ class MainTest {
     }
 
     @Test
-    public void trainLight(){
+    public void trainLight() {
         File lightWalks = new File("./mainLightWalks/");
         lightWalks.mkdir();
         lightWalks.deleteOnExit();
@@ -72,14 +76,30 @@ class MainTest {
 
         try {
             FileUtils.forceDelete(lightWalks);
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             LOGGER.error("Failed to clean up after test.", ioe);
         }
         Main.reset();
     }
 
     @Test
-    public void getHelp(){
+    public void parameterCheck() {
+        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
+        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100"});
+        assertEquals(100, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+
+        // important: reset
+        Main.reset();
+
+        // without light option
+        Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "100"});
+        assertEquals(100, ((RDF2Vec) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+
+    }
+
+    @Test
+    public void getHelp() {
         String result = Main.getHelp();
         assertNotNull(result);
 
@@ -91,9 +111,115 @@ class MainTest {
     }
 
     @Test
-    public void containsIgnoreCase(){
+    public void containsIgnoreCase() {
         assertTrue(Main.containsIgnoreCase("hello", new String[]{"hello", "world"}));
         assertTrue(Main.containsIgnoreCase("HELLO", new String[]{"hello", "world"}));
         assertFalse(Main.containsIgnoreCase("Europa", new String[]{"hello", "world"}));
+    }
+
+
+    /**
+     * Plain generation of walks.
+     */
+    @Test
+    public void plainWalkGenerationLight(){
+
+        // prepare file
+        File graphFileToUse = new File("./swdf-2012-11-28.nt");
+        HDT dataSet = null;
+        try {
+            dataSet = HDTManager.loadHDT(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Could not load HDT file.");
+        }
+        HdtParser.serializeDataSetAsNtFile(dataSet, graphFileToUse);
+
+        // prepare directory
+        File walkDirectory = new File("./walksOnly/");
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+
+
+        String lightFilePath = getClass().getClassLoader().getResource("./swdf_light_entities.txt").getPath();
+        Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/"});
+
+        // make sure that there is only a walk file
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+        assertFalse(files.contains("model.kv"));
+        assertFalse(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+
+        // now check out the walk file
+        try {
+            File walkFile = new File(walkDirectory, "walk_file.gz");
+            assertTrue(walkFile.exists(), "The walk file does not exist.");
+            assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
+
+            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(walkFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+
+            int heikoCount = 0;
+            int heinerCount = 0;
+            int pcmCount = 0;
+
+            String readLine;
+            while((readLine = reader.readLine()) != null){
+                if (readLine.contains("http://data.semanticweb.org/person/heiko-paulheim")) heikoCount++;
+                if (readLine.contains("http://data.semanticweb.org/person/heiner-stuckenschmidt")) heinerCount++;
+                if (readLine.contains("http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member")) pcmCount++;
+            }
+
+            assertTrue(100 <= heikoCount && heikoCount <= 300);
+            assertTrue(100 <= heinerCount && heinerCount <= 300);
+            assertTrue(100 <= pcmCount && pcmCount <= 300);
+
+            reader.close();
+        } catch (FileNotFoundException fnfe){
+            fnfe.printStackTrace();
+            fail("Could not read from walk file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Could not read from walk file.");
+        }
+
+        // clean up
+        graphFileToUse.delete();
+        walkDirectory.delete();
+    }
+
+
+    @AfterAll
+    static void cleanUp() {
+        try {
+            FileUtils.deleteDirectory(new File("./walks"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./walks/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./python-server"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./python-server).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./extClassic"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./extClassic/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./extLight"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./extLight/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./walksOnly"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./walksOnly/).");
+            e.printStackTrace();
+        }
     }
 }

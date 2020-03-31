@@ -32,6 +32,9 @@ optional parameters.
 - `-light <entity_file>`<br/>
 If you intend to use *RDF2Vec Light*, you have to use this switch followed by the file path ot the describing the entities
 for which you require an embedding space. The file should contain one entity (full URI) per line.
+- `-onlyWalks`<br>
+If added to the call, this switch will deactivate the training part so that only walks are generated. If training 
+parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.
 - `-threads <number_of_threads>` (default: `(# of available processors) / 2`)<br/>
 This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the 
 training.

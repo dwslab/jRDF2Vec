@@ -5,6 +5,9 @@ import org.apache.jena.query.*;
 
 import java.util.HashSet;
 
+/**
+ * Get all entities using a Jena OntModel.
+ */
 public class OntModelEntitySelector implements EntitySelector {
 
     /**

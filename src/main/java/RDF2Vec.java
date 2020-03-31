@@ -49,7 +49,7 @@ public class RDF2Vec implements IRDF2Vec {
     /**
      * Resources directory where the python files will be copied to.
      */
-    File resourceDirectory = null;
+    File pythonServerResourceDirectory = null;
 
     /**
      * Logger
@@ -110,8 +110,8 @@ public class RDF2Vec implements IRDF2Vec {
 
         before = Instant.now();
         Gensim gensim;
-        if(this.resourceDirectory != null) {
-            gensim = Gensim.getInstance(this.resourceDirectory);
+        if(this.pythonServerResourceDirectory != null) {
+            gensim = Gensim.getInstance(this.pythonServerResourceDirectory);
         } else gensim = Gensim.getInstance();
 
         String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
@@ -204,12 +204,12 @@ public class RDF2Vec implements IRDF2Vec {
         this.configuration = configuration;
     }
 
-    public File getResourceDirectory() {
-        return resourceDirectory;
+    public File getPythonServerResourceDirectory() {
+        return pythonServerResourceDirectory;
     }
 
-    public void setResourceDirectory(File resourceDirectory) {
-        this.resourceDirectory = resourceDirectory;
+    public void setPythonServerResourceDirectory(File pythonServerResourceDirectory) {
+        this.pythonServerResourceDirectory = pythonServerResourceDirectory;
     }
 
     /**

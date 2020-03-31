@@ -54,9 +54,10 @@ public class MidWalkEntityProcessingRunnable implements Runnable {
      */
     public void run() {
         if (walkGenerator.parser.getClass() == HdtParser.class) {
-            walkGenerator.writeToFile(((HdtParser) walkGenerator.parser).generateMidWalksForEntity(walkGenerator.shortenUri(entity), this.depth, this.numberOfWalks));
+            walkGenerator.writeToFile(((HdtParser) walkGenerator.parser).generateMidWalksForEntity(walkGenerator.shortenUri(entity), this.numberOfWalks, this.depth));
         } else if (walkGenerator.parser.getClass() == NtMemoryParser.class) {
-            walkGenerator.writeToFile(((NtMemoryParser) walkGenerator.parser).generateMidWalksForEntity(walkGenerator.shortenUri(entity), this.depth, this.numberOfWalks));
+            // yes, the depth and # of walks parameters are this way
+            walkGenerator.writeToFile(((NtMemoryParser) walkGenerator.parser).generateMidWalksForEntity(walkGenerator.shortenUri(entity),this.depth, this.numberOfWalks));
         } else if (walkGenerator.parser.getClass() == NxMemoryParser.class) {
             walkGenerator.writeToFile(((NxMemoryParser) walkGenerator.parser).generateMidWalksForEntity(walkGenerator.shortenUri(entity), this.depth, this.numberOfWalks));
         } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT PARSER!");

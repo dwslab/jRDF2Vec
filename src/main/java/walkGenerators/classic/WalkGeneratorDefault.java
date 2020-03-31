@@ -100,6 +100,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
                     LOGGER.info("HDT file detected. Using HDT parser.");
                         try {
                             this.parser = new HdtParser(pathToTripleFile);
+                            this.entitySelector = new HdtEntitySelector(pathToTripleFile);
                         } catch (IOException ioe){
                             LOGGER.error("Propagated HDT Initializer Exception", ioe);
                         }

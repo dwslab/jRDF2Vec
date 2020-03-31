@@ -56,7 +56,7 @@ class RDF2VecTest {
         externalResourcesDirectory.deleteOnExit();
         externalResourcesDirectory.mkdirs();
         RDF2Vec light = new RDF2Vec(graphFilePath);
-        light.setResourceDirectory(externalResourcesDirectory);
+        light.setPythonServerResourceDirectory(externalResourcesDirectory);
         Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
         configuration.setVectorDimension(10);
         light.train();

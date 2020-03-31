@@ -99,8 +99,6 @@ class NtMemoryParserTest {
         }
 
         assertEquals(3, maxLengh);
-
-
     }
 
 
@@ -135,7 +133,6 @@ class NtMemoryParserTest {
                 // check whether the target entity occurs
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
-
 
             String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
             try {
@@ -206,7 +203,5 @@ class NtMemoryParserTest {
             fail("Init should not fail.");
         }
     }
-
-
 
 }
