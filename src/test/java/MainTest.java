@@ -122,7 +122,68 @@ class MainTest {
      * Plain generation of walks.
      */
     @Test
-    public void plainWalkGenerationLight(){
+    public void plainWalkGenerationLightHdtFile(){
+
+        // prepare file
+        File graphFileToUse = new File(getClass().getClassLoader().getResource("./swdf-2012-11-28.hdt").getPath());
+
+        // prepare directory
+        File walkDirectory = new File("./walksOnly/");
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+
+        String lightFilePath = getClass().getClassLoader().getResource("./swdf_light_entities.txt").getPath();
+        Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/"});
+
+        // make sure that there is only a walk file
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+        assertFalse(files.contains("model.kv"));
+        assertFalse(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+
+        // now check out the walk file
+        try {
+            File walkFile = new File(walkDirectory, "walk_file.gz");
+            assertTrue(walkFile.exists(), "The walk file does not exist.");
+            assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
+
+            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(walkFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+
+            int heikoCount = 0;
+            int heinerCount = 0;
+            int pcmCount = 0;
+
+            String readLine;
+            while((readLine = reader.readLine()) != null){
+                if (readLine.contains("http://data.semanticweb.org/person/heiko-paulheim")) heikoCount++;
+                if (readLine.contains("http://data.semanticweb.org/person/heiner-stuckenschmidt")) heinerCount++;
+                if (readLine.contains("http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member")) pcmCount++;
+            }
+
+            assertTrue(100 <= heikoCount && heikoCount <= 300);
+            assertTrue(100 <= heinerCount && heinerCount <= 300);
+            assertTrue(100 <= pcmCount && pcmCount <= 300);
+
+            reader.close();
+        } catch (FileNotFoundException fnfe){
+            fnfe.printStackTrace();
+            fail("Could not read from walk file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Could not read from walk file.");
+        }
+
+        // clean up
+        walkDirectory.delete();
+    }
+
+
+    /**
+     * Plain generation of walks.
+     */
+    @Test
+    public void plainWalkGenerationLightNtFile(){
 
         // prepare file
         File graphFileToUse = new File("./swdf-2012-11-28.nt");
