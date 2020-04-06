@@ -1,11 +1,8 @@
-import org.semanticweb.yars.nx.parser.NxParser;
 import walkGenerators.base.DummyWalkGenerator;
 import walkGenerators.base.NxMemoryParser;
-import walkGenerators.classic.WalkGeneratorDefault;
-import walkGenerators.light.DBpedia.DBpediaLightEntitySelector;
+import walkGenerators.base.WalkGeneratorDefault;
 import walkGenerators.light.DBpedia.DBpediaWalkGeneratorLight;
 import walkGenerators.light.LightEntitySelector;
-import walkGenerators.light.WalkGeneratorLight;
 
 /**
  * Can be started in CLI using {@code -main} option.

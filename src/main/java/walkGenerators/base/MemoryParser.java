@@ -93,6 +93,44 @@ public abstract class MemoryParser implements IParser {
 
 
     /**
+     * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     * @param numberOfWalks The number of walks to be generated.
+     * @param entity The entity for which a walk shall be generated.
+     * @param depth The depth of each walk.
+     * @return List where every item is a walk separated by spaces.
+     */
+    public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
+        return convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
+    }
+
+
+    /**
+     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
+     * into a list of strings where a walk is one string (and the elements are separated by spaces).
+     * The lists are duplicate free.
+     * @param dataStructureToConvert The data structure that shall be converted.
+     * @return Data structure converted to string list.
+     */
+    public List<String> convertToStringWalksDuplicateFree(List<List<String>> dataStructureToConvert) {
+        HashSet<String> uniqueSet = new HashSet<>();
+        for (List<String> individualWalk : dataStructureToConvert){
+            String walk = "";
+            boolean isFirst = true;
+            for(String walkComponent : individualWalk){
+                if(isFirst){
+                    isFirst = false;
+                    walk = walkComponent;
+                } else {
+                    walk += " " + walkComponent;
+                }
+            }
+            uniqueSet.add(walk);
+        }
+        return new ArrayList<>(uniqueSet);
+    }
+
+
+    /**
      * Generates a single walk for the given entity with the given depth.
      *
      * @param entity The entity for which a walk shall be generated.

@@ -1,5 +1,6 @@
 import training.Word2VecConfiguration;
-import walkGenerators.classic.WalkGeneratorDefault;
+import walkGenerators.base.WalkGenerationMode;
+import walkGenerators.base.WalkGeneratorDefault;
 import walkGenerators.light.WalkGeneratorLight;
 
 import java.io.File;
@@ -13,7 +14,7 @@ public class Main {
     /**
      * word2vec configuration (not just CBOW/SG but contains also all other parameters)
      */
-    private static Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
+    private static Word2VecConfiguration configuration = Word2VecConfiguration.SG;
 
     /**
      * File for light-weight generation
@@ -37,13 +38,15 @@ public class Main {
 
     /**
      * Depth for the walks to be generated.
+     * Default: 4
      */
-    private static int depth = -1;
+    private static int depth = 4;
 
     /**
      * The number of walks to be generated for each node.
+     * Default: 100
      */
-    private static int numberOfWalks = -1;
+    private static int numberOfWalks = 100;
 
     /**
      * The file to which the python resources shall be copied.
@@ -59,6 +62,11 @@ public class Main {
      * Where the walks will be persisted (directory).
      */
     private static File walkDirectory = null;
+
+    /**
+     * Walk generation mode.
+     */
+    private static WalkGenerationMode walkGenerationMode = null;
 
     /**
      * If true, only walks are generated and no embeddings are trained.
@@ -184,6 +192,12 @@ public class Main {
         if (dimensions > 0) configuration.setVectorDimension(dimensions);
 
 
+        String walkGenerationModeText = getValue("-walkGenerationMode", args);
+        walkGenerationModeText = (walkGenerationModeText == null) ? getValue("-walkMode", args) : walkGenerationModeText;
+        if(walkGenerationModeText != null) {
+            walkGenerationMode = WalkGenerationMode.getModeFromString(walkGenerationModeText);
+        }
+
 
         Instant before, after;
 
@@ -203,18 +217,18 @@ public class Main {
                 walkFile = walkDirectory.getAbsolutePath() + "/walk_file.gz";
             }
 
-
             before = Instant.now();
 
             // now distinguish light/non-light
             if (lightEntityFile != null) {
                 // light walk generation:
                 WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile);
-                generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
+                generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, walkFile);
+
             } else {
                 // classic walk generation
                 WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile);
-                classicGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+                classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, walkFile);
             }
 
             after = Instant.now();
@@ -329,12 +343,28 @@ public class Main {
     }
 
     /**
-     * Get the instance for testing.
+     * Get the instance for testing. Not required for operational usage.
      *
      * @return RDF2Vec instance.
      */
     public static IRDF2Vec getRdf2VecInstance() {
         return rdf2VecInstance;
+    }
+
+    /**
+     * Get the walk generation mode for testing. Not required for operational usage.
+     * @return Walk Generation Mode.
+     */
+    public static WalkGenerationMode getWalkGenerationMode() {
+        return walkGenerationMode;
+    }
+
+    /**
+     * Get depth for testing. Not required for operational usage.
+     * @return Depth as int.
+     */
+    public static int getDepth() {
+        return depth;
     }
 
     /**
@@ -361,10 +391,12 @@ public class Main {
                 "    This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).\n\n" +
                 "    -depth <depth> (default: 4)\n" +
                 "    This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form <s p o>.\n\n" +
-                "    -trainingMode <cbow|sg> (default: cbow)\n" +
+                "    -trainingMode <cbow|sg> (default: sg)\n" +
                 "    This parameter controls the mode to be used for the word2vec training. Allowed values are cbow and sg.\n\n" +
                 "    -numberOfWalks <number> (default: 100)\n" +
-                "    The number of walks to be performed per entity.\n";
+                "    The number of walks to be performed per entity.\n\n" +
+                "    -walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE> (default for light: MID_WALKS, default for classic: RANDOM_WALKS_DUPLICATE_FREE)\n" +
+                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n";
     }
 
     /**
@@ -376,10 +408,11 @@ public class Main {
         knowledgeGraphFile = null;
         numberOfThreads = -1;
         dimensions = -1;
-        depth = -1;
-        numberOfWalks = -1;
+        depth = 4;
+        numberOfWalks = 100;
         resourcesDirectory = null;
         rdf2VecInstance = null;
+        walkGenerationMode = null;
     }
 
 }

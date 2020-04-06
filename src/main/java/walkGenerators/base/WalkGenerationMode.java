@@ -1,51 +1,67 @@
 package walkGenerators.base;
 
 /**
- * Generation Mode
+ * There must be a runnable for each walk generation option.
  */
 public enum WalkGenerationMode {
 
     /**
-     * Random walks.
+     * Mid-walk walk generation: Given an entity, it is randomly decided whether to go backwards or forwards during
+     * the walk generation.
      */
-    RANDOM_WITH_DUPLICATES,
+    MID_WALKS,
 
     /**
-     * Random walks without duplicates.
+     * Mid-walk walk generation: Given an entity, it is randomly decided whether to go backwards or forwards during
+     * the walk generation. The generated walks are free of duplicates. Due to the implementation this can lead
+     * to less generated walks than originally specified.
      */
-    RANDOM_DUPLICATE_FREE,
+    MID_WALKS_DUPLICATE_FREE,
 
     /**
-     * Mid walks.
+     * Plain random walks generated in a forward-fashion (going backwards is not allowed).
      */
-    MID_WITH_DUPLICATES;
+    RANDOM_WALKS,
 
     /**
-     * Maps a string representation to an enum instance.
-     * @param modeIdentifier Label describing the mode.
-     * @return Mode, if unknown: null.
+     * Plain random walks generated in a forward-fashion (going backwards is not allowed).
+     * Duplicates are not allowed.
      */
-    public static WalkGenerationMode getMode(String modeIdentifier){
-        modeIdentifier = modeIdentifier.toUpperCase();
-        modeIdentifier = modeIdentifier.trim();
-        switch (modeIdentifier){
-            case "RANDOM_WITH_DUPLICATES":
-                return WalkGenerationMode.RANDOM_WITH_DUPLICATES;
-            case "RANDOM_DUPLICATE_FREE":
-                return WalkGenerationMode.RANDOM_DUPLICATE_FREE;
-            case "MID_WITH_DUPLICATES":
-                return WalkGenerationMode.MID_WITH_DUPLICATES;
+    RANDOM_WALKS_DUPLICATE_FREE;
+
+
+    /**
+     * String representation of mode.
+     * @param modeString The mode as String.
+     * @return If possible, walk generation mode. Else null.
+     */
+    public static WalkGenerationMode getModeFromString(String modeString){
+        modeString = modeString.toLowerCase().trim();
+        switch (modeString){
+            case "mid_walks":
+                return MID_WALKS;
+            case "mid_walks_duplicate_free":
+                return MID_WALKS_DUPLICATE_FREE;
+            case "random_walks":
+                return RANDOM_WALKS;
+            case "random_walks_duplicate_free":
+                return RANDOM_WALKS_DUPLICATE_FREE;
             default:
                 return null;
         }
     }
 
     /**
-     * Obtain all available options.
-     * @return String of options, pipe separated.
+     * Get a string representation of all available modes.
+     * @return String representation of all modes.
      */
     public static String getOptions(){
-        return "RANDOM_WITH_DUPLICATES | RANDOM_DUPLICATE_FREE | MID_WITH_DUPLICATES";
+        String result = "";
+        for(WalkGenerationMode mode : WalkGenerationMode.values()){
+            result += mode.toString() + " | ";
+        }
+        result = result.substring(0, result.length() - 3);
+        return result;
     }
 
 }

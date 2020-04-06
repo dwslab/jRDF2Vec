@@ -1,3 +1,5 @@
+import walkGenerators.base.WalkGenerationMode;
+
 /**
  * Interface for RDF2Vec orchestration classes.
  */
@@ -14,4 +16,16 @@ public interface IRDF2Vec {
      * @return The time it took to train the model for the last run as String. Will never be null.
      */
     String getRequiredTimeForLastTrainingString();
+
+    /**
+     * Set the walk generation mode.
+     * @param walkGenerationMode Mode to use.
+     */
+    void setWalkGenerationMode(WalkGenerationMode walkGenerationMode);
+
+    /**
+     * Set the walk generation mode for the generation part of RDF2Vec.
+     * @return {@link WalkGenerationMode} to be used.
+     */
+    WalkGenerationMode getWalkGenerationMode();
 }

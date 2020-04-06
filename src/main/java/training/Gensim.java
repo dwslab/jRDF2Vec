@@ -86,7 +86,7 @@ public class Gensim {
 
 
     /**
-     * Method to train a vector space model. The file for the training (i.e., csv file where first column is id and second colum text) has to
+     * Method to train a vector space model. The file for the training (i.e., csv file where first column is id and second column text) has to
      * exist already.
      * @param modelPath identifier for the model (used for querying a specific model
      * @param trainingFilePath The file path to the file that shall be used for training.

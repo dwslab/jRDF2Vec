@@ -1,5 +1,7 @@
-package walkGenerators.base;
+package walkGenerators.runnables;
 
+import walkGenerators.base.MemoryParser;
+import walkGenerators.base.WalkGenerator;
 import walkGenerators.dataStructure.Triple;
 
 import java.util.ArrayList;

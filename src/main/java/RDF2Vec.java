@@ -2,12 +2,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Gensim;
 import training.Word2VecConfiguration;
-import walkGenerators.classic.WalkGeneratorDefault;
+import walkGenerators.base.WalkGenerationMode;
+import walkGenerators.base.WalkGeneratorDefault;
 
 import java.io.File;
 import java.time.Instant;
 
-import static walkGenerators.classic.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+import static walkGenerators.base.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
  * This class allows to generate walks and train embeddings for RDF2Vec Classic.
@@ -76,6 +77,11 @@ public class RDF2Vec implements IRDF2Vec {
     private String requiredTimeForLastTrainingString = null;
 
     /**
+     * Walk generation mode for the walk generation part.
+     */
+    private WalkGenerationMode walkGenerationMode = WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
+
+    /**
      * Constructor
      *
      * @param knowledgeGraphFile File to the knowledge graph.
@@ -104,7 +110,7 @@ public class RDF2Vec implements IRDF2Vec {
 
         Instant before = Instant.now();
         WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile);
-        classicGenerator.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, getWalkFilePath());
+        classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, getWalkFilePath());
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
 
@@ -228,5 +234,15 @@ public class RDF2Vec implements IRDF2Vec {
     public String getRequiredTimeForLastTrainingString() {
         if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
         else return requiredTimeForLastTrainingString;
+    }
+
+    @Override
+    public void setWalkGenerationMode(WalkGenerationMode walkGenerationMode) {
+        this.walkGenerationMode = walkGenerationMode;
+    }
+
+    @Override
+    public WalkGenerationMode getWalkGenerationMode() {
+        return this.walkGenerationMode;
     }
 }

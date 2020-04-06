@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import walkGenerators.base.IsearchCondition;
 import walkGenerators.base.NtMemoryParser;
+import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.base.WalkGenerator;
 
 import java.io.*;
@@ -72,6 +73,11 @@ public class BabelNetWalkGenerator extends WalkGenerator {
             }
         });
         ((NtMemoryParser)this.parser).readNtTriplesFromDirectoryMultiThreaded(pathToNtFiles, true);
+    }
+
+    @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+        // do nothing
     }
 
     @Override
@@ -277,6 +283,16 @@ public class BabelNetWalkGenerator extends WalkGenerator {
             LOGGER.error("Problematic URI that will be returned as it is:\n" + uri);
             return uri;
         }
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
     }
 
 

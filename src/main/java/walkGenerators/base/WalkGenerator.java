@@ -6,6 +6,10 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.runnables.DuplicateFreeMidWalkEntityProcessingRunnable;
+import walkGenerators.runnables.DuplicateFreeWalkEntityProcessingRunnable;
+import walkGenerators.runnables.MidWalkEntityProcessingRunnable;
+import walkGenerators.runnables.RandomWalkEntityProcessingRunnable;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -25,35 +29,33 @@ public abstract class WalkGenerator implements IWalkGenerator {
 
     /**
      * The walk file(s) will be persisted in "./walks".
-     * @param numberOfThreads The number of threads to be run.
+     *
+     * @param numberOfThreads        The number of threads to be run.
      * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
-     * @param depth The depth of each walk.
+     * @param depth                  The depth of each walk.
      */
     public abstract void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth);
 
     /**
-     *
-     * @param numberOfThreads The number of threads to be run.
-     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
-     * @param depth The depth of each walk.
+     * @param numberOfThreads           The number of threads to be run.
+     * @param numberOfWalksPerEntity    The number of walks that shall be performed per entity.
+     * @param depth                     The depth of each walk.
      * @param filePathOfFileToBeWritten The path to the file that shall be written.
      */
     public abstract void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten);
 
     /**
-     *
-     * @param numberOfThreads The number of threads to be run.
-     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
-     * @param depth The depth of each walk.
+     * @param numberOfThreads           The number of threads to be run.
+     * @param numberOfWalksPerEntity    The number of walks that shall be performed per entity.
+     * @param depth                     The depth of each walk.
      * @param filePathOfFileToBeWritten The path to the file that shall be written.
      */
     public abstract void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten);
 
     /**
-     *
-     * @param numberOfThreads The number of threads to be run.
+     * @param numberOfThreads        The number of threads to be run.
      * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
-     * @param depth The depth of each walk.
+     * @param depth                  The depth of each walk.
      */
     public abstract void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth);
 
@@ -94,21 +96,61 @@ public abstract class WalkGenerator implements IWalkGenerator {
 
     /**
      * Given a URI, a short version is created.
+     *
      * @param uri The uri to be transformed.
      * @return Shortened version of the URI.
      */
     public abstract String shortenUri(String uri);
 
+    /**
+     * Generate walks for the entities that are duplicate free (i.e., no walk exists twice in the resulting file).
+     *
+     * @param entities        The entities for which walks shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param numberOfWalks   The number of walks to be generated per thread.
+     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
+     */
+    public void generateRandomMidWalksForEntitiesDuplicateFree(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
+        File outputFile = new File(filePath);
+        outputFile.getParentFile().mkdirs();
+
+        // initialize the writer
+        try {
+            this.writer = new OutputStreamWriter(new GZIPOutputStream(
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
+        } catch (Exception e1) {
+            LOGGER.error("Could not initialize writer. Aborting process.", e1);
+            return;
+        }
+
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
+                0, TimeUnit.SECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
+
+        for (String entity : entities) {
+            DuplicateFreeMidWalkEntityProcessingRunnable th = new DuplicateFreeMidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            pool.execute(th);
+        }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(10, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Interrupted Exception");
+            e.printStackTrace();
+        }
+        this.close();
+    }
+
 
     /**
-     * Generate walks for the entities that are free of duplicates (i.e., no walk exists twice in the resulting file).
+     * Generate walks for the entities.
      *
-     * @param entities The entities for which walks shall be generated.
+     * @param entities        The entities for which walks shall be generated.
      * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks The number of walks to be generated per thread.
-     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
+     * @param numberOfWalks   The number of walks to be generated per thread.
+     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
      */
-    public void generateRandomMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
+    public void generateRandomMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
         outputFile.getParentFile().mkdirs();
 
@@ -143,12 +185,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Generate walks for the entities that are free of duplicates (i.e., no walk exists twice in the resulting file).
      *
-     * @param entities The entities for which walks shall be generated.
+     * @param entities        The entities for which walks shall be generated.
      * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks The number of walks to be generated per thread.
-     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
+     * @param numberOfWalks   The number of walks to be generated per thread.
+     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
-    public void generateDuplicateFreeWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength){
+    public void generateDuplicateFreeWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
         outputFile.getParentFile().mkdirs();
 
@@ -182,10 +224,10 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Generate walks for the entities.
      *
-     * @param entities The entities for which walks shall be generated.
+     * @param entities        The entities for which walks shall be generated.
      * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks The number of walks to be generated per thread.
-     * @param walkLength The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
+     * @param numberOfWalks   The number of walks to be generated per thread.
+     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
     public void generateWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
@@ -303,7 +345,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Writes the given HashSet to a file.
      *
-     * @param filePath The path to the file that shall be written.
+     * @param filePath   The path to the file that shall be written.
      * @param setToWrite The HashSet that hsall be written to the file.
      */
     public static void writeHashSetToFile(String filePath, HashSet<String> setToWrite) {
@@ -313,7 +355,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
             for (String entry : setToWrite) {
                 if (isFirstLine) isFirstLine = false;
                 else writer.write("\n");
-                if(entry != null) writer.write(entry);
+                if (entry != null) writer.write(entry);
                 else LOGGER.error("Empty entry in set to write.");
             }
             writer.flush();
@@ -328,7 +370,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Reads an ontology from a given URL.
      *
-     * @param path of ontology to be read.
+     * @param path     of ontology to be read.
      * @param language The syntax format of the ontology file such as {@code "TTL"}, {@code "NT"}, or {@code "RDFXML"}.
      * @return Model instance.
      * @throws MalformedURLException Exception for malformed URLs.
@@ -339,7 +381,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
             OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
             model.read(url.toString(), language);
             return model;
-        } catch (RiotException re){
+        } catch (RiotException re) {
             LOGGER.error("Could not parse: " + path + "\nin jena.", re);
             return null;
         }
@@ -363,12 +405,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
     /**
      * Close resources.
      */
-    public void close(){
-        if(writer == null) return;
+    public void close() {
+        if (writer == null) return;
         try {
             writer.flush();
             writer.close();
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             LOGGER.error("There was an error when closing the writer.", ioe);
         }
     }

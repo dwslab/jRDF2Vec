@@ -3,6 +3,11 @@ package walkGenerators.base;
 public class DummyWalkGenerator extends WalkGenerator {
 
     @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+        // do nothing
+    }
+
+    @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         // do nothing
     }
@@ -29,6 +34,16 @@ public class DummyWalkGenerator extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        // do nothing
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        // do nothing
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         // do nothing
     }
 

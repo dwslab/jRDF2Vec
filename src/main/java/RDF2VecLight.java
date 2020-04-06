@@ -2,12 +2,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Gensim;
 import training.Word2VecConfiguration;
+import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.light.WalkGeneratorLight;
 
 import java.io.File;
 import java.time.Instant;
 
-import static walkGenerators.classic.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+import static walkGenerators.base.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
  * This class allows to generate walks and train embeddings for RDF2Vec Light.
@@ -66,6 +67,11 @@ public class RDF2VecLight implements IRDF2Vec {
     private String requiredTimeForLastTrainingString = null;
 
     /**
+     * Walk generation mode.
+     */
+    private WalkGenerationMode walkGenerationMode = WalkGenerationMode.MID_WALKS;
+
+    /**
      * Logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(RDF2VecLight.class);
@@ -116,7 +122,8 @@ public class RDF2VecLight implements IRDF2Vec {
 
         Instant before = Instant.now();
         WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, entitiesFile);
-        generatorLight.generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, this.getWalkFilePath());
+        generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, this.getWalkFilePath());
+
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
 
@@ -249,6 +256,16 @@ public class RDF2VecLight implements IRDF2Vec {
     public String getRequiredTimeForLastTrainingString() {
         if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
         else return requiredTimeForLastTrainingString;
+    }
+
+    @Override
+    public void setWalkGenerationMode(WalkGenerationMode walkGenerationMode) {
+        this.walkGenerationMode = walkGenerationMode;
+    }
+
+    @Override
+    public WalkGenerationMode getWalkGenerationMode() {
+        return this.walkGenerationMode;
     }
 
 }

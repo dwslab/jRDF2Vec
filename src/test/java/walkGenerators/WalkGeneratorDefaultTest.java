@@ -1,7 +1,7 @@
 package walkGenerators;
 
 import org.junit.jupiter.api.Test;
-import walkGenerators.classic.WalkGeneratorDefault;
+import walkGenerators.base.WalkGeneratorDefault;
 
 import java.io.*;
 import java.util.HashSet;

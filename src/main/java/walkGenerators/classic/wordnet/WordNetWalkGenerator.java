@@ -5,6 +5,7 @@ import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import walkGenerators.base.NtMemoryParser;
+import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.base.WalkGenerator;
 
 import java.io.*;
@@ -60,6 +61,11 @@ public class WordNetWalkGenerator extends WalkGenerator {
         }
     }
 
+
+    @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+        // do nothing
+    }
 
     @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
@@ -145,4 +151,15 @@ public class WordNetWalkGenerator extends WalkGenerator {
     public OntModel getModel() {
         return model;
     }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
+    }
+
 }

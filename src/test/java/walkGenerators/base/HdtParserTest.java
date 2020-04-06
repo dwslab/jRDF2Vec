@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -134,6 +135,59 @@ class HdtParserTest {
 
 
     @Test
+    public void generateMidWalksForEntityDuplicateFree(){
+        try {
+            HdtParser parser = new HdtParser(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            String concept = "http://data.semanticweb.org/person/amelie-cordier";
+            int numberOfWalks = 100;
+            int depth = 1;
+            List<String> walks1 = parser.generateMidWalksForEntityDuplicateFree(concept, numberOfWalks, depth);
+            assertNotNull(walks1);
+
+            // check number of generated walks
+            assertTrue(walks1.size() < numberOfWalks);
+
+            nextWalk:
+            for (String walk : walks1) {
+
+                // check walk size
+                assertTrue((walk.split(" ").length % 2) == 1.0, "Walks must be uneven. Number of elements in walk: " + walk.split(" ").length + "\nWalk:\n" + walk);
+
+                for (String component : walk.split(" ")) {
+                    if (component.equals(concept)) {
+                        continue nextWalk;
+                    }
+                }
+
+                // check whether the target entity occurs
+                fail("No occurrence of " + concept + " in sentence: " + walk);
+            }
+
+            String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+            try {
+                HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
+                for (String walk : walks1) {
+                    String[] walkArray = walk.split(" ");
+                    for (int i = 2; i < walkArray.length - 1; i += i + 2) {
+                        IteratorTripleString iterator = hdtDataSet.search(walkArray[i - 2], walkArray[i - 1], walkArray[i]);
+                        assertTrue(iterator.hasNext(), "The following triple appeared in the walk but not in the data set:\n"
+                                + walkArray[i - 2] + " " + walkArray[i - 1] + " " + walkArray[i]
+                                + "\nSentence:\n" + walk);
+                    }
+                }
+            } catch (IOException e) {
+                fail("No exception should occur.", e);
+            } catch (NotFoundException e) {
+                fail("No exception should occur.", e);
+            }
+        } catch (IOException ioe) {
+            LOGGER.error("HDT Init error.");
+            fail("Init should not fail.");
+        }
+    }
+
+
+    @Test
     public void generateMidWalksForEntity() {
         try {
             HdtParser parser = new HdtParser(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
@@ -162,7 +216,6 @@ class HdtParserTest {
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
 
-
             String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
             try {
                 HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
@@ -186,5 +239,23 @@ class HdtParserTest {
         }
     }
 
+    @Test
+    void isSameListContent() {
+        List<String> list_1 = new ArrayList<>();
+        list_1.add("A");
+        list_1.add("B");
+
+        List<String> list_2 = new ArrayList<>();
+        list_2.add("A");
+        list_2.add("B");
+
+        List<String> list_3 = new ArrayList<>();
+        list_3.add("A");
+        list_3.add("C");
+
+        // default
+        assertTrue(list_1.equals(list_2));
+        assertFalse(list_1.equals(list_3));
+    }
 
 }

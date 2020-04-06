@@ -43,9 +43,13 @@ This parameter allows you to control the size of the resulting vectors (e.g. 100
 - `-depth <depth>` (default: `4`)<br/>
 This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd
 number. A depth of 1 leads to a sentence in the form `<s p o>`.
-- `-trainingMode <cbow|sg>` (default: `cbow`) <br/>
+- `-trainingMode <cbow | sg>` (default: `sg`) <br/>
 This parameter controls the mode to be used for the word2vec training. Allowed values are `cbow` and `sg`.
 - `-numberOfWalks <number>` (default: `100`)<br/>
 The number of walks to be performed per entity.
+- `-walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE>` 
+(default for light: `MID_WALKS`, default for classic: `RANDOM_WALKS_DUPLICATE_FREE`)<br/>
+This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). 
+
 
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.

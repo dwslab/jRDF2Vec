@@ -1,7 +1,11 @@
-package walkGenerators.base;
+package walkGenerators.runnables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.base.HdtParser;
+import walkGenerators.base.NtMemoryParser;
+import walkGenerators.base.NxMemoryParser;
+import walkGenerators.base.WalkGenerator;
 
 /**
  * Runnable for mid walk generation.

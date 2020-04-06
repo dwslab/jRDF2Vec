@@ -2,7 +2,8 @@ package walkGenerators.classic.DBpedia;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.base.DuplicateFreeWalkEntityProcessingRunnable;
+import walkGenerators.base.WalkGenerationMode;
+import walkGenerators.runnables.DuplicateFreeWalkEntityProcessingRunnable;
 import walkGenerators.base.NtMemoryParser;
 import walkGenerators.base.WalkGenerator;
 
@@ -111,6 +112,11 @@ public class DBpediaWalkGenerator extends WalkGenerator {
     }
 
     @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+        // do nothing
+    }
+
+    @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         // not implemented for DBpedia: trigger duplicate free walks
         LOGGER.warn("Random walks with duplicates not implemented for DBpedia. Generating duplicate free walks.");
@@ -176,6 +182,16 @@ public class DBpediaWalkGenerator extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         LOGGER.error("Not implemented.");
     }
 

@@ -5,7 +5,8 @@ import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import walkGenerators.base.NtMemoryParser;
-import walkGenerators.base.RandomWalkEntityProcessingRunnable;
+import walkGenerators.base.WalkGenerationMode;
+import walkGenerators.runnables.RandomWalkEntityProcessingRunnable;
 import walkGenerators.base.WalkGenerator;
 
 import java.io.File;
@@ -62,6 +63,11 @@ public class DbnaryWalkGenerator extends WalkGenerator {
         }
     }
 
+
+    @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+        // do nothing
+    }
 
     @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
@@ -162,6 +168,16 @@ public class DbnaryWalkGenerator extends WalkGenerator {
         }
         writeHashSetToFile("./cache/dbnary_entities.txt", result);
         return result;
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
     }
 
 

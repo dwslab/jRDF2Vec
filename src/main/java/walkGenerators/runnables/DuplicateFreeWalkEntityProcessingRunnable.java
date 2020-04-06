@@ -1,7 +1,9 @@
-package walkGenerators.base;
+package walkGenerators.runnables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import walkGenerators.base.MemoryParser;
+import walkGenerators.base.WalkGenerator;
 
 /**
  * A single task for the thread pool.

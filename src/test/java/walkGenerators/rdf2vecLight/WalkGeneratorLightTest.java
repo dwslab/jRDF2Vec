@@ -1,7 +1,7 @@
 package walkGenerators.rdf2vecLight;
 
 import org.junit.jupiter.api.Test;
-import walkGenerators.classic.WalkGeneratorDefault;
+import walkGenerators.base.WalkGeneratorDefault;
 import walkGenerators.light.WalkGeneratorLight;
 
 import java.io.*;
@@ -128,9 +128,54 @@ class WalkGeneratorLightTest {
         }
 
         assertTrue(subjectsOfWalks.size() > 0, "Assert that walks have been generated for more than one entity.");
+        assertEquals(1, subjectsOfWalks.size(), "There was only one entitiy specified for which walks shall be generated.");
         assertTrue(subjectsOfWalks.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot"));
         assertFalse(subjectsOfWalks.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#FourCheesesTopping"), "Four Cheese Topping is not in the subset of entities. No walks should be created for this entity.");
         generatedFile.delete();
     }
+
+
+    @Test
+    void generateRandomMidWalksForEntities(){
+        // make sure that there are no walk duplicates
+        File pizzaOntology = new File(getClass().getResource("/pizza.ttl").getFile());
+        assertTrue(pizzaOntology.exists());
+
+        String generatedFilePath = "./test_walks_light_mid_test.gz";
+
+        HashSet<String> entities = new HashSet<>();
+        entities.add("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot");
+
+        WalkGeneratorDefault generator = new WalkGeneratorLight(pizzaOntology, entities);
+        generator.generateRandomMidWalks(1, 1000, 1, generatedFilePath);
+
+        File generatedFile = new File(generatedFilePath);
+        assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
+
+        GZIPInputStream gzip = null;
+        try {
+            gzip = new GZIPInputStream(new FileInputStream(generatedFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Input stream to verify file could not be established.");
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+        String readLine;
+        int numberOfLines = 0;
+        try {
+            while ((readLine = reader.readLine()) != null) {
+                numberOfLines++;
+                assertTrue(readLine.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot"));
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+            fail("Could not read gzipped file.");
+        }
+
+        assertTrue(numberOfLines == 1000, "Expected number of lines: 1000; actual: " + numberOfLines);
+        generatedFile.delete();
+    }
+
 
 }

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 
 import walkGenerators.base.IWalkGenerator;
+import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.classic.alod.generationInMemory.model.StringFloat;
 import walkGenerators.classic.alod.generationInMemory.model.WalkGeneratorClassic;
 
@@ -22,7 +23,7 @@ import java.util.zip.GZIPOutputStream;
 
 
 /**
- * This class can read the ALOD classic nquad file and generate paths.
+ * This class can read the ALOD classic n-quad file and generate paths.
  */
 public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGenerator {
 
@@ -115,6 +116,11 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
             LOG.error("IO Exception");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+
     }
 
     /**
@@ -582,6 +588,17 @@ public class WalkGeneratorClassicWalks implements WalkGeneratorClassic, IWalkGen
         }
         return result;
     }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        LOGGER.error("Not implemented.");
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        LOGGER.error("Not implemented.");
+    }
+
 
 
 }

@@ -1,9 +1,9 @@
-package walkGenerators.classic;
+package walkGenerators.base;
 
 import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.base.*;
+import walkGenerators.runnables.RandomWalkEntityProcessingRunnable;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +31,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     private OntModel model;
 
-
     /**
      * Inject default entity selector.
      */
@@ -51,15 +50,16 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     /**
      * Constructor
+     *
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
-    public WalkGeneratorDefault(File tripleFile){
+    public WalkGeneratorDefault(File tripleFile) {
         String pathToTripleFile = tripleFile.getAbsolutePath();
-        if(!tripleFile.exists()){
+        if (!tripleFile.exists()) {
             LOGGER.error("The resource file you specified does not exist. ABORT.");
             return;
         }
-        if(tripleFile.isDirectory()){
+        if (tripleFile.isDirectory()) {
             LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                     "if you use an entity selector that requires one ontology.");
             this.parser = new NtMemoryParser(this);
@@ -74,12 +74,12 @@ public class WalkGeneratorDefault extends WalkGenerator {
                         LOGGER.info("Using NxParser.");
                         this.parser = new NxMemoryParser(pathToTripleFile, this);
                         this.entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
                         this.parser = new NtMemoryParser(pathToTripleFile, this);
                         this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
                     }
-                    if(((MemoryParser) parser).getDataSize() == 0L){
+                    if (((MemoryParser) parser).getDataSize() == 0L) {
                         LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
                         this.parser = new NtMemoryParser(pathToTripleFile, this);
                         this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
@@ -96,14 +96,14 @@ public class WalkGeneratorDefault extends WalkGenerator {
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                     NtMemoryParser.saveAsNt(this.model, newResourceFile);
                     this.parser = new NtMemoryParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")){
+                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
                     LOGGER.info("HDT file detected. Using HDT parser.");
-                        try {
-                            this.parser = new HdtParser(pathToTripleFile);
-                            this.entitySelector = new HdtEntitySelector(pathToTripleFile);
-                        } catch (IOException ioe){
-                            LOGGER.error("Propagated HDT Initializer Exception", ioe);
-                        }
+                    try {
+                        this.parser = new HdtParser(pathToTripleFile);
+                        this.entitySelector = new HdtEntitySelector(pathToTripleFile);
+                    } catch (IOException ioe) {
+                        LOGGER.error("Propagated HDT Initializer Exception", ioe);
+                    }
                 }
                 LOGGER.info("Model read into memory.");
             } catch (MalformedURLException mue) {
@@ -114,10 +114,34 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     /**
      * Constructor
+     *
      * @param pathToTripleFile The path to the NT file.
      */
     public WalkGeneratorDefault(String pathToTripleFile) {
         this(new File(pathToTripleFile));
+    }
+
+
+    @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+        if (generationMode == null) {
+            System.out.println("walkGeneration mode is null... Using default: RANDOM_WALKS_DUPLICATE_FREE");
+            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+        } else if (generationMode == WalkGenerationMode.MID_WALKS) {
+            System.out.println("generate random mid walks...");
+            this.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
+        } else if (generationMode == WalkGenerationMode.MID_WALKS_DUPLICATE_FREE) {
+            System.out.println("generate random mid walks duplicate free...");
+            this.generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+        } else if (generationMode == WalkGenerationMode.RANDOM_WALKS) {
+            System.out.println("generate random walks...");
+            this.generateRandomWalks(numberOfThreads, numberOfWalks, depth, walkFile);
+        } else if (generationMode == WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE) {
+            System.out.println("generate random walks duplicate free...");
+            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+        } else {
+            System.out.println("ERROR. Cannot identify the walkGenenerationMode chosen. Aborting program.");
+        }
     }
 
     @Override
@@ -149,11 +173,11 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if(this.parser == null){
-            LOGGER.error("Parser not initilized. Aborting program");
+        if (this.parser == null) {
+            LOGGER.error("Parser not initialized. Aborting program");
             return;
         }
-        if(!parserIsOk){
+        if (!parserIsOk) {
             LOGGER.error("Will not execute walk generation due to parser initialization error.");
             return;
         }
@@ -161,14 +185,33 @@ public class WalkGeneratorDefault extends WalkGenerator {
         generateRandomMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+    }
+
+    @Override
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        if (this.parser == null) {
+            LOGGER.error("Parser not initialized. Aborting program");
+            return;
+        }
+        if (!parserIsOk) {
+            LOGGER.error("Will not execute walk generation due to parser initialization error.");
+            return;
+        }
+        this.filePath = filePathOfFileToBeWritten;
+        generateRandomMidWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
+    }
+
 
     /**
      * Generate walks for the entities.
      *
-     * @param entities The entities for which walks shall be generated.
+     * @param entities        The entities for which walks shall be generated.
      * @param numberOfThreads The number of threads involved in generating the walks.
-     * @param numberOfWalks The number of walks to be generated per entity.
-     * @param walkLength The length of each walk.
+     * @param numberOfWalks   The number of walks to be generated per entity.
+     * @param walkLength      The length of each walk.
      */
     public void generateWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
@@ -206,6 +249,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     /**
      * Default: Do not change URIs.
+     *
      * @param uri The uri to be transformed.
      * @return The URI as it is.
      */
