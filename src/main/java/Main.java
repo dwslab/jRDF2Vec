@@ -36,17 +36,22 @@ public class Main {
      */
     private static int dimensions = -1;
 
+    private static final int DEFAULT_DEPTH = 4;
+
     /**
      * Depth for the walks to be generated.
      * Default: 4
      */
-    private static int depth = 4;
+    private static int depth = DEFAULT_DEPTH;
+
+
+    private static final int DEFAULT_NUMBER_OF_WALKS = 100;
 
     /**
      * The number of walks to be generated for each node.
      * Default: 100
      */
-    private static int numberOfWalks = 100;
+    private static int numberOfWalks = DEFAULT_NUMBER_OF_WALKS;
 
     /**
      * The file to which the python resources shall be copied.
@@ -223,11 +228,13 @@ public class Main {
             if (lightEntityFile != null) {
                 // light walk generation:
                 WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile);
+                walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, walkFile);
 
             } else {
                 // classic walk generation
                 WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile);
+                walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE : walkGenerationMode;
                 classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, walkFile);
             }
 
@@ -260,6 +267,9 @@ public class Main {
             // setting the number of walks
             if (numberOfWalks > 0) rdf2vec.setNumberOfWalksPerEntity(numberOfWalks);
 
+            // setting the walk generation mode
+            rdf2vec.setWalkGenerationMode(walkGenerationMode);
+
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
 
@@ -287,6 +297,9 @@ public class Main {
 
             // set resource directory
             if (resourcesDirectory != null) rdf2VecLight.setResourceDirectory(resourcesDirectory);
+
+            // setting the walk generation mode
+            rdf2VecLight.setWalkGenerationMode(walkGenerationMode);
 
             rdf2VecLight.setConfiguration(configuration);
             before = Instant.now();
@@ -408,8 +421,8 @@ public class Main {
         knowledgeGraphFile = null;
         numberOfThreads = -1;
         dimensions = -1;
-        depth = 4;
-        numberOfWalks = 100;
+        depth = DEFAULT_DEPTH;
+        numberOfWalks = DEFAULT_NUMBER_OF_WALKS;
         resourcesDirectory = null;
         rdf2VecInstance = null;
         walkGenerationMode = null;
