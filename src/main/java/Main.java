@@ -171,6 +171,7 @@ public class Main {
                 System.out.println("Could not parse the number of walks. Using default.");
             }
         }
+        System.out.println("Generating " + numberOfWalks + " walks per entity.");
 
         String resourcesDirectroyPath = getValue("-serverResourcesDir", args);
         if (resourcesDirectroyPath != null) {

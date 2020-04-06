@@ -64,6 +64,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
                     "if you use an entity selector that requires one ontology.");
             this.parser = new NtMemoryParser(this);
             ((NtMemoryParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
+            this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) this.parser).getData());
             return;
         } else {
             // decide on parser depending on
