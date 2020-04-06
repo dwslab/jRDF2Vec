@@ -45,7 +45,7 @@ public class RDF2Vec implements IRDF2Vec {
     /**
      * The training configuration to be used.
      */
-    Word2VecConfiguration configuration = training.Word2VecConfiguration.CBOW;
+    Word2VecConfiguration configuration = new Word2VecConfiguration();
 
     /**
      * Resources directory where the python files will be copied to.

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Word2VecConfiguration;
+import training.Word2VecType;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,7 @@ class RDF2VecTest {
     void train() {
         File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
         RDF2Vec classic = new RDF2Vec(graphFilePath);
-        Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
         configuration.setVectorDimension(10);
 
         classic.train();
@@ -57,7 +58,7 @@ class RDF2VecTest {
         externalResourcesDirectory.mkdirs();
         RDF2Vec light = new RDF2Vec(graphFilePath);
         light.setPythonServerResourceDirectory(externalResourcesDirectory);
-        Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
         configuration.setVectorDimension(10);
         light.train();
         File serverFile = new File(externalResourcesDirectory, "python_server.py");

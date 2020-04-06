@@ -2,6 +2,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Gensim;
 import training.Word2VecConfiguration;
+import training.Word2VecType;
 import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.light.WalkGeneratorLight;
 
@@ -49,7 +50,7 @@ public class RDF2VecLight implements IRDF2Vec {
     /**
      * The training configuration to be used.
      */
-    Word2VecConfiguration configuration = training.Word2VecConfiguration.CBOW;
+    Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
 
     /**
      * Resources directory where the python files will be copied to.

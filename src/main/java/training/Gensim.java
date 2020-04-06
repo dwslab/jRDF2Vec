@@ -1,13 +1,19 @@
 package training;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.rdfhdt.hdt.dictionary.impl.BaseDictionary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,10 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,17 @@ public class Gensim {
      * Default logger
      */
     private final static Logger LOGGER = LoggerFactory.getLogger(Gensim.class);
+
+    /**
+     * Default resources directory (where the python files will be copied to by default).
+     */
+    private static final String DEFAULT_RESOURCES_DIRECTORY = "./python-server/";
+
+    /**
+     * Objectmapper from jackson to generate JSON.
+     */
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+
 
     /**
      * Constructor
@@ -70,20 +84,19 @@ public class Gensim {
 
     /**
      * Indicates whether the shutdown hook has been initialized.
-     * This flag is required in order to have only one hook despite multiple re-initializations.
+     * This flag is required in order to have only one hook despite multiple reinitializations.
      */
     private boolean isHookStarted = false;
-
-    /**
-     * Default resources directory (where the python files will be copied to by default).
-     */
-    private static final String DEFAULT_RESOURCES_DIRECTORY = "./python-server/";
 
     /**
      * The directory where the python files will be copied to.
      */
     private File resourcesDirectory = new File(DEFAULT_RESOURCES_DIRECTORY);
 
+
+    /************************************
+     * Vector space model
+     ***********************************/
 
     /**
      * Method to train a vector space model. The file for the training (i.e., csv file where first column is id and second column text) has to
@@ -105,8 +118,7 @@ public class Gensim {
 
 
     /**
-     * Method to train a vector space model. The file for the training (i.e., csv file where first column is id and second colum text) has to
-     * exist already.
+     * Method to query a vector space model (which has to be trained with trainVectorSpaceModel).
      * @param modelPath identifier for the model (used for querying a specific model
      * @param documentIdOne Document id for the first document
      * @param documentIdTwo Document id for the second document
@@ -132,6 +144,11 @@ public class Gensim {
         }
     }
 
+
+    /************************************
+     * Word2vec model
+     ***********************************/
+
     /**
      * Method to train a word2vec model. The file for the training (i.e., file with sentences, paths etc.) has to
      * exist already.
@@ -156,7 +173,7 @@ public class Gensim {
         request.addHeader("window_size", "" + configuration.getWindowSize());
         request.addHeader("iterations", "" + configuration.getIterations());
         request.addHeader("negatives", "" + configuration.getNegatives());
-        request.addHeader("cbow_or_sg", configuration.toString());
+        request.addHeader("cbow_or_sg", configuration.getType().toString());
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
@@ -367,7 +384,7 @@ public class Gensim {
     /**
      * Client to communicate with the server.
      */
-    private CloseableHttpClient httpClient;
+    private static CloseableHttpClient httpClient;
 
     /**
      * Get the instance.
@@ -396,10 +413,12 @@ public class Gensim {
     /**
      * Shut down the service.
      */
-    public void shutDown() {
+    public static void shutDown() {
         isShutDown = true;
+        instance = null;
         try {
-            httpClient.close();
+            if (httpClient != null)
+                httpClient.close();
         } catch (IOException e) {
             LOGGER.error("Could not close client.", e);
         }
@@ -417,7 +436,7 @@ public class Gensim {
     /**
      * The python process.
      */
-    private Process serverProcess;
+    private static Process serverProcess;
 
 
     /**
@@ -447,7 +466,8 @@ public class Gensim {
     /**
      * Initializes the server.
      */
-    private void startServer() {
+    private boolean startServer() {
+        isShutDown = false;
 
         File serverResourceDirectory = this.resourcesDirectory;
         serverResourceDirectory.mkdirs();
@@ -462,13 +482,13 @@ public class Gensim {
             if (!serverFile.exists()) {
                 LOGGER.error("Server File does not exist. Cannot start server. ABORTING. Please make sure that " +
                         "the 'python_server.py' file is placed in directory '" + DEFAULT_RESOURCES_DIRECTORY + "'.");
-                return;
+                return false;
             }
             canonicalPath = serverFile.getCanonicalPath();
         } catch (IOException e) {
             LOGGER.error("Server File (" + serverFile.getAbsolutePath() + ") does not exist. " +
                     "Cannot start server. ABORTING.", e);
-            return;
+            return false;
         }
         String pythonCommand = getPythonCommand();
         List<String> command = Arrays.asList(pythonCommand, canonicalPath);
@@ -480,7 +500,8 @@ public class Gensim {
         try {
             pb.inheritIO();
             this.serverProcess = pb.start();
-            for (int i = 0; i < 3; i++) {
+            final int maxTrials = 5;
+            for (int i = 0; i < maxTrials; i++) {
                 HttpGet request = new HttpGet(serverUrl + "/melt_ml.html");
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -490,12 +511,18 @@ public class Gensim {
                         break;
                     }
                 } catch (HttpHostConnectException hce) {
-                    LOGGER.info("Server is not yet running. Waiting 5 seconds. Trial {} / 3", i + 1);
+                    LOGGER.info("Server is not yet running. Waiting 5 seconds. Trial {} / {}", i + 1, maxTrials);
                     TimeUnit.SECONDS.sleep(5);
                 } catch (IOException ioe) {
                     LOGGER.error("Problem with http request.", ioe);
                 }
                 httpClient.close();
+                if (i == maxTrials -1){
+                    LOGGER.error("Failed to start the gensim server after " + maxTrials + " trials.");
+                    isHookStarted = false;
+                    isShutDown = true;
+                    return false;
+                }
             }
         } catch (IOException ex) {
             LOGGER.error("Could not start python server.", ex);
@@ -513,6 +540,7 @@ public class Gensim {
             }));
             isHookStarted = true;
         }
+        return true;
     }
 
     /**
@@ -661,6 +689,18 @@ public class Gensim {
         if(!resourcesDirectory.isDirectory()){
             LOGGER.error("The specified directory is no directory. Using default: '" + DEFAULT_RESOURCES_DIRECTORY + "'");
             resourcesDirectory = new File(DEFAULT_RESOURCES_DIRECTORY);
+        }
+
+        // check if python command file exists in default resources directory
+        Path pythonCommandFilePath = Paths.get(DEFAULT_RESOURCES_DIRECTORY, "python_command.txt");
+        if(Files.exists(pythonCommandFilePath)){
+            LOGGER.info("Python command file detected. Trying to copy file to external resources directory.");
+            try {
+                FileUtils.copyFile(pythonCommandFilePath.toFile(), new File(resourcesDirectory, "python_command.txt"));
+            } catch (IOException e) {
+                LOGGER.error("Could not copy python command file.", e);
+            }
+            LOGGER.info("Python command file successfully copied to external resources directory.");
         }
         this.resourcesDirectory = resourcesDirectory;
     }

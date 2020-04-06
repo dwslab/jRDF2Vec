@@ -3,16 +3,24 @@ package training;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * The configuration for the word2vec calculation.
  */
-public enum Word2VecConfiguration {
-    CBOW, SG;
+public class Word2VecConfiguration {
 
     /**
      * Default logger.
      */
     private static Logger LOGGER = LoggerFactory.getLogger(Word2VecConfiguration.class);
+
+    /**
+     * Model type.
+     * Default type: SG.
+     */
+    private Word2VecType type = Word2VecType.SG;
 
     /**
      * Size of the vector. Default: 200.
@@ -30,9 +38,9 @@ public enum Word2VecConfiguration {
     private int iterations = 5;
 
     /**
-     * The number of negatives during the word2vec training. Default 25.
+     * The number of negatives during the word2vec training. Default 5.
      */
-    private int negatives = 25;
+    private int negatives = 5;
 
     /**
      * The minimum count for the word2vec training. Default: 1.
@@ -43,6 +51,44 @@ public enum Word2VecConfiguration {
      * The number of threads to be used for the computation.
      */
     private int numberOfThreads = Runtime.getRuntime().availableProcessors();
+
+
+    /**
+     * Default Constructor.
+     * Many parameters are assumed such as training type SG.
+     */
+    public Word2VecConfiguration(){}
+
+    /**
+     * Constructor
+     * @param type Training type (SG/CBOW).
+     */
+    public Word2VecConfiguration(Word2VecType type){
+        setType(type);
+    }
+
+    /**
+     * Constructor
+     * @param type Training type (SG/CBOW).
+     * @param vectorDimension ize of the vectors (number of elements).
+     */
+    public Word2VecConfiguration(Word2VecType type, int vectorDimension){
+        setType(type);
+        this.vectorDimension = vectorDimension;
+    }
+
+    /**
+     * Constructor
+     * @param type Training type (SG/CBOW).
+     * @param vectorDimension Size of the vectors (number of elements).
+     * @param iterations aka epochs
+     */
+    public Word2VecConfiguration(Word2VecType type, int vectorDimension, int iterations){
+        setType(type);
+        this.vectorDimension = vectorDimension;
+        this.iterations = iterations;
+    }
+
 
     public int getNumberOfThreads(){
         return this.numberOfThreads;
@@ -62,8 +108,8 @@ public enum Word2VecConfiguration {
 
     public void setNegatives(int negatives){
         if(negatives < 1){
-            LOGGER.warn("The number of negatives must be greater than 1. Using default: 25.");
-            negatives = 25;
+            LOGGER.warn("The number of negatives must be greater than 1. Using default: 5.");
+            negatives = 5;
         }
         this.negatives = negatives;
     }
@@ -116,16 +162,11 @@ public enum Word2VecConfiguration {
         this.minCount = minCount;
     }
 
-    @Override
-    public String toString(){
-        switch (this){
-            case CBOW:
-                return "cbow";
-            case SG:
-                return "sg";
-            default:
-                // this code part is never reached
-                return "UNDEFINED";
-        }
+    public Word2VecType getType() {
+        return type;
+    }
+
+    public void setType(Word2VecType type) {
+        this.type = type;
     }
 }

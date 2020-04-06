@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import training.Word2VecConfiguration;
+import training.Word2VecType;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ class RDF2VecLightTest {
         File entityFilePath = new File(this.getClass().getClassLoader().getResource("dummyEntities.txt").getFile());
         File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
         RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
-        Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
         configuration.setVectorDimension(10);
         light.train();
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
@@ -60,7 +61,7 @@ class RDF2VecLightTest {
         externalResourcesDirectory.mkdirs();
         RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
         light.setResourceDirectory(externalResourcesDirectory);
-        Word2VecConfiguration configuration = Word2VecConfiguration.CBOW;
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
         configuration.setVectorDimension(10);
         light.train();
         File serverFile = new File(externalResourcesDirectory, "python_server.py");

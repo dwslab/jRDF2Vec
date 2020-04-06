@@ -1,4 +1,5 @@
 import training.Word2VecConfiguration;
+import training.Word2VecType;
 import walkGenerators.base.WalkGenerationMode;
 import walkGenerators.base.WalkGeneratorDefault;
 import walkGenerators.light.WalkGeneratorLight;
@@ -14,7 +15,7 @@ public class Main {
     /**
      * word2vec configuration (not just CBOW/SG but contains also all other parameters)
      */
-    private static Word2VecConfiguration configuration = Word2VecConfiguration.SG;
+    private static Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
 
     /**
      * File for light-weight generation
@@ -186,9 +187,9 @@ public class Main {
         trainingModeText = (trainingModeText == null) ? getValue("-trainMode", args) : trainingModeText;
         if (trainingModeText != null) {
             if (trainingModeText.equalsIgnoreCase("sg")) {
-                configuration = Word2VecConfiguration.SG;
-            } else configuration = Word2VecConfiguration.CBOW;
-        } else configuration = Word2VecConfiguration.CBOW;
+                configuration = new Word2VecConfiguration(Word2VecType.SG);
+            } else configuration = new Word2VecConfiguration(Word2VecType.CBOW);
+        } else configuration = new Word2VecConfiguration(Word2VecType.SG); // default: SG
 
         // setting training threads
         if (numberOfThreads > 0) configuration.setNumberOfThreads(numberOfThreads);
@@ -416,7 +417,7 @@ public class Main {
      * Reset parameters (required for testing)
      */
     public static void reset() {
-        configuration = Word2VecConfiguration.CBOW;
+        configuration = new Word2VecConfiguration(Word2VecType.SG);
         lightEntityFile = null;
         knowledgeGraphFile = null;
         numberOfThreads = -1;
