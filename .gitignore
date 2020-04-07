@@ -78,6 +78,7 @@ log.txt.5
 /mainWalks/*
 /data/*
 /walksOnly/*
+/src/main/java/walkGenerators/evaluation/*
 
 # binaries
 bin/
