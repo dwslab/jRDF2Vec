@@ -6,10 +6,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import walkGenerators.runnables.DuplicateFreeMidWalkEntityProcessingRunnable;
-import walkGenerators.runnables.DuplicateFreeWalkEntityProcessingRunnable;
-import walkGenerators.runnables.MidWalkEntityProcessingRunnable;
-import walkGenerators.runnables.RandomWalkEntityProcessingRunnable;
+import walkGenerators.runnables.*;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -129,6 +126,46 @@ public abstract class WalkGenerator implements IWalkGenerator {
 
         for (String entity : entities) {
             DuplicateFreeMidWalkEntityProcessingRunnable th = new DuplicateFreeMidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            pool.execute(th);
+        }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(10, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Interrupted Exception");
+            e.printStackTrace();
+        }
+        this.close();
+    }
+
+
+    /**
+     * Generate walks for the entities.
+     *
+     * @param entities        The entities for which walks shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param numberOfWalks   The number of walks to be generated per thread.
+     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
+     */
+    public void generateWeightedMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
+        File outputFile = new File(filePath);
+        outputFile.getParentFile().mkdirs();
+
+        // initialize the writer
+        try {
+            this.writer = new OutputStreamWriter(new GZIPOutputStream(
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
+        } catch (Exception e1) {
+            LOGGER.error("Could not initialize writer. Aborting process.", e1);
+            return;
+        }
+
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
+                0, TimeUnit.SECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
+
+        for (String entity : entities) {
+            WeightedMidWalkEntityProcessingRunnable th = new WeightedMidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();

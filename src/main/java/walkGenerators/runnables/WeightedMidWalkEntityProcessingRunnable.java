@@ -7,13 +7,12 @@ import walkGenerators.base.NtMemoryParser;
 import walkGenerators.base.NxMemoryParser;
 import walkGenerators.base.WalkGenerator;
 
-
-public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
+public class WeightedMidWalkEntityProcessingRunnable implements Runnable{
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(MidWalkEntityProcessingRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WeightedMidWalkEntityProcessingRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -44,7 +43,7 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
      * @param depth    Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public DuplicateFreeMidWalkEntityProcessingRunnable(WalkGenerator generator, String entity, int numberOfWalks, int depth) {
+    public WeightedMidWalkEntityProcessingRunnable(WalkGenerator generator, String entity, int numberOfWalks, int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;
@@ -55,13 +54,11 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
      * Actual thread execution.
      */
     public void run() {
-        if (walkGenerator.parser.getClass() == HdtParser.class) {
-            walkGenerator.writeToFile(((HdtParser) walkGenerator.parser).generateMidWalksForEntityDuplicateFree(walkGenerator.shortenUri(entity), this.numberOfWalks, this.depth));
-        } else if (walkGenerator.parser.getClass() == NtMemoryParser.class) {
+        if (walkGenerator.parser.getClass() == NtMemoryParser.class) {
             // yes, the depth and # of walks parameters are this way
-            walkGenerator.writeToFile(((NtMemoryParser) walkGenerator.parser).generateMidWalksForEntityDuplicateFree(walkGenerator.shortenUri(entity), this.numberOfWalks, depth));
+            walkGenerator.writeToFile(((NtMemoryParser) walkGenerator.parser).generateWeightedMidWalksForEntity(walkGenerator.shortenUri(entity),this.depth, this.numberOfWalks));
         } else if (walkGenerator.parser.getClass() == NxMemoryParser.class) {
-            walkGenerator.writeToFile(((NxMemoryParser) walkGenerator.parser).generateMidWalksForEntityDuplicateFree(walkGenerator.shortenUri(entity), this.numberOfWalks, depth));
+            walkGenerator.writeToFile(((NxMemoryParser) walkGenerator.parser).generateWeightedMidWalksForEntity(walkGenerator.shortenUri(entity), this.depth, this.numberOfWalks));
         } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT PARSER!");
     }
 }

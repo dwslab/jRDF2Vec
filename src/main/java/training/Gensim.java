@@ -47,12 +47,6 @@ public class Gensim {
     private static final String DEFAULT_RESOURCES_DIRECTORY = "./python-server/";
 
     /**
-     * Objectmapper from jackson to generate JSON.
-     */
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
-
-
-    /**
      * Constructor
      */
     private Gensim() {

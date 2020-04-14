@@ -4,6 +4,7 @@ package walkGenerators.base;
  * A non-functional walk generator.
  */
 public class DummyWalkGenerator extends WalkGenerator {
+
     @Override
     public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
 
@@ -41,6 +42,16 @@ public class DummyWalkGenerator extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+
+    }
+
+    @Override
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+
+    }
+
+    @Override
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
 
     }
 

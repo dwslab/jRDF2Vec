@@ -38,6 +38,16 @@ public class DummyWalkGenerator extends WalkGenerator {
     }
 
     @Override
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+
+    }
+
+    @Override
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+
+    }
+
+    @Override
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         // do nothing
     }

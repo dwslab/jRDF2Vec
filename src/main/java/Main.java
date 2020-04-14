@@ -164,6 +164,7 @@ public class Main {
 
         String numberOfWalksText = getValue("-numberOfWalks", args);
         numberOfWalksText = (numberOfWalksText == null) ? getValue("-numOfWalks", args) : numberOfWalksText;
+        numberOfWalksText = (numberOfWalksText == null) ? getValue("-numOfWalks", args) : numberOfWalksText;
         if (numberOfWalksText != null) {
             try {
                 numberOfWalks = Integer.parseInt(numberOfWalksText);

@@ -140,6 +140,9 @@ public class WalkGeneratorDefault extends WalkGenerator {
         } else if (generationMode == WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE) {
             System.out.println("generate random walks duplicate free...");
             this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+        } else if (generationMode == WalkGenerationMode.MID_WALKS_WEIGHTED) {
+            System.out.println("generate weighted mid walks...");
+            this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
         } else {
             System.out.println("ERROR. Cannot identify the walkGenenerationMode chosen. Aborting program.");
         }
@@ -153,7 +156,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
     @Override
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
         this.filePath = filePathOfFileToBeWritten;
-        generateWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
+        generateRandomWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     @Override
@@ -187,6 +190,25 @@ public class WalkGeneratorDefault extends WalkGenerator {
     }
 
     @Override
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
+        generateWeightedMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+    }
+
+    @Override
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+        if (this.parser == null) {
+            LOGGER.error("Parser not initialized. Aborting program");
+            return;
+        }
+        if (!parserIsOk) {
+            LOGGER.error("Will not execute walk generation due to parser initialization error.");
+            return;
+        }
+        this.filePath = filePathOfFileToBeWritten;
+        generateWeightedMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
+    }
+
+    @Override
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
     }
@@ -214,7 +236,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * @param numberOfWalks   The number of walks to be generated per entity.
      * @param walkLength      The length of each walk.
      */
-    public void generateWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
+    public void generateRandomWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
         File outputFile = new File(filePath);
         outputFile.getParentFile().mkdirs();
 
