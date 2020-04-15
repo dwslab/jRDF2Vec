@@ -37,7 +37,7 @@ public abstract class MemoryParser implements IParser {
 
     /**
      * Indicator whether anonymous nodes shall be handled as if they were just one node.
-     * E.g. _:genid413438 is handled like -> ANODE
+     * E.g. _:genid413438 is handled like -&gt; ANODE
      */
     boolean isUnifiyAnonymousNodes = false;
 

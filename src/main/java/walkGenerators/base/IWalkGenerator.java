@@ -8,8 +8,13 @@ public interface IWalkGenerator {
     /**
      * Generate walks according to the stated method.
      * @param generationMode The algorithm to be used for the walk generation.
+     * @param numberOfThreads The number of threads to be run.
+     * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
+     * @param depth The depth of each walk. Depth 1 leads to three elements in the walk, depth 2 leads to 5 elements in
+     *              the walk.
+     * @param walkFile The walk file.
      */
-     void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile);
+     void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalksPerEntity, int depth, String walkFile);
 
     /**
      * The walk file(s) will be persisted in "./walks".
