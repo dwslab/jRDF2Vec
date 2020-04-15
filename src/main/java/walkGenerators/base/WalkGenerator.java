@@ -340,71 +340,6 @@ public abstract class WalkGenerator implements IWalkGenerator {
 
 
     /**
-     * Reads a HashSet from the file as specified by the file path.
-     *
-     * @param filePath The path to the file that is to be read.
-     * @return The parsed file as HashSet.
-     */
-    public static HashSet<String> readHashSetFromFile(String filePath) {
-        return readHashSetFromFile(new File(filePath));
-    }
-
-    /**
-     * Reads a HashSet from the file as specified by the file.
-     *
-     * @param file The file that is to be read.
-     * @return The parsed file as HashSet.
-     */
-    public static HashSet<String> readHashSetFromFile(File file) {
-        HashSet<String> result = new HashSet<>();
-        if (!file.exists()) {
-            System.out.println("File does not exist.");
-            return result;
-        }
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result.add(line);
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.error("File not found.", e);
-            e.printStackTrace();
-        } catch (IOException e) {
-            LOGGER.error("IOException occured.", e);
-            e.printStackTrace();
-        }
-        LOGGER.info("Entities read into cache.");
-        return result;
-    }
-
-
-    /**
-     * Writes the given HashSet to a file.
-     *
-     * @param filePath   The path to the file that shall be written.
-     * @param setToWrite The HashSet that hsall be written to the file.
-     */
-    public static void writeHashSetToFile(String filePath, HashSet<String> setToWrite) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8));
-            boolean isFirstLine = true;
-            for (String entry : setToWrite) {
-                if (isFirstLine) isFirstLine = false;
-                else writer.write("\n");
-                if (entry != null) writer.write(entry);
-                else LOGGER.error("Empty entry in set to write.");
-            }
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("There was a problem writing the file.");
-        }
-    }
-
-
-    /**
      * Reads an ontology from a given URL.
      *
      * @param path     of ontology to be read.
@@ -422,20 +357,6 @@ public abstract class WalkGenerator implements IWalkGenerator {
             LOGGER.error("Could not parse: " + path + "\nin jena.", re);
             return null;
         }
-    }
-
-
-    /**
-     * This method will remove a leading less-than and a trailing greater-than sign (tags).
-     *
-     * @param stringToBeEdited The string that is to be edited.
-     * @return String without tags.
-     */
-    public static String removeTags(String stringToBeEdited) {
-        if (stringToBeEdited.startsWith("<")) stringToBeEdited = stringToBeEdited.substring(1);
-        if (stringToBeEdited.endsWith(">"))
-            stringToBeEdited = stringToBeEdited.substring(0, stringToBeEdited.length() - 1);
-        return stringToBeEdited;
     }
 
 
