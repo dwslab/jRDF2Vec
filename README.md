@@ -51,5 +51,37 @@ The number of walks to be performed per entity.
 (default for light: `MID_WALKS`, default for classic: `RANDOM_WALKS_DUPLICATE_FREE`)<br/>
 This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). 
 
-
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
+
+## Run using Docker
+
+### Run
+
+Pull image from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
+
+Test run to get help message:
+
+```bash
+docker run -it --rm vemonet/jrdf2vec
+```
+
+Mount volumes on `/data` in the container to generate tests embeddings
+
+* `$(pwd)` to use current working directory on Linux and MacOS
+* `${PWD}` to use current working directory on Windows
+
+```bash
+docker run -it --rm \
+  -v $(pwd)/src/test/resources:/data \
+  vemonet/jrdf2vec \
+  -light /data/sample_dbpedia_entity_file.txt \
+  -graph /data/sample_dbpedia_nt_file.nt
+```
+
+### Build
+
+From source code:
+
+```bash
+docker build -t jrdf2vec .
+```
