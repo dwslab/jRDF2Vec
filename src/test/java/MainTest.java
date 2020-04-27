@@ -110,7 +110,7 @@ class MainTest {
         assertTrue(subjectsOfWalks.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#FourCheesesTopping"));
         try {
             FileUtils.deleteDirectory(new File("./classicWalks/"));
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             LOGGER.error("Error while trying to delete ./classicWalks/");
         }
 
@@ -164,7 +164,7 @@ class MainTest {
         assertTrue(numberOfLinesDuplicateFree < numberOfLinesWithDuplicates);
         try {
             FileUtils.deleteDirectory(new File("./classicWalks/"));
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             LOGGER.error("Error while trying to delete ./classicWalks/");
         }
     }
@@ -230,8 +230,8 @@ class MainTest {
         assertTrue(Main.containsIgnoreCase("hello", new String[]{"hello", "world"}));
         assertTrue(Main.containsIgnoreCase("HELLO", new String[]{"hello", "world"}));
         assertFalse(Main.containsIgnoreCase("Europa", new String[]{"hello", "world"}));
+        assertFalse(Main.containsIgnoreCase(null, null));
     }
-
 
     /**
      * Plain generation of walks.
@@ -293,8 +293,6 @@ class MainTest {
         // clean up
         walkDirectory.delete();
     }
-
-
 
 
     /**
@@ -374,6 +372,17 @@ class MainTest {
         walkDirectory.delete();
     }
 
+    @Test
+    void runMainWithInsufficientArguments() {
+        // just making sure that there are no exceptions.
+        try {
+            Main.main(null);
+            Main.main(new String[]{"-helloWorld"});
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Exception thrown.");
+        }
+    }
 
     /**
      * Random Mid walk duplicate free generation.
@@ -522,6 +531,14 @@ class MainTest {
         walkDirectory.delete();
     }
 
+    @Test
+    public void getValue() {
+        assertNull(Main.getValue(null, null));
+        assertNull(Main.getValue(null, new String[]{"european", "union"}));
+        assertNull(Main.getValue("hello", null));
+        assertNull(Main.getValue("-hello", new String[]{"european", "union"}));
+        assertEquals("union", Main.getValue("-european", new String[]{"-european", "union"}));
+    }
 
     @AfterAll
     static void cleanUp() {

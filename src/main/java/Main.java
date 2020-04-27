@@ -82,7 +82,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        if (args.length == 0) {
+        if (args == null || args.length == 0) {
             System.out.println("Not enough arguments.");
         }
 
@@ -331,7 +331,8 @@ public class Main {
      * @param arguments Arguments as received upon program start.
      * @return Value of argument if existing, else null.
      */
-    private static String getValue(String key, String[] arguments) {
+    public static String getValue(String key, String[] arguments) {
+        if (arguments == null) return null;
         int positionSet = -1;
         for (int i = 0; i < arguments.length; i++) {
             if (arguments[i].equalsIgnoreCase(key)) {
@@ -352,6 +353,7 @@ public class Main {
      * @return True if {@code element} is contained in {@code array}, else false.
      */
     public static boolean containsIgnoreCase(String element, String[] array) {
+        if(element == null || array == null) return false;
         for (String s : array) {
             if (element.equalsIgnoreCase(s)) return true;
         }
