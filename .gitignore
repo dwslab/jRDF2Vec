@@ -80,6 +80,7 @@ log.txt.5
 /walksOnly/*
 /src/main/java/walkGenerators/evaluation/*
 /src/test/java/walkGenerators/rdf2vecLight/TestCaseTest.java
+/data
 
 # binaries
 bin/
