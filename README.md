@@ -53,7 +53,7 @@ Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issue
 
 ### Run
 
-Pull image from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
+The image is pulled from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
 
 Test run to get help message:
 
@@ -64,7 +64,7 @@ docker run -it --rm vemonet/jrdf2vec
 Mount volumes on `/data` in the container to provide input files and generate embeddings:
 
 * `$(pwd)` to use current working directory on Linux and MacOS
-* `${PWD}` to use current working directory on Windows
+* `${PWD}` to use current working directory on Windows (also make the command a one-line)
 
 ```bash
 docker run -it --rm \
@@ -73,6 +73,8 @@ docker run -it --rm \
   -light /data/sample_dbpedia_entity_file.txt \
   -graph /data/sample_dbpedia_nt_file.nt
 ```
+
+> Embeddings will be generated in the shared volume (`/data` in the container).
 
 ### Build
 
