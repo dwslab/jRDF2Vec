@@ -6,7 +6,9 @@ jRDF2Vec is a Java implementation of the RDF2Vec.
 It supports multi-threaded, in-memory (or disk-access-based) walk generation and training.
 You can generate embeddings for any `NT`, `OWL/XML`, [`RDF HDT`](http://www.rdfhdt.org/), or `TTL` file.
 
-## How to use jRDF2vec?
+Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
+
+## How to use the jRDF2vec Command-Line Interface?
 Download this project, execute `mvn clean install`. 
 
 ### System Requirements
@@ -47,13 +49,12 @@ The number of walks to be performed per entity.
 (default for light: `MID_WALKS`, default for classic: `RANDOM_WALKS_DUPLICATE_FREE`)<br/>
 This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). 
 
-Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
-
-## Run using Docker
+## Run jRDF2Vec using Docker
+Optionally, Docker can be used to run jRDF2Vec.
 
 ### Run
 
-The image is pulled from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
+The image can be pulled from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
 
 Test run to get help message:
 
