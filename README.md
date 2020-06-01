@@ -1,6 +1,8 @@
 # jRDF2vec
 [![Java CI](https://github.com/dwslab/jRDF2Vec/workflows/Java%20CI/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions)
 [![Coverage Status](https://coveralls.io/repos/github/dwslab/jRDF2Vec/badge.svg?branch=master)](https://coveralls.io/github/dwslab/jRDF2Vec?branch=master)
+[![License](https://img.shields.io/github/license/dwslab/jRDF2Vec)](https://github.com/dwslab/jRDF2Vec/blob/master/LICENSE)
+
 
 jRDF2Vec is a Java implementation of the RDF2Vec. 
 It supports multi-threaded, in-memory (or disk-access-based) walk generation and training.
