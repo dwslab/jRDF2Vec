@@ -3,34 +3,33 @@ name: Java CI
 on: [push]
 
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
         with:
           persist-credentials: false # this is required for the deploy plugin
-      - name: Set up JDK 8
+      - name: Set up JDK 8 🐧
         uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Cache Maven packages
+      - name: Cache Maven packages 📦
         uses: actions/cache@v1
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Setup Python
+      - name: Setup Python 🐍
         uses: actions/setup-python@v1
         with:
           python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-      - name: Install python dependencies
+      - name: Install python dependencies 🐍
         run: pip install -r ./src/main/resources/requirements.txt
-      - name: Build with Maven
+      - name: Build with Maven 🏗
         run: mvn -B package --file pom.xml
-      - name: Coveralls
+      - name: Coveralls 🕵️‍
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
         run: mvn javadoc:javadoc
