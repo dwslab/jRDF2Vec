@@ -15,7 +15,6 @@ public class Main_IDE {
     }
 
 
-
     public static void checkNxParser(){
         String filePath = "/work/jportisc/wikidata_2020_02_11/wikidata_truthy_2020_02_11.nt";
         NxMemoryParser parser = new NxMemoryParser(filePath,new DummyWalkGenerator());
