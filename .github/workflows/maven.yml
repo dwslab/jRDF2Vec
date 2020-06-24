@@ -1,7 +1,5 @@
 name: Java CI
-
 on: [push]
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -33,9 +31,11 @@ jobs:
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
         run: mvn javadoc:javadoc
+      - name: Debug
+        run: cd home/runner/work/jRDF2Vec/jRDF2Vec/target/site/apidocs && pwd
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: home/runner/work/jRDF2Vec/jRDF2Vec/target/site/apidocs/ # The folder the action should deploy.
+          FOLDER: home/runner/work/jRDF2Vec/jRDF2Vec/target/site/apidocs
