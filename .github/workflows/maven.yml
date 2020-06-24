@@ -38,5 +38,5 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: home/runner/work/jRDF2Vec/jRDF2Vec/target/site/apidocs
+          FOLDER: target/site/apidocs
 
