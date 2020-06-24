@@ -30,8 +30,10 @@ jobs:
         run: mvn -B package --file pom.xml
       - name: Coveralls
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
-      - name: Generate Documentation
+      - name: Generate Documentation 📚
         run: mvn javadoc:javadoc
+      - name: Install rsync 📚
+        run: apt-get update && apt-get install -y rsync
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
