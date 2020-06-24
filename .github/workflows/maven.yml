@@ -26,8 +26,6 @@ jobs:
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
       - name: Install python dependencies
         run: pip install -r ./src/main/resources/requirements.txt
-      - name: Install Dependencies
-        run: git clone https://github.com/rdfhdt/hdt-java.git && cd ./hdt-java/ && mvn clean install
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Coveralls
