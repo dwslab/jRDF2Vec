@@ -49,7 +49,6 @@ public class Main {
 
     /**
      * Depth for the walks to be generated.
-     * Default: 4
      */
     private static int depth = DEFAULT_DEPTH;
 
@@ -164,10 +163,10 @@ public class Main {
             try {
                 depth = Integer.parseInt(depthText);
             } catch (NumberFormatException nfe) {
-                System.out.println("Could not parse the depth. Using default.");
-                depth = 4;
+                System.out.println("Could not parse the depth. Using default (" + DEFAULT_DEPTH + ").");
+                depth = DEFAULT_DEPTH;
             }
-        } else depth = 4;
+        } else depth = DEFAULT_DEPTH;
         System.out.println("Using depth " + depth);
 
         String numberOfWalksText = getValue("-numberOfWalks", args);
@@ -432,6 +431,8 @@ public class Main {
                 "    This parameter controls the mode to be used for the word2vec training. Allowed values are cbow and sg.\n\n" +
                 "    -numberOfWalks <number> (default: 100)\n" +
                 "    The number of walks to be performed per entity.\n\n" +
+                "    -minCount <number> (default: 1)\n" +
+                "    The minimum word count for the word2vec training. Unlike in the gensim defaults, this parameter is set to 1 because for KG embeddings, a vector for each node/arc is desired.\n\n" +
                 "    -walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE> (default for light: MID_WALKS, default for classic: RANDOM_WALKS_DUPLICATE_FREE)\n" +
                 "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n";
     }

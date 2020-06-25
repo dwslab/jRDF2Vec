@@ -33,23 +33,28 @@ The file containing the knowledge graph for which you want to generate embedding
 *jRDF2Vec* follows the <a href="https://en.wikipedia.org/wiki/Convention_over_configuration">convention over 
 configuration</a> design paradigm to increase usability. You can overwrite the default values by setting one or more optional parameters.
 
-- `-light <entity_file>`<br/>
-If you intend to use *RDF2Vec Light*, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.
+**Parameters for the Walk Configuration**
 - `-onlyWalks`<br>
 If added to the call, this switch will deactivate the training part so that only walks are generated. If training parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.
-- `-threads <number_of_threads>` (default: `(# of available processors) / 2`)<br/>
-This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.
-- `-dimension <size_of_vector>` (default: `200`)<br/>
-This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).
-- `-depth <depth>` (default: `4`)<br/>
-This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form `<s p o>`.
-- `-trainingMode <cbow | sg>` (default: `sg`) <br/>
-This parameter controls the mode to be used for the word2vec training. Allowed values are `cbow` and `sg`.
+- `-light <entity_file>`<br/>
+If you intend to use *RDF2Vec Light*, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.
 - `-numberOfWalks <number>` (default: `100`)<br/>
 The number of walks to be performed per entity.
 - `-walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE>` 
 (default for light: `MID_WALKS`, default for classic: `RANDOM_WALKS_DUPLICATE_FREE`)<br/>
 This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). 
+- `-depth <depth>` (default: `4`)<br/>
+This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form `<s p o>`.
+- `-threads <number_of_threads>` (default: `(# of available processors) / 2`)<br/>
+This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.
+
+**Parameters for the Training Configuration**
+- `-trainingMode <cbow | sg>` (default: `sg`) <br/>
+This parameter controls the mode to be used for the word2vec training. Allowed values are `cbow` and `sg`.
+- `-dimension <size_of_vector>` (default: `200`)<br/>
+This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).
+- `-minCount <number>` (default: `1`)<br/>
+The minimum word count for the word2vec training. Unlike in the gensim defaults, this parameter is set to 1 by default because for knowledge graph embeddings, a vector for each node/arc is desired.
 
 ## Run jRDF2Vec using Docker
 Optionally, Docker can be used to run jRDF2Vec.
