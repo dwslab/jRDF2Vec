@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/dwslab/jRDF2Vec)](https://github.com/dwslab/jRDF2Vec/blob/master/LICENSE)
 
 
-jRDF2Vec is a Java implementation of the RDF2Vec. 
+jRDF2Vec is a Java implementation of <a href="http://rdf2vec.org/">RDF2Vec</a>. 
 It supports multi-threaded, in-memory (or disk-access-based) walk generation and training.
 You can generate embeddings for any `NT`, `OWL/XML`, [`RDF HDT`](http://www.rdfhdt.org/), or `TTL` file.
 

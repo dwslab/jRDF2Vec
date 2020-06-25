@@ -37,6 +37,14 @@ public class Main {
      */
     private static int dimensions = -1;
 
+    /**
+     * Word2vec mincount parameter.
+     */
+    private static int minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
+
+    /**
+     * Default value to be used for the depth.
+     */
     private static final int DEFAULT_DEPTH = 4;
 
     /**
@@ -145,10 +153,10 @@ public class Main {
             try {
                 dimensions = Integer.parseInt(dimensionText);
             } catch (NumberFormatException nfe) {
-                System.out.println("Could not parse the number of dimensions. Using default.");
-                dimensions = 200;
+                System.out.println("Could not parse the number of dimensions. Using default (" + Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT + ").");
+                dimensions = Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT;
             }
-        } else dimensions = 200;
+        } else dimensions = Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT;
         if(!isOnlyWalks) System.out.println("Using vector dimension: " + dimensions);
 
         String depthText = getValue("-depth", args);
@@ -184,6 +192,16 @@ public class Main {
             }
         }
 
+        String minCountString = getValue("-minCount", args);
+        if(minCountString != null) {
+            try {
+                minCount = Integer.parseInt(minCountString);
+            } catch (NumberFormatException nfe) {
+                System.out.println("Could not parse the minCount. Using default (" + Word2VecConfiguration.MIN_COUNT_DEFAULT + ").");
+                minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
+            }
+        } else minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
+
         // determining the configuration for the rdf2vec training
         String trainingModeText = getValue("-trainingMode", args);
         trainingModeText = (trainingModeText == null) ? getValue("-trainMode", args) : trainingModeText;
@@ -199,13 +217,14 @@ public class Main {
         // setting dimensions
         if (dimensions > 0) configuration.setVectorDimension(dimensions);
 
+        // setting minCount
+        if(minCount > 0) configuration.setMinCount(minCount);
 
         String walkGenerationModeText = getValue("-walkGenerationMode", args);
         walkGenerationModeText = (walkGenerationModeText == null) ? getValue("-walkMode", args) : walkGenerationModeText;
         if(walkGenerationModeText != null) {
             walkGenerationMode = WalkGenerationMode.getModeFromString(walkGenerationModeText);
         }
-
 
         Instant before, after;
 

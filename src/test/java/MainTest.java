@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import walkGenerators.base.HdtParser;
 import walkGenerators.base.WalkGenerationMode;
-import walkGenerators.base.WalkGeneratorDefault;
 
 
 import java.io.*;
@@ -201,16 +200,17 @@ class MainTest {
     public void parameterCheck() {
         String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
         String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
-        Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100"});
+        Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100", "-minCount", "3"});
         assertEquals(100, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+        assertEquals(3, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
 
         // important: reset
         Main.reset();
 
         // without light option
-        Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "100"});
+        Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "100", "-minCount", "2"});
         assertEquals(100, ((RDF2Vec) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-
+        assertEquals(2, ((RDF2Vec) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
     }
 
     @Test
