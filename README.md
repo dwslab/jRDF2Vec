@@ -86,3 +86,6 @@ From source code:
 ```bash
 docker build -t jrdf2vec .
 ```
+
+## Developer Documentation
+The most recent JavaDoc sites generated from the latest commit can be found <a href="https://dwslab.github.io/jRDF2Vec/">here</a>.<br/>
