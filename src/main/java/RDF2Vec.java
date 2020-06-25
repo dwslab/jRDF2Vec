@@ -26,7 +26,7 @@ public class RDF2Vec implements IRDF2Vec {
     int numberOfThreads = Runtime.getRuntime().availableProcessors() / 2;
 
     /**
-     * Walks to be performed per entitiy
+     * Walks to be performed per entity.
      */
     int numberOfWalksPerEntity = 100;
 
@@ -38,7 +38,6 @@ public class RDF2Vec implements IRDF2Vec {
 
     /**
      * File to which the walk will be written to.
-     * Default: {@link }
      */
     String walkFilePath;
 
@@ -91,7 +90,7 @@ public class RDF2Vec implements IRDF2Vec {
         this.knowledgeGraphFile = knowledgeGraphFile;
         if (walkDirectory == null || !walkDirectory.isDirectory()) {
             LOGGER.warn("walkDirectory is not a directory. Using default.");
-            walkFilePath = DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+            walkFilePath = WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
         } else {
             this.walkFilePath = walkDirectory.getAbsolutePath() + "/walk_file.gz";
         }
@@ -121,7 +120,7 @@ public class RDF2Vec implements IRDF2Vec {
         } else gensim = Gensim.getInstance();
 
         String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
-        gensim.trainWord2VecModel(fileToWrite, getWalkFilePath(), this.configuration);
+        gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
         gensim.shutDown();
         after = Instant.now();
         this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);

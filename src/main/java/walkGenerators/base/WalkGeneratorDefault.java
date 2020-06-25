@@ -37,9 +37,14 @@ public class WalkGeneratorDefault extends WalkGenerator {
     public EntitySelector entitySelector;
 
     /**
+     * If not specified differently, this directory will be used to persist walks.
+     */
+    public final static String DEFAULT_WALK_DIRECTORY = "./walks";
+
+    /**
      * If not specified differently, this file will be used to persists walks.
      */
-    public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = "./walks/walk_file.gz";
+    public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = DEFAULT_WALK_DIRECTORY + "/walk_file.gz";
 
     /**
      * Can be set to false if there are problems with the parser to make sure that generation functions do not

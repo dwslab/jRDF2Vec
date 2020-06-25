@@ -45,15 +45,17 @@ public class Main {
     /**
      * Default value to be used for the depth.
      */
-    private static final int DEFAULT_DEPTH = 4;
+    public static final int DEFAULT_DEPTH = 4;
 
     /**
      * Depth for the walks to be generated.
      */
     private static int depth = DEFAULT_DEPTH;
 
-
-    private static final int DEFAULT_NUMBER_OF_WALKS = 100;
+    /**
+     * The default number of walks to be generated per node in the graph.
+     */
+    public static final int DEFAULT_NUMBER_OF_WALKS = 100;
 
     /**
      * The number of walks to be generated for each node.

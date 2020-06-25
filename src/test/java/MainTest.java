@@ -7,6 +7,7 @@ import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import training.Word2VecConfiguration;
 import walkGenerators.base.HdtParser;
 import walkGenerators.base.WalkGenerationMode;
 
@@ -211,6 +212,23 @@ class MainTest {
         Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "100", "-minCount", "2"});
         assertEquals(100, ((RDF2Vec) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
         assertEquals(2, ((RDF2Vec) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+    }
+
+    @Test
+    public void parameterCheckNegative() {
+        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
+        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "-10", "-minCount", "-3"});
+        assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+
+        // important: reset
+        Main.reset();
+
+        // without light option
+        Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "abc", "-minCount", "abc"});
+        assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, (Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, (Main.getRdf2VecInstance()).getConfiguration().getMinCount());
     }
 
     @Test

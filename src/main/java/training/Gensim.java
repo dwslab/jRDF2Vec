@@ -1,16 +1,11 @@
 package training;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -147,7 +142,7 @@ public class Gensim {
      * Method to train a word2vec model. The file for the training (i.e., file with sentences, paths etc.) has to
      * exist already.
      * @param modelOrVectorPath If a vector file is desired, the file ending '.kv' is required.
-     * @param trainingFilePath The file path to the file that shall be used for training.
+     * @param trainingFilePath The file path to the file that shall be used for training. The path can be a directory of walk files or a single walk file.
      * @param configuration The configuration for the training operation.
      * @return True if training succeeded, else false.
      */

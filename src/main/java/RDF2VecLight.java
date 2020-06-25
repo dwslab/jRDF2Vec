@@ -135,7 +135,7 @@ public class RDF2VecLight implements IRDF2Vec {
         } else gensim = Gensim.getInstance();
 
         String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
-        gensim.trainWord2VecModel(fileToWrite, getWalkFilePath(), this.configuration);
+        gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
         gensim.writeModelAsTextFile(fileToWrite, fileToWrite.substring(0, fileToWrite.length() - 3) + ".txt", entitiesFile.getAbsolutePath());
         gensim.shutDown();
         after = Instant.now();

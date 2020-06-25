@@ -1,3 +1,4 @@
+import training.Word2VecConfiguration;
 import walkGenerators.base.WalkGenerationMode;
 
 /**
@@ -28,4 +29,16 @@ public interface IRDF2Vec {
      * @return {@link WalkGenerationMode} to be used.
      */
     WalkGenerationMode getWalkGenerationMode();
+
+    /**
+     * Obtain the Word2Vec Configuration
+     * @return The configuration object.
+     */
+    Word2VecConfiguration getConfiguration();
+
+    /**
+     * The number of walks to be generated per entity.
+     * @return Number of walks.
+     */
+    int getNumberOfWalksPerEntity();
 }
