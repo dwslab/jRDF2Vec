@@ -1,3 +1,4 @@
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

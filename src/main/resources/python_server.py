@@ -83,7 +83,7 @@ class MySentences(object):
 
 @app.route('/train-word2vec', methods=['GET'])
 def train_word_2_vec():
-    """Method to train a word2vec model given one file to be used for training. Parameters are expected in the request
+    """Method to train a word2vec model given one file to be used for de.uni_mannheim.informatik.dws.jrdf2vec.training. Parameters are expected in the request
     header.
 
     Returns

@@ -1,4 +1,7 @@
 import com.google.common.collect.Sets;
+import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
+import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
+import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -7,9 +10,9 @@ import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import training.Word2VecConfiguration;
-import walkGenerators.base.HdtParser;
-import walkGenerators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.HdtParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGenerationMode;
 
 
 import java.io.*;
@@ -44,7 +47,7 @@ class MainTest {
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec.class)");
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
 

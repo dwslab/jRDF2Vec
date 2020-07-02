@@ -1,11 +1,12 @@
+import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import training.Word2VecConfiguration;
-import training.Word2VecType;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,7 @@ class RDF2VecLightTest {
         assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
         assertTrue(new File("./walks/model.txt").exists(), "Text file not written.");
         assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
-        assertFalse(light.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
+        assertFalse(light.getRequiredTimeForLastTrainingString().startsWith("<"), "No de.uni_mannheim.informatik.dws.jrdf2vec.training time tracked."); // make sure time was tracked
         assertFalse(light.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
         // clean up

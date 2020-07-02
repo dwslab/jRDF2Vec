@@ -31,8 +31,6 @@ jobs:
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
         run: mvn javadoc:javadoc
-      - name: Debug
-        run: pwd && cd /home/runner/work/jRDF2Vec/jRDF2Vec/target/site/apidocs && pwd
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:

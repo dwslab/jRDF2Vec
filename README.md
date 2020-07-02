@@ -4,8 +4,8 @@
 [![License](https://img.shields.io/github/license/dwslab/jRDF2Vec)](https://github.com/dwslab/jRDF2Vec/blob/master/LICENSE)
 
 
-jRDF2Vec is a Java implementation of <a href="http://rdf2vec.org/">RDF2Vec</a>. 
-It supports multi-threaded, in-memory (or disk-access-based) walk generation and training.
+jRDF2Vec is a Java implementation of <a href="http://rdf2vec.org/">de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec</a>. 
+It supports multi-threaded, in-memory (or disk-access-based) walk generation and de.uni_mannheim.informatik.dws.jrdf2vec.training.
 You can generate embeddings for any `NT`, `OWL/XML`, [`RDF HDT`](http://www.rdfhdt.org/), or `TTL` file.
 
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
@@ -35,9 +35,9 @@ configuration</a> design paradigm to increase usability. You can overwrite the d
 
 **Parameters for the Walk Configuration**
 - `-onlyWalks`<br>
-If added to the call, this switch will deactivate the training part so that only walks are generated. If training parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.
+If added to the call, this switch will deactivate the de.uni_mannheim.informatik.dws.jrdf2vec.training part so that only walks are generated. If de.uni_mannheim.informatik.dws.jrdf2vec.training parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.
 - `-light <entity_file>`<br/>
-If you intend to use *RDF2Vec Light*, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.
+If you intend to use *de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light*, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.
 - `-numberOfWalks <number>` (default: `100`)<br/>
 The number of walks to be performed per entity.
 - `-walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE>` 
@@ -46,15 +46,15 @@ This parameter determines the mode for the walk generation (multiple walk genera
 - `-depth <depth>` (default: `4`)<br/>
 This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form `<s p o>`.
 - `-threads <number_of_threads>` (default: `(# of available processors) / 2`)<br/>
-This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.
+This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the de.uni_mannheim.informatik.dws.jrdf2vec.training.
 
 **Parameters for the Training Configuration**
 - `-trainingMode <cbow | sg>` (default: `sg`) <br/>
-This parameter controls the mode to be used for the word2vec training. Allowed values are `cbow` and `sg`.
+This parameter controls the mode to be used for the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Allowed values are `cbow` and `sg`.
 - `-dimension <size_of_vector>` (default: `200`)<br/>
 This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).
 - `-minCount <number>` (default: `1`)<br/>
-The minimum word count for the word2vec training. Unlike in the gensim defaults, this parameter is set to 1 by default because for knowledge graph embeddings, a vector for each node/arc is desired.
+The minimum word count for the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Unlike in the gensim defaults, this parameter is set to 1 by default because for knowledge graph embeddings, a vector for each node/arc is desired.
 
 ## Run jRDF2Vec using Docker
 Optionally, Docker can be used to run jRDF2Vec.
