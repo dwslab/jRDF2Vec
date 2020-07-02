@@ -1,7 +1,8 @@
-
-training
-walkGenerators.base
-walkGenerators.dataStructure
-walkGenerators.light
-walkGenerators.light.DBpedia
-walkGenerators.runnables
+de.uni_mannheim.informatik.dws.jrdf2vec
+de.uni_mannheim.informatik.dws.jrdf2vec.training
+de.uni_mannheim.informatik.dws.jrdf2vec.util
+de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base
+de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.dataStructures
+de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.light
+de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.light.DBpedia
+de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.runnables
