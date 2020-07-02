@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -62,6 +63,34 @@ class MainTest {
             LOGGER.error("Failed to clean up after test.", ioe);
             fail();
         }
+    }
+
+    @Test
+    public void testTxtVectorGeneration(){
+        String modelFilePath = this.getClass().getClassLoader().getResource("test_model_vectors.kv").getPath();
+        File modelFile = new File(modelFilePath);
+        if(!modelFile.exists()){
+            fail("Could not find required test file.");
+        }
+        String[] args = {"-generateTxtVectorFile", modelFilePath};
+        Main.main(args);
+        File vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        assertTrue(vectorFile.exists());
+        assertTrue(getNumberOfLines(vectorFile) > 5);
+        vectorFile.delete();
+    }
+
+    @Test
+    public void testTxtVectorGenerationFail(){
+        String modelFilePath = this.getClass().getClassLoader().getResource("test_model_vectors.kv").getPath();
+        File modelFile = new File(modelFilePath);
+        if(!modelFile.exists()){
+            fail("Could not find required test file.");
+        }
+        String[] args = {"-generateTxtVectorFile"};
+        Main.main(args);
+        File vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        assertFalse(vectorFile.exists());
     }
 
     @Test

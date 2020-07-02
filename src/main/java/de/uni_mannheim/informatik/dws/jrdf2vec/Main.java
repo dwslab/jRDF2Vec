@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
@@ -92,15 +93,29 @@ public class Main {
      */
     private static boolean isOnlyWalks = false;
 
+
     public static void main(String[] args) {
 
         if (args == null || args.length == 0) {
-            System.out.println("Not enough arguments.");
+            System.out.println("Not enough arguments. Call '-help' to learn more about the CLI.");
+            return;
         }
 
         if (containsIgnoreCase("-help", args) || containsIgnoreCase("--help", args) || containsIgnoreCase("-h", args)) {
             System.out.println(getHelp());
             return;
+        }
+
+        if(args.length == 2) {
+            String transformationSource = getValue("-generateTxtVectorFile", args);
+            if(transformationSource == null) {
+                // check for alternative spelling
+                transformationSource = getValue("-generateTextVectorFile", args);
+            }
+            if(transformationSource != null) {
+                generateTextVectorFile(transformationSource);
+                return;
+            }
         }
 
         String knowledgeGraphFilePath = getValue("-graph", args);
@@ -110,14 +125,14 @@ public class Main {
             // stop program execution
             return;
         }
-        if (knowledgeGraphFilePath != null) {
-            knowledgeGraphFile = new File(knowledgeGraphFilePath);
-            if (!knowledgeGraphFile.exists()) {
-                System.out.println("The given file does not exist: " + knowledgeGraphFilePath);
-                // stop program execution
-                return;
-            }
+
+        knowledgeGraphFile = new File(knowledgeGraphFilePath);
+        if (!knowledgeGraphFile.exists()) {
+            System.out.println("The given file does not exist: " + knowledgeGraphFilePath);
+            // stop program execution
+            return;
         }
+
 
         String lightEntityFilePath = getValue("-light", args);
         if (lightEntityFilePath != null) {
@@ -128,7 +143,7 @@ public class Main {
         }
 
         isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
-        if(!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args); // allowing a bit more...
+        if (!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args); // allowing a bit more...
 
         String walkDirectoryPath = getValue("-walkDir", args);
         walkDirectoryPath = (walkDirectoryPath == null) ? getValue("-walkDirectory", args) : walkDirectoryPath;
@@ -161,7 +176,7 @@ public class Main {
                 dimensions = Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT;
             }
         } else dimensions = Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT;
-        if(!isOnlyWalks) System.out.println("Using vector dimension: " + dimensions);
+        if (!isOnlyWalks) System.out.println("Using vector dimension: " + dimensions);
 
         String depthText = getValue("-depth", args);
         if (depthText != null) {
@@ -197,7 +212,7 @@ public class Main {
         }
 
         String minCountString = getValue("-minCount", args);
-        if(minCountString != null) {
+        if (minCountString != null) {
             try {
                 minCount = Integer.parseInt(minCountString);
             } catch (NumberFormatException nfe) {
@@ -222,11 +237,11 @@ public class Main {
         if (dimensions > 0) configuration.setVectorDimension(dimensions);
 
         // setting minCount
-        if(minCount > 0) configuration.setMinCount(minCount);
+        if (minCount > 0) configuration.setMinCount(minCount);
 
         String walkGenerationModeText = getValue("-walkGenerationMode", args);
         walkGenerationModeText = (walkGenerationModeText == null) ? getValue("-walkMode", args) : walkGenerationModeText;
-        if(walkGenerationModeText != null) {
+        if (walkGenerationModeText != null) {
             walkGenerationMode = WalkGenerationMode.getModeFromString(walkGenerationModeText);
         }
 
@@ -346,6 +361,24 @@ public class Main {
         System.out.println(rdf2VecInstance.getRequiredTimeForLastTrainingString());
     }
 
+    /**
+     * Given a model or vector file, a text file is generated containing all the vectors.
+     * @param transformationSource File path to the model or vector file.
+     */
+    private static void generateTextVectorFile(String transformationSource) {
+        File sourceFile = new File(transformationSource);
+        if(!sourceFile.exists()){
+            System.out.println("The given file does not exist. Cannot generate text vector file.");
+            return;
+        }
+        if(sourceFile.isDirectory()){
+            System.out.println("The specified file is a directory. Cannot generate text vector file.");
+            return;
+        }
+        File fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        Gensim.getInstance().writeModelAsTextFile(transformationSource, fileToGenerate.getAbsolutePath());
+    }
+
 
     /**
      * Helper method.
@@ -376,7 +409,7 @@ public class Main {
      * @return True if {@code element} is contained in {@code array}, else false.
      */
     public static boolean containsIgnoreCase(String element, String[] array) {
-        if(element == null || array == null) return false;
+        if (element == null || array == null) return false;
         for (String s : array) {
             if (element.equalsIgnoreCase(s)) return true;
         }
@@ -394,6 +427,7 @@ public class Main {
 
     /**
      * Get the walk generation mode for testing. Not required for operational usage.
+     *
      * @return Walk Generation Mode.
      */
     public static WalkGenerationMode getWalkGenerationMode() {
@@ -402,6 +436,7 @@ public class Main {
 
     /**
      * Get depth for testing. Not required for operational usage.
+     *
      * @return Depth as int.
      */
     public static int getDepth() {

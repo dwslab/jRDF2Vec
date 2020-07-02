@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -318,27 +319,6 @@ class GensimTest {
             LOGGER.info("Cannot create path of resource", ex);
             return null;
         }
-    }
-
-    /**
-     * Helper method to obtain the number of read lines.
-     * @param file File to be read.
-     * @return Number of lines in the file.
-     */
-    private static int getNumberOfLines(File file){
-        int linesRead = 0;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            while(br.readLine() != null){
-                linesRead++;
-            }
-            br.close();
-        } catch (FileNotFoundException fnfe){
-            fnfe.printStackTrace();
-        } catch (IOException ioe){
-            ioe.printStackTrace();
-        }
-        return linesRead;
     }
 
 }

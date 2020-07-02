@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
+import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,27 @@ public class Util {
         result += "Minutes: " + minutes + "\n";
         result += "Seconds: " + seconds + "\n";
         return result;
+    }
+
+    /**
+     * Helper method to obtain the number of read lines.
+     * @param file File to be read.
+     * @return Number of lines in the file.
+     */
+    public static int getNumberOfLines(File file){
+        int linesRead = 0;
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            while(br.readLine() != null){
+                linesRead++;
+            }
+            br.close();
+        } catch (FileNotFoundException fnfe){
+            fnfe.printStackTrace();
+        } catch (IOException ioe){
+            ioe.printStackTrace();
+        }
+        return linesRead;
     }
 
 }
