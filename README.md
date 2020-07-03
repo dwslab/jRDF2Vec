@@ -17,7 +17,7 @@ Download this project, execute `mvn clean install`.
 - Java 8 or later.
 - Python 3 with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.
 
-### Command-Line Interface (jRDF2Vec CLI)
+### Command-Line Interface (jRDF2Vec CLI) for Training and Walk Generation
 Use the resulting jar from the `target` directory.
 
 *Minimal Example*
@@ -55,6 +55,18 @@ This parameter controls the mode to be used for the word2vec de.uni_mannheim.inf
 This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).
 - `-minCount <number>` (default: `1`)<br/>
 The minimum word count for the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Unlike in the gensim defaults, this parameter is set to 1 by default because for knowledge graph embeddings, a vector for each node/arc is desired.
+
+### Command-Line Interface (jRDF2Vec CLI) - Additional Services
+Besides generating walks and training embedding, the CLI offers additional services which are described below.
+
+#### Generating a Text Vector File
+jRDF is compatible with the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation framework for KG embeddings (GEval)</a>. 
+This frameworks requires the vectors to be present in a text file. If you have a gensim model or vector file, you can
+use the following command to generate this file:
+
+```
+java -jar jrdf2vec-1.0-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
+```
 
 ## Run jRDF2Vec using Docker
 Optionally, Docker can be used to run jRDF2Vec.
