@@ -43,4 +43,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: jars # The branch the action should deploy to.
           FOLDER: target/jrdf2vec-1.0-SNAPSHOT.jar
-          TARGET_FOLDER: /jars
+          TARGET_FOLDER: jars
