@@ -38,6 +38,9 @@ class MainTest {
         Main.reset();
     }
 
+    /**
+     * Test classic run with vector text file generation.
+     */
     @Test
     public void trainClassic() {
         String walkPath = "./mainWalks/";
@@ -56,6 +59,7 @@ class MainTest {
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
         assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("vectors.txt"));
 
         try {
             FileUtils.forceDelete(walkDirectory);
@@ -64,6 +68,38 @@ class MainTest {
             fail();
         }
     }
+
+    /**
+     * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
+     */
+    @Test
+    public void trainClassicNoTextVectorFile(){
+        String walkPath = "./mainWalks/";
+        File walkDirectory = new File(walkPath);
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec.class)");
+        assertTrue(walkDirectory.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertFalse(files.contains("vectors.txt"));
+
+        try {
+            FileUtils.forceDelete(walkDirectory);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+            fail();
+        }
+    }
+
 
     @Test
     public void testTxtVectorGeneration(){
@@ -219,8 +255,38 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("model.txt"));
         assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("vectors.txt"));
+
+        try {
+            FileUtils.forceDelete(lightWalks);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+        }
+    }
+
+    /**
+     * Test light run with explicit statement that no vector text file shall be written.
+     */
+    @Test
+    public void trainLightNoVectorTextFile() {
+        File lightWalks = new File("./mainLightWalks/");
+        lightWalks.mkdir();
+        lightWalks.deleteOnExit();
+        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
+        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/", "-noVectorTextFileGeneration"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class));
+        assertTrue(lightWalks.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(lightWalks.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertFalse(files.contains("vectors.txt"));
 
         try {
             FileUtils.forceDelete(lightWalks);
@@ -270,6 +336,9 @@ class MainTest {
 
         // print the help for manual inspection
         System.out.println(result);
+
+        // printing some empty lines to better check the output manually
+        System.out.println("\n\n\n\n\n");
 
         // just making sure there is no exception thrown etc. and the program is not running after calling help.
         Main.main(new String[]{"-help"});
@@ -638,6 +707,12 @@ class MainTest {
             FileUtils.deleteDirectory(new File("./walksOnlyMidWeighted/"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./walksOnlyMidWeighted/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./mainWalks/"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./mainWalks/).");
             e.printStackTrace();
         }
     }

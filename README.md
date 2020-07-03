@@ -55,6 +55,8 @@ This parameter controls the mode to be used for the word2vec training. Allowed v
 This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).
 - `-minCount <number>` (default: `1`)<br/>
 This parameter controls the minimum word count for the word2vec training. Unlike in the gensim defaults, this parameter is set to 1 by default because for knowledge graph embeddings, a vector for each node/arc is desired.
+- `-noVectorTextFileGeneration` | `-vectorTextFileGeneration`<br/>
+A switch which indicates whether a text file with the vectors shall be persisted on the disk. This is enabled by default. Use `-noVectorTextFileGeneration` to disable the file generation.
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.

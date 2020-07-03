@@ -35,7 +35,7 @@ public class RDF2VecLight implements IRDF2Vec {
     int numberOfThreads = Runtime.getRuntime().availableProcessors() / 2;
 
     /**
-     * Walks to be performed per entitiy
+     * Walks to be performed per entity
      */
     int numberOfWalksPerEntity = 100;
 
@@ -51,7 +51,7 @@ public class RDF2VecLight implements IRDF2Vec {
     String walkFilePath = DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
     /**
-     * The de.uni_mannheim.informatik.dws.jrdf2vec.training configuration to be used.
+     * The training configuration to be used.
      */
     Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
 
@@ -74,6 +74,12 @@ public class RDF2VecLight implements IRDF2Vec {
      * Walk generation mode.
      */
     private WalkGenerationMode walkGenerationMode = WalkGenerationMode.MID_WALKS;
+
+    /**
+     * Indicator whether a text file with all the vectors shall be generated.
+     * This is, for example, required when using the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation framework for KG embeddings</a>.
+     */
+    boolean isVectorTextFileGeneration = true;
 
     /**
      * Logger
@@ -139,7 +145,9 @@ public class RDF2VecLight implements IRDF2Vec {
 
         String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
         gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
-        gensim.writeModelAsTextFile(fileToWrite, fileToWrite.substring(0, fileToWrite.length() - 3) + ".txt", entitiesFile.getAbsolutePath());
+        if(isVectorTextFileGeneration) {
+            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + "vectors.txt", entitiesFile.getAbsolutePath());
+        }
         gensim.shutDown();
         after = Instant.now();
         this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);
@@ -249,7 +257,7 @@ public class RDF2VecLight implements IRDF2Vec {
      * @return The time it took to generate walks for the last run as String. Will never be null.
      */
     public String getRequiredTimeForLastWalkGenerationString() {
-        if (this.requiredTimeForLastWalkGenerationString == null) return "<de.uni_mannheim.informatik.dws.jrdf2vec.training time not yet set>";
+        if (this.requiredTimeForLastWalkGenerationString == null) return "<training time not yet set>";
         else return requiredTimeForLastWalkGenerationString;
     }
 
@@ -258,7 +266,7 @@ public class RDF2VecLight implements IRDF2Vec {
      * @return The time it took to train the model for the last run as String. Will never be null.
      */
     public String getRequiredTimeForLastTrainingString() {
-        if(this.requiredTimeForLastTrainingString == null) return "<de.uni_mannheim.informatik.dws.jrdf2vec.training time not yet set>";
+        if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
         else return requiredTimeForLastTrainingString;
     }
 
@@ -272,5 +280,14 @@ public class RDF2VecLight implements IRDF2Vec {
         return this.walkGenerationMode;
     }
 
+    @Override
+    public boolean isVectorTextFileGeneration() {
+        return isVectorTextFileGeneration;
+    }
+
+    @Override
+    public void setVectorTextFileGeneration(boolean vectorTextFileGeneration) {
+        isVectorTextFileGeneration = vectorTextFileGeneration;
+    }
 }
 

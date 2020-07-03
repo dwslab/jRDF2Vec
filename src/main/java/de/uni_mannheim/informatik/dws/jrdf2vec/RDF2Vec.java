@@ -14,7 +14,7 @@ import java.time.Instant;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
- * This class allows to generate walks and train embeddings for de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Classic.
+ * This class allows to generate walks and train embeddings for RDF2Vec Classic.
  */
 public class RDF2Vec implements IRDF2Vec {
 
@@ -84,6 +84,12 @@ public class RDF2Vec implements IRDF2Vec {
     private WalkGenerationMode walkGenerationMode = WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
 
     /**
+     * Indicator whether a text file with all the vectors shall be generated.
+     * This is, for example, required when using the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation framework for KG embeddings</a>.
+     */
+    boolean isVectorTextFileGeneration = true;
+
+    /**
      * Constructor
      *
      * @param knowledgeGraphFile File to the knowledge graph.
@@ -124,6 +130,9 @@ public class RDF2Vec implements IRDF2Vec {
 
         String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
         gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
+        if(isVectorTextFileGeneration) {
+            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + "vectors.txt");
+        }
         gensim.shutDown();
         after = Instant.now();
         this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);
@@ -246,5 +255,13 @@ public class RDF2Vec implements IRDF2Vec {
     @Override
     public WalkGenerationMode getWalkGenerationMode() {
         return this.walkGenerationMode;
+    }
+
+    public boolean isVectorTextFileGeneration() {
+        return isVectorTextFileGeneration;
+    }
+
+    public void setVectorTextFileGeneration(boolean vectorTextFileGeneration) {
+        isVectorTextFileGeneration = vectorTextFileGeneration;
     }
 }

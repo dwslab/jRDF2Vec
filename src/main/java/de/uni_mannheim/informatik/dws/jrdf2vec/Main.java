@@ -93,6 +93,11 @@ public class Main {
      */
     private static boolean isOnlyWalks = false;
 
+    /**
+     * By default a vector text file is generated.
+     */
+    private static boolean isVectorTextFileGeneration = true;
+
 
     public static void main(String[] args) {
 
@@ -221,6 +226,13 @@ public class Main {
             }
         } else minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
 
+
+        if(containsIgnoreCase("-noVectorTextFileGeneration", args)){
+            isVectorTextFileGeneration = false;
+        } else if(containsIgnoreCase("-vectorTextFileGeneration", args)){
+            isVectorTextFileGeneration = true;
+        }
+
         // determining the configuration for the rdf2vec de.uni_mannheim.informatik.dws.jrdf2vec.training
         String trainingModeText = getValue("-trainingMode", args);
         trainingModeText = (trainingModeText == null) ? getValue("-trainMode", args) : trainingModeText;
@@ -293,7 +305,7 @@ public class Main {
         // ------------------------------------
 
         if (lightEntityFile == null) {
-            System.out.println("de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Classic");
+            System.out.println("RDF2Vec Classic");
 
             RDF2Vec rdf2vec;
             if (walkDirectory == null) rdf2vec = new RDF2Vec(knowledgeGraphFile);
@@ -314,6 +326,12 @@ public class Main {
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
 
+            // setting the walk generation mode
+            rdf2vec.setWalkGenerationMode(walkGenerationMode);
+
+            // set vector text file
+            rdf2vec.setVectorTextFileGeneration(isVectorTextFileGeneration);
+
             rdf2vec.setConfiguration(configuration);
             before = Instant.now();
             rdf2vec.train();
@@ -322,7 +340,7 @@ public class Main {
             // setting the instance to allow for better testability
             rdf2VecInstance = rdf2vec;
         } else {
-            System.out.println("de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light Mode");
+            System.out.println("RDF2Vec Light Mode");
             RDF2VecLight rdf2VecLight;
             if (walkDirectory == null) rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile);
             else rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile, walkDirectory);
@@ -338,6 +356,9 @@ public class Main {
 
             // set resource directory
             if (resourcesDirectory != null) rdf2VecLight.setResourceDirectory(resourcesDirectory);
+
+            // set vector text file
+            rdf2VecLight.setVectorTextFileGeneration(isVectorTextFileGeneration);
 
             // setting the walk generation mode
             rdf2VecLight.setWalkGenerationMode(walkGenerationMode);
@@ -451,30 +472,46 @@ public class Main {
      */
     public static String getHelp() {
 
-        return "jRDF2Vec Help\n" +
-                "-------------\n\n" +
+        return  "*****************\n" +
+                "* jRDF2Vec Help *\n" +
+                "*****************\n\n" +
+
+                "Walk Generation and RDF2Vec Training\n" +
+                "------------------------------------\n\n" +
+
                 "Required Parameters:\n\n" +
                 "    -graph <graph_file>\n" +
                 "    The file containing the knowledge graph for which you want to generate embeddings.\n\n" +
                 "Optional Parameters:\n\n" +
                 "    -light <entity_file>\n" +
-                "    If you intend to use de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.\n\n" +
+                "    If you intend to use RDF2Vec Light, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.\n\n" +
                 "    -onlyWalks\n" +
-                "    If added to the call, this switch will deactivate the de.uni_mannheim.informatik.dws.jrdf2vec.training part so that only walks are generated. If de.uni_mannheim.informatik.dws.jrdf2vec.training parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.\n\n" +
+                "    If added to the call, this switch will deactivate the training part so that only walks are generated. If training parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.\n\n" +
                 "    -threads <number_of_threads> (default: (# of available processors) / 2)\n" +
-                "    This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the de.uni_mannheim.informatik.dws.jrdf2vec.training.\n\n" +
+                "    This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.\n\n" +
                 "    -dimension <size_of_vector> (default: 200)\n" +
                 "    This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).\n\n" +
                 "    -depth <depth> (default: 4)\n" +
                 "    This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form <s p o>.\n\n" +
                 "    -trainingMode <cbow|sg> (default: sg)\n" +
-                "    This parameter controls the mode to be used for the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Allowed values are cbow and sg.\n\n" +
+                "    This parameter controls the mode to be used for the word2vec training. Allowed values are cbow and sg.\n\n" +
                 "    -numberOfWalks <number> (default: 100)\n" +
                 "    The number of walks to be performed per entity.\n\n" +
                 "    -minCount <number> (default: 1)\n" +
-                "    The minimum word count for the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Unlike in the gensim defaults, this parameter is set to 1 because for KG embeddings, a vector for each node/arc is desired.\n\n" +
+                "    The minimum word count for the training. Unlike in the gensim defaults, this parameter is set to 1 because for KG embeddings, a vector for each node/arc is desired.\n\n" +
+                "    -noVectorTextFileGeneration | -vectorTextFileGeneration\n" +
+                "    A switch that indicates whether a text file with the vectors shall be persisted on the disk. This is enabled by default. Use -noVectorTextFileGeneration to disable the file generation.\n\n" +
                 "    -walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE> (default for light: MID_WALKS, default for classic: RANDOM_WALKS_DUPLICATE_FREE)\n" +
-                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n";
+                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n\n\n" +
+
+
+                "Additional Services\n" +
+                "-------------------\n\n" +
+
+                "A) Generation of Text Vector File\n" +
+                "   jRDF is compatible with the evaluation framework for KG embeddings (GEval). This framework requires the vectors to be present in a text file. If you have a gensim model or vector file, you can use the following parameter to generate this file:\n\n" +
+                "       -generateTextVectorFile <model_or_vector_file>\n" +
+                "        The file path to the model or vector file that shall be used to write the vectors in a text file needs to be specified.";
     }
 
     /**
@@ -491,6 +528,7 @@ public class Main {
         resourcesDirectory = null;
         rdf2VecInstance = null;
         walkGenerationMode = null;
+        isVectorTextFileGeneration = true;
     }
 
 }

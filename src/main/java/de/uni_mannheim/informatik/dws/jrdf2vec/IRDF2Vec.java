@@ -4,7 +4,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGenerationMode;
 
 /**
- * Interface for de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec orchestration classes.
+ * Interface for RDF2Vec orchestration classes.
  */
 public interface IRDF2Vec {
 
@@ -37,6 +37,18 @@ public interface IRDF2Vec {
      * @return The configuration object.
      */
     Word2VecConfiguration getConfiguration();
+
+    /**
+     * Obtain the indicator of whether a vector text file will be generated.
+     * @return True if a vector text file will be generated, else false. 
+     */
+    boolean isVectorTextFileGeneration();
+
+    /**
+     * Set whether a vector text file will be generated.
+     * @param vectorTextFileGeneration True if file shall be generated, else false.
+     */
+    void setVectorTextFileGeneration(boolean vectorTextFileGeneration);
 
     /**
      * The number of walks to be generated per entity.

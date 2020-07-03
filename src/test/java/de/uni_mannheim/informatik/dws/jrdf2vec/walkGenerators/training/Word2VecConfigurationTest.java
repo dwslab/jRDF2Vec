@@ -1,5 +1,7 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.training;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.training;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
