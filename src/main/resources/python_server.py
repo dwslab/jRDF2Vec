@@ -373,13 +373,10 @@ def write_vectors_as_text_file():
     final_string = ""
     if entity_file is None:
         for concept in vectors.vocab:
-            if concept in vectors.vocab:
-                vector = vectors.get_vector(concept)
-                final_string += concept + " "
-                for element in np.nditer(vector):
-                    final_string += str(element) + " "
-            else:
-                logging.info("WARN: The following concept has not been found in the vector space: " + concept)
+            vector = vectors.get_vector(concept)
+            final_string += concept + " "
+            for element in np.nditer(vector):
+                final_string += str(element) + " "
             final_string += "\n"
         # write final string to file
     else:

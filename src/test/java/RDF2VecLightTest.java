@@ -39,7 +39,7 @@ class RDF2VecLightTest {
         light.train();
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
         assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
-        assertTrue(new File("./walks/model.txt").exists(), "Text file not written.");
+        assertTrue(new File("./walks/vectors.txt").exists(), "Text file not written.");
         assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
         assertFalse(light.getRequiredTimeForLastTrainingString().startsWith("<"), "No de.uni_mannheim.informatik.dws.jrdf2vec.training time tracked."); // make sure time was tracked
         assertFalse(light.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
