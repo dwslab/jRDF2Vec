@@ -1,3 +1,0 @@
-http://www.co-ode.org/ontologies/pizza/pizza.owl#FourCheesesTopping
-http://www.co-ode.org/ontologies/pizza/pizza.owl#OliveTopping
-http://www.co-ode.org/ontologies/pizza/pizza.owl#Italy
