@@ -370,29 +370,38 @@ def write_vectors_as_text_file():
     file_to_write = request.headers.get("file_to_write")
     entity_file = request.headers.get("entity_file")
     vectors = get_vectors(model_path=model_path, vector_path=vector_path)
-    final_string = ""
-    if entity_file is None:
-        for concept in vectors.vocab:
-            vector = vectors.get_vector(concept)
-            final_string += concept + " "
-            for element in np.nditer(vector):
-                final_string += str(element) + " "
-            final_string += "\n"
-        # write final string to file
-    else:
-        concepts = read_concept_file(entity_file)
-        for concept in concepts:
-            if concept in vectors.vocab:
-                vector = vectors.get_vector(concept)
-                final_string += concept + " "
-                for element in np.nditer(vector):
-                    final_string += str(element) + " "
-            else:
-                logging.info("WARN: The following concept has not been found in the vector space: " + concept)
-                logging.info("Trying to resolve new URI.")
-            final_string += "\n"
+    print("Writing the vectors as text file.")
     with open(file_to_write, "w+") as f:
-        f.write(final_string)
+        if entity_file is None:
+            print("Processing " + str(len(vectors.vocab)) + " vectors...")
+            count = 0
+            for concept in vectors.vocab:
+                line_to_write = ""
+                count += 1
+                vector = vectors.get_vector(concept)
+                line_to_write += concept + " "
+                for element in np.nditer(vector):
+                    line_to_write += str(element) + " "
+                line_to_write += "\n"
+                f.write(line_to_write)
+                if count % 1000 == 0:
+                    print("Vectors processed: " + str(count))
+        else:
+            concepts = read_concept_file(entity_file)
+            print("Processing " + str(len(concepts)) + " vectors...")
+            for concept in concepts:
+                line_to_write = ""
+                if concept in vectors.vocab:
+                    vector = vectors.get_vector(concept)
+                    line_to_write += concept + " "
+                    for element in np.nditer(vector):
+                        line_to_write += str(element) + " "
+                else:
+                    logging.info("WARN: The following concept has not been found in the vector space: " + concept)
+                line_to_write += "\n"
+                f.write(line_to_write)
+                if count % 1000 == 0:
+                    print("Vectors processed: " + str(count))
     return "True"
 
 def read_concept_file(path_to_concept_file):

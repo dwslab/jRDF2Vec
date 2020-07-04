@@ -161,35 +161,15 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
-        <!--
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>3.13.1</version>
-        </dependency>
-        -->
-
-
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>
             <version>3.13.1</version>
         </dependency>
-
-        <!--
-                <dependency>
-                    <groupId>org.apache.jena</groupId>
-                    <artifactId>apache-jena-libs</artifactId>
-                    <version>3.13.1</version>
-                    <type>pom</type>
-                </dependency>
-        -->
 
         <!-- slf4j -->
         <dependency>
