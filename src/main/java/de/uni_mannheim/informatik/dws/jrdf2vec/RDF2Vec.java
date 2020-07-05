@@ -45,7 +45,7 @@ public class RDF2Vec implements IRDF2Vec {
     String walkFilePath;
 
     /**
-     * The de.uni_mannheim.informatik.dws.jrdf2vec.training configuration to be used.
+     * The training configuration to be used.
      */
     Word2VecConfiguration configuration = new Word2VecConfiguration();
 
@@ -106,7 +106,7 @@ public class RDF2Vec implements IRDF2Vec {
     }
 
     /**
-     * Train an de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light model.
+     * Train an RDF2Vec model.
      * The model will appear in the directory where the walks reside.
      */
     public void train() {
