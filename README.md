@@ -11,7 +11,8 @@ You can generate embeddings for any `NT`, `OWL/XML`, [`RDF HDT`](http://www.rdfh
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
 
 ## How to use the jRDF2vec Command-Line Interface?
-Download this project, execute `mvn clean install`. 
+Download this project, execute `mvn clean install`.
+Alternatively, you can download the packaged JAR of the latest successful commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
 
 ### System Requirements
 - Java 8 or later.

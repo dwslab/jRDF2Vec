@@ -11,8 +11,8 @@ import org.rdfhdt.hdt.hdt.HDTManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.HdtParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.HdtParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
 
 
 import java.io.*;

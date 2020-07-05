@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
 
 import static org.junit.jupiter.api.Assertions.*;
 

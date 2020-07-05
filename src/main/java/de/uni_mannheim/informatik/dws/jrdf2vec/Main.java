@@ -4,9 +4,9 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGenerationMode;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGeneratorDefault;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.light.WalkGeneratorLight;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGeneratorLight;
 
 import java.io.File;
 import java.time.Instant;

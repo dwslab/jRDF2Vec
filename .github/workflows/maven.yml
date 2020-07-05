@@ -37,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
           FOLDER: target/site/apidocs
-      - name: Copy JAR to special folder for deplyoment
+      - name: Copy JAR to special folder for deplyoment 📩
         run: mkdir ./jars && cp target/jrdf2vec-1.0-SNAPSHOT.jar ./jars
       - name: Deploy JAR 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3

@@ -1,10 +1,10 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.DummyWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.NxMemoryParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.base.WalkGeneratorDefault;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.light.DBpedia.DBpediaWalkGeneratorLight;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators.light.LightEntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.DummyWalkGenerator;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.NxMemoryParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.dbpedia.DBpediaWalkGeneratorLight;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.LightEntitySelector;
 
 /**
  * Can be started in CLI using {@code -main} option.
