@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
@@ -77,5 +78,17 @@ class UtilTest {
         }
     }
 
+    @Test
+    void getDimensionalityFromVectorTextFileTest() {
+        String walkDirectory = UtilTest.class.getClassLoader().getResource("freude_vectors.txt").getPath();
+        assertEquals(3, Util.getDimensionalityFromVectorTextFile(walkDirectory));
+        assertEquals(3, Util.getDimensionalityFromVectorTextFile(new File(walkDirectory)));
+    }
+
+    @Test
+    void getDimensionalityFromVectorTextFileFail(){
+        assertEquals(-1, Util.getDimensionalityFromVectorTextFile(""));
+        assertEquals(-1, Util.getDimensionalityFromVectorTextFile(new File("")));
+    }
 
 }

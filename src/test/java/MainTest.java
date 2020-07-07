@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.HdtParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 
 
 import java.io.*;
@@ -92,7 +93,7 @@ class MainTest {
     @Test
     public void onlyTraining(){
         String walkDirectory = MainTest.class.getClassLoader().getResource("walk_directory_test").getPath();
-        Main.main(new String[]{"-onlyTraining", "-walkDirectory", walkDirectory});
+        Main.main(new String[]{"-onlyTraining", "-walkDirectory", walkDirectory, "-dimensions", "80"});
         System.out.println(walkDirectory);
 
         File modelkvFile = new File(walkDirectory + "/model.kv");
@@ -106,6 +107,7 @@ class MainTest {
         File vectorsFile = new File(walkDirectory + "/vectors.txt");
         vectorsFile.deleteOnExit();
         assertTrue(vectorsFile.exists());
+        assertEquals(80, Util.getDimensionalityFromVectorTextFile(vectorsFile));
 
         // clean-up
         modelkvFile.delete();
