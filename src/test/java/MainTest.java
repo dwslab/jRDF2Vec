@@ -236,7 +236,6 @@ class MainTest {
             LOGGER.error("Error while trying to delete ./classicWalks/");
         }
 
-
         // now again with another configuration...
         Main.reset();
         walkDirectory = new File(directoryName);

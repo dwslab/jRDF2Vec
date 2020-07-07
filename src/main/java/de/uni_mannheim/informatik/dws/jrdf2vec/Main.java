@@ -135,7 +135,7 @@ public class Main {
                 // try again with a different writing
                 walksPath = getValue("-walkDir",args);
                 if(walksPath == null) {
-                    System.out.println("Required parameter -walkDirectory <path to walk directory or file> missing. Aborting program.");
+                    System.out.println("Required parameter -walkDirectory <path to walk directory or file> missing. Aborting program. Call '-help' to learn more about the CLI.");
                     return;
                 }
             }
@@ -143,7 +143,12 @@ public class Main {
 
         String knowledgeGraphFilePath = getValue("-graph", args);
 
+        isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
+        // allowing a bit more...
+        if (!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args);
+
         if(!isOnlyTraining) {
+            // the KG file path is only relevant if we want to do walk generation...
             if (knowledgeGraphFilePath == null) {
                 System.out.println("Required parameter '-graph <kg_file>' not set - program cannot be started. " +
                         "Call '-help' to learn more about the CLI.");
@@ -166,9 +171,7 @@ public class Main {
             }
         }
 
-        isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
-        // allowing a bit more...
-        if (!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args);
+
 
         String walkDirectoryPath = getValue("-walkDir", args);
         walkDirectoryPath = (walkDirectoryPath == null) ? getValue("-walkDirectory", args) : walkDirectoryPath;
@@ -568,6 +571,7 @@ public class Main {
         rdf2VecInstance = null;
         walkGenerationMode = null;
         isVectorTextFileGeneration = true;
+        isOnlyTraining = false;
     }
 
 }
