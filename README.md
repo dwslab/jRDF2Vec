@@ -48,6 +48,8 @@ This parameter determines the mode for the walk generation (multiple walk genera
 This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form `<s p o>`.
 - `-threads <number_of_threads>` (default: `(# of available processors) / 2`)<br/>
 This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.
+- `-walkDirectory <directory where walk files shall be generated/reside>`<br/>
+The directory where the walks shall be generated into. In case of `-onlyTraining`, the directory where the walks reside.
 
 **Parameters for the Training Configuration**
 - `-trainingMode <cbow | sg>` (default: `sg`) <br/>
@@ -58,6 +60,8 @@ This parameter allows you to control the size of the resulting vectors (e.g. 100
 This parameter controls the minimum word count for the word2vec training. Unlike in the gensim defaults, this parameter is set to 1 by default because for knowledge graph embeddings, a vector for each node/arc is desired.
 - `-noVectorTextFileGeneration` | `-vectorTextFileGeneration`<br/>
 A switch which indicates whether a text file with the vectors shall be persisted on the disk. This is enabled by default. Use `-noVectorTextFileGeneration` to disable the file generation.
+- `-onlyTraining`<br/>
+If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter `-walkDirectory` must be set. If walk generation parameters are specified, they are ignored.
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.

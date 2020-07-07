@@ -94,6 +94,11 @@ public class Main {
     private static boolean isOnlyWalks = false;
 
     /**
+     * If true, only the training step is executed.
+     */
+    private static boolean isOnlyTraining = false;
+
+    /**
      * By default a vector text file is generated.
      */
     private static boolean isVectorTextFileGeneration = true;
@@ -123,21 +128,35 @@ public class Main {
             }
         }
 
+        if(containsIgnoreCase("-onlyTraining", args)){
+            isOnlyTraining = true;
+            String walksPath = getValue("-walkDirectory", args);
+            if(walksPath == null){
+                // try again with a different writing
+                walksPath = getValue("-walkDir",args);
+                if(walksPath == null) {
+                    System.out.println("Required parameter -walkDirectory <path to walk directory or file> missing. Aborting program.");
+                    return;
+                }
+            }
+        }
+
         String knowledgeGraphFilePath = getValue("-graph", args);
-        if (knowledgeGraphFilePath == null) {
-            System.out.println("Required parameter '-graph <kg_file>' not set - program cannot be started. " +
-                    "Call '-help' to learn more about the CLI.");
-            // stop program execution
-            return;
-        }
 
-        knowledgeGraphFile = new File(knowledgeGraphFilePath);
-        if (!knowledgeGraphFile.exists()) {
-            System.out.println("The given file does not exist: " + knowledgeGraphFilePath);
-            // stop program execution
-            return;
+        if(!isOnlyTraining) {
+            if (knowledgeGraphFilePath == null) {
+                System.out.println("Required parameter '-graph <kg_file>' not set - program cannot be started. " +
+                        "Call '-help' to learn more about the CLI.");
+                // stop program execution
+                return;
+            }
+            knowledgeGraphFile = new File(knowledgeGraphFilePath);
+            if (!knowledgeGraphFile.exists()) {
+                System.out.println("The given file does not exist: " + knowledgeGraphFilePath);
+                // stop program execution
+                return;
+            }
         }
-
 
         String lightEntityFilePath = getValue("-light", args);
         if (lightEntityFilePath != null) {
@@ -148,7 +167,8 @@ public class Main {
         }
 
         isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
-        if (!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args); // allowing a bit more...
+        // allowing a bit more...
+        if (!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args);
 
         String walkDirectoryPath = getValue("-walkDir", args);
         walkDirectoryPath = (walkDirectoryPath == null) ? getValue("-walkDirectory", args) : walkDirectoryPath;
@@ -233,7 +253,7 @@ public class Main {
             isVectorTextFileGeneration = true;
         }
 
-        // determining the configuration for the rdf2vec de.uni_mannheim.informatik.dws.jrdf2vec.training
+        // determining the configuration for the training
         String trainingModeText = getValue("-trainingMode", args);
         trainingModeText = (trainingModeText == null) ? getValue("-trainMode", args) : trainingModeText;
         if (trainingModeText != null) {
@@ -259,13 +279,28 @@ public class Main {
 
         Instant before, after;
 
+        // -------------------
+        //    only training
+        // -------------------
+        if(isOnlyTraining){
+            System.out.println("Only training is performed, no walks are going to be generated.");
+            before = Instant.now();
+            String modelFilePathToWrite = walkDirectory.getAbsolutePath() + "/model.kv";
+            Gensim.getInstance().trainWord2VecModel(modelFilePathToWrite, walkDirectory.getAbsolutePath(), configuration);
+            Gensim.getInstance().writeModelAsTextFile(modelFilePathToWrite, walkDirectory.getAbsolutePath() + "/vectors.txt");
+            after = Instant.now();
+            System.out.println("\nTotal Time:");
+            System.out.println(Util.getDeltaTimeString(before, after));
+            return;
+        }
+
+
         // ------------------
         //     only walks
         // ------------------
 
         if (isOnlyWalks) {
-            System.out.println("Only walks are being generated, no de.uni_mannheim.informatik.dws.jrdf2vec.training is performed.");
-
+            System.out.println("Only walks are being generated, training is performed.");
             String walkFile = "./walks/walk_file.gz";
 
             // handle the walk directory
@@ -296,12 +331,12 @@ public class Main {
             System.out.println("\nTotal Time:");
             System.out.println(Util.getDeltaTimeString(before, after));
 
-            return; // important: stop here to avoid any de.uni_mannheim.informatik.dws.jrdf2vec.training.
+            return; // important: stop here to avoid any training.
         }
 
 
         // ------------------------------------
-        //     full run (walks + de.uni_mannheim.informatik.dws.jrdf2vec.training)
+        //     full run (walks + training)
         // ------------------------------------
 
         if (lightEntityFile == null) {
@@ -440,7 +475,7 @@ public class Main {
     /**
      * Get the instance for testing. Not required for operational usage.
      *
-     * @return de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec instance.
+     * @return RDF2Vec instance.
      */
     public static IRDF2Vec getRdf2VecInstance() {
         return rdf2VecInstance;
@@ -502,7 +537,11 @@ public class Main {
                 "    -noVectorTextFileGeneration | -vectorTextFileGeneration\n" +
                 "    A switch that indicates whether a text file with the vectors shall be persisted on the disk. This is enabled by default. Use -noVectorTextFileGeneration to disable the file generation.\n\n" +
                 "    -walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE> (default for light: MID_WALKS, default for classic: RANDOM_WALKS_DUPLICATE_FREE)\n" +
-                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n\n\n" +
+                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n\n" +
+                "    -walkDirectory <directory where walk files shall be generated/reside>\n" +
+                "    The directory where the walks shall be generated into. In case of -onlyTraining, the directory where the walks reside.\n\n" +
+                "    -onlyTraining\n" +
+                "    If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter -walkDirectory must be set. If walk generation parameters are specified, they are ignored.\n\n\n" +
 
 
                 "Additional Services\n" +

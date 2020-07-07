@@ -1,3 +1,4 @@
+import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -39,7 +40,31 @@ class RDF2VecTest {
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
         assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
         assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
-        assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No de.uni_mannheim.informatik.dws.jrdf2vec.training time tracked."); // make sure time was tracked
+        assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
+        assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
+
+        // clean up
+        try {
+            FileUtils.deleteDirectory(new File("./walks"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed.");
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void trainWithMixedInputFiles(){
+        File graphFilePath = new File(this.getClass().getClassLoader().getResource("mixedWalkDirectory").getPath());
+        RDF2Vec classic = new RDF2Vec(graphFilePath);
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
+        configuration.setVectorDimension(10);
+
+        classic.train();
+
+        assertTrue(new File("./walks/model").exists(), "Model file not written.");
+        assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
+        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
         assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
         // clean up

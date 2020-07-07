@@ -69,6 +69,60 @@ class MainTest {
         }
     }
 
+    @Test
+    void trainWithMixedInputFilesCommandLine(){
+        File graphFilePath = new File(this.getClass().getClassLoader().getResource("mixedWalkDirectory").getPath());
+        Main.main(new String[]{"-graph", graphFilePath.getAbsolutePath(), "-dimension", "100", "-depth", "4", "-trainingMode", "sg", "-numberOfWalks", "100", "-walkGenerationMode", "RANDOM_WALKS_DUPLICATE_FREE"});
+
+        assertTrue(new File("./walks/model").exists(), "Model file not written.");
+        assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
+        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertFalse(Main.getRdf2VecInstance().getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
+        assertFalse(Main.getRdf2VecInstance().getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
+
+        // clean up
+        try {
+            FileUtils.deleteDirectory(new File("./walks"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed.");
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void onlyTraining(){
+        String walkDirectory = MainTest.class.getClassLoader().getResource("walk_directory_test").getPath();
+        Main.main(new String[]{"-onlyTraining", "-walkDirectory", walkDirectory});
+        System.out.println(walkDirectory);
+
+        File modelkvFile = new File(walkDirectory + "/model.kv");
+        modelkvFile.deleteOnExit();
+        assertTrue(modelkvFile.exists());
+
+        File modelFile = new File(walkDirectory + "/model");
+        modelFile.deleteOnExit();
+        assertTrue(modelFile.exists());
+
+        File vectorsFile = new File(walkDirectory + "/vectors.txt");
+        vectorsFile.deleteOnExit();
+        assertTrue(vectorsFile.exists());
+
+        // clean-up
+        modelkvFile.delete();
+        modelFile.delete();
+        vectorsFile.delete();
+    }
+
+    /**
+     * Just making sure that the program does not fail if used inappropriately.
+     */
+    @Test
+    public void onlyTrainingFail(){
+        Main.main(new String[]{"-onlyTraining"});
+        Main.main(new String[]{"-onlyTraining", "-minCount", "5"});
+        Main.main(new String[]{"-threads", "3", "-onlyTraining", "-minCount", "5"});
+    }
+
     /**
      * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
      */

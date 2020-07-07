@@ -15,7 +15,7 @@ import java.time.Instant;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
- * This class allows to generate walks and train embeddings for de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light.
+ * This class allows to generate walks and train embeddings for RDF2Vec Light.
  */
 public class RDF2VecLight implements IRDF2Vec {
 

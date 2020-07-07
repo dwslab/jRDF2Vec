@@ -139,12 +139,12 @@ public class Gensim {
      ***********************************/
 
     /**
-     * Method to train a word2vec model. The file for the de.uni_mannheim.informatik.dws.jrdf2vec.training (i.e., file with sentences, paths etc.) has to
+     * Method to train a word2vec model. The file for the training (i.e., file with sentences, paths etc.) has to
      * exist already.
      * @param modelOrVectorPath If a vector file is desired, the file ending '.kv' is required.
-     * @param trainingFilePath The file path to the file that shall be used for de.uni_mannheim.informatik.dws.jrdf2vec.training. The path can be a directory of walk files or a single walk file.
-     * @param configuration The configuration for the de.uni_mannheim.informatik.dws.jrdf2vec.training operation.
-     * @return True if de.uni_mannheim.informatik.dws.jrdf2vec.training succeeded, else false.
+     * @param trainingFilePath The file path to the file that shall be used for training. The path can be a directory of walk files or a single walk file.
+     * @param configuration The configuration for the training operation.
+     * @return True if training succeeded, else false.
      */
     public boolean trainWord2VecModel(String modelOrVectorPath, String trainingFilePath, Word2VecConfiguration configuration){
         HttpGet request = new HttpGet(serverUrl + "/train-word2vec");
@@ -364,15 +364,21 @@ public class Gensim {
      * @return The canonical model path as String.
      */
     private String getCanonicalPath(String filePath) {
+        if(filePath == null){
+            LOGGER.error("The provided file path is null.");
+            return null;
+        }
         File modelFile = new File(filePath);
         if (!modelFile.exists() || modelFile.isDirectory()) {
             LOGGER.error("ERROR: The specified model path does not exist or is a directory.");
+            LOGGER.error("Provided file path: " + filePath);
             return filePath;
         }
         try {
             return modelFile.getCanonicalPath();
         } catch (IOException e) {
             LOGGER.error("Could not derive canonical model path.", e);
+            LOGGER.error("Provided file path: " + filePath);
             return filePath;
         }
     }
