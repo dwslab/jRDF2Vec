@@ -175,7 +175,7 @@ class GensimTest {
 
     @Test
     void writeModelAsTextFile() {
-        // "normal" de.uni_mannheim.informatik.dws.jrdf2vec.training task
+        // "normal" training task
         String testFilePath = getPathOfResource("testInputForWord2Vec.txt");
         String fileToWrite = "./freudeWord2vec.kv";
         assertTrue(gensim.trainWord2VecModel(fileToWrite, testFilePath, new Word2VecConfiguration(Word2VecType.CBOW)));

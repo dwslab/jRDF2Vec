@@ -138,7 +138,7 @@ class MainTest {
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec.class)");
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
 

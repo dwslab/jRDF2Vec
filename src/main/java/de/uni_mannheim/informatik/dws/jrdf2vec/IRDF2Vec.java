@@ -27,7 +27,7 @@ public interface IRDF2Vec {
     void setWalkGenerationMode(WalkGenerationMode walkGenerationMode);
 
     /**
-     * Set the walk generation mode for the generation part of de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec.
+     * Set the walk generation mode for the generation part of RDF2Vec.
      * @return {@link WalkGenerationMode} to be used.
      */
     WalkGenerationMode getWalkGenerationMode();

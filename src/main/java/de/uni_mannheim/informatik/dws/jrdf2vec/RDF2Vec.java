@@ -234,7 +234,7 @@ public class RDF2Vec implements IRDF2Vec {
      * @return The time it took to generate walks for the last run as String. Will never be null.
      */
     public String getRequiredTimeForLastWalkGenerationString() {
-        if (this.requiredTimeForLastWalkGenerationString == null) return "<de.uni_mannheim.informatik.dws.jrdf2vec.training time not yet set>";
+        if (this.requiredTimeForLastWalkGenerationString == null) return "<training time not yet set>";
         else return requiredTimeForLastWalkGenerationString;
     }
 
@@ -243,7 +243,7 @@ public class RDF2Vec implements IRDF2Vec {
      * @return The time it took to train the model for the last run as String. Will never be null.
      */
     public String getRequiredTimeForLastTrainingString() {
-        if(this.requiredTimeForLastTrainingString == null) return "<de.uni_mannheim.informatik.dws.jrdf2vec.training time not yet set>";
+        if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
         else return requiredTimeForLastTrainingString;
     }
 

@@ -116,7 +116,7 @@ public class RDF2VecLight implements IRDF2Vec {
     }
 
     /**
-     * Train an de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light model.
+     * Train an RDF2Vec Light model.
      * The model will appear in the directory where the walks reside.
      */
     public void train() {

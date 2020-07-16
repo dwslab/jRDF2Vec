@@ -32,7 +32,7 @@ public class Main {
     private static File knowledgeGraphFile = null;
 
     /**
-     * The number of threads to be used for the walk generation and for the de.uni_mannheim.informatik.dws.jrdf2vec.training.
+     * The number of threads to be used for the walk generation and for the training.
      */
     private static int numberOfThreads = -1;
 
@@ -192,7 +192,7 @@ public class Main {
                 numberOfThreads = Runtime.getRuntime().availableProcessors() / 2;
             }
         } else numberOfThreads = Runtime.getRuntime().availableProcessors() / 2;
-        System.out.println("Using " + numberOfThreads + " threads for walk generation and de.uni_mannheim.informatik.dws.jrdf2vec.training.");
+        System.out.println("Using " + numberOfThreads + " threads for walk generation and training.");
 
         String dimensionText = getValue("-dimension", args);
         dimensionText = (dimensionText == null) ? getValue("-dimensions", args) : dimensionText;
@@ -265,7 +265,7 @@ public class Main {
             } else configuration = new Word2VecConfiguration(Word2VecType.CBOW);
         } else configuration = new Word2VecConfiguration(Word2VecType.SG); // default: SG
 
-        // setting de.uni_mannheim.informatik.dws.jrdf2vec.training threads
+        // setting training threads
         if (numberOfThreads > 0) configuration.setNumberOfThreads(numberOfThreads);
 
         // setting dimensions

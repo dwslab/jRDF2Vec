@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.HashSet;
 
 /**
- * Default Walk Generator for de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec Light.
+ * Default Walk Generator for RDF2Vec Light.
  */
 public class WalkGeneratorLight extends WalkGeneratorDefault {
 
@@ -16,7 +16,6 @@ public class WalkGeneratorLight extends WalkGeneratorDefault {
      * Default Logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkGeneratorLight.class);
-
 
     /**
      * Constructor

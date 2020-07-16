@@ -30,7 +30,7 @@ public class Word2VecConfiguration {
     public static final int VECTOR_DIMENSION_DEFAULT = 200;
 
     /**
-     * The size of the window during the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Default: 5.
+     * The size of the window during the word2vec training. Default: 5.
      */
     private int windowSize = WINDOW_SIZE_DEFAULT;
 
@@ -40,7 +40,7 @@ public class Word2VecConfiguration {
     public static final int WINDOW_SIZE_DEFAULT = 5;
 
     /**
-     * Iterations during the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training.
+     * Iterations during the word2vec training.
      */
     private int iterations = ITERATIONS_DEFAULT;
 
@@ -50,7 +50,7 @@ public class Word2VecConfiguration {
     public static final int ITERATIONS_DEFAULT = 5;
 
     /**
-     * The number of negatives during the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training. Default 5.
+     * The number of negatives during the word2vec training. Default 5.
      */
     private int negatives = NEGATIVES_DEFAULT;
 
@@ -60,7 +60,7 @@ public class Word2VecConfiguration {
     public static final int NEGATIVES_DEFAULT = 5;
 
     /**
-     * The minimum count for the word2vec de.uni_mannheim.informatik.dws.jrdf2vec.training.
+     * The minimum count for the word2vec training.
      */
     private int minCount = MIN_COUNT_DEFAULT;
 
@@ -87,7 +87,7 @@ public class Word2VecConfiguration {
 
     /**
      * Default Constructor.
-     * Many parameters are assumed such as de.uni_mannheim.informatik.dws.jrdf2vec.training type SG.
+     * Many parameters are assumed such as training type SG.
      */
     public Word2VecConfiguration(){}
 
