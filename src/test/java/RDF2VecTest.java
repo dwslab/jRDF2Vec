@@ -114,6 +114,9 @@ class RDF2VecTest {
         cleanUp();
     }
 
+    /**
+     * Deleting test files.
+     */
     static void cleanUp(){
         try {
             FileUtils.deleteDirectory(new File("./walks"));
