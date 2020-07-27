@@ -86,7 +86,7 @@ public class Util {
 
     /**
      * Given a vector text file, this method determines the dimensionality within the file based on the first valid line.
-     * @param vectorTextFile
+     * @param vectorTextFile Vector text file for which dimensionality of containing vectors shall be determined.
      * @return Dimensionality as int.
      */
     public static int getDimensionalityFromVectorTextFile(File vectorTextFile){

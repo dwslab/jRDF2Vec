@@ -205,12 +205,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.mpkorstanje</groupId>
-            <artifactId>simmetrics-core</artifactId>
-            <version>4.1.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
@@ -240,6 +234,7 @@
             <version>2.3.3</version>
         </dependency>
 
+        <!-- jitpack dependency -->
         <dependency>
             <groupId>com.github.rdfhdt.hdt-java</groupId>
             <artifactId>hdt-java-core</artifactId>
