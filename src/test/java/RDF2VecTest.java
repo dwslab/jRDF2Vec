@@ -2,6 +2,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +99,21 @@ class RDF2VecTest {
         }
     }
 
+    /**
+     * In rare cases when the test execution is aborted in the middle of processing, some intermediate test files
+     * may have been created. When restarting the tests, those may lead to errors. Therefore, the cleanup is also run
+     * before all tests.
+     */
+    @BeforeAll
+    static void beforeCleanUp(){
+        cleanUp();
+    }
+
     @AfterAll
+    static void afterAll(){
+        cleanUp();
+    }
+
     static void cleanUp(){
         try {
             FileUtils.deleteDirectory(new File("./walks"));
