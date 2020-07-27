@@ -16,6 +16,12 @@
     </properties>
 
     <repositories>
+        <!-- Central needs to be explicitly stated as first choice (otherwise there is an issue with com.github.jsonld-java) -->
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
