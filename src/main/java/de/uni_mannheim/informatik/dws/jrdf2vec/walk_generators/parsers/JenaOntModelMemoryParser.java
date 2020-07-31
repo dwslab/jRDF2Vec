@@ -1,4 +1,4 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
@@ -24,7 +24,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(JenaOntModelMemoryParser.class);
 
     /**
-     * Read n-triples from the given file.
+     * Read n-triples from the given file into {@link MemoryParser#data}.
      * @param fileToReadFrom File from which will be read (must be any RDF file such as NT, XML etc.).
      */
     public void readDataFromFile(File fileToReadFrom){
@@ -43,7 +43,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
     }
 
     /**
-     * Read n-triples from the given file.
+     * Read n-triples from the given model into {@link MemoryParser#data}.
      * @param model Reference to the {@link OntModel} that shall be parsed into the internal triple data structure.
      */
     public void readDataFromOntModel(OntModel model){

@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
+
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.readOntology;
 
 /**
  * Default Walk Generator.
@@ -52,6 +55,18 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     private boolean parserIsOk = true;
 
+
+    /**
+     * Constructor
+     *
+     * @param ontModel Model for which walks shall be generated.
+     */
+    public WalkGeneratorDefault(OntModel ontModel) {
+        this.model = ontModel;
+        this.parser = new JenaOntModelMemoryParser();
+        ((JenaOntModelMemoryParser) this.parser).readDataFromOntModel(model);
+        this.entitySelector = new MemoryEntitySelector(((JenaOntModelMemoryParser) parser).getData());
+    }
 
     /**
      * Constructor

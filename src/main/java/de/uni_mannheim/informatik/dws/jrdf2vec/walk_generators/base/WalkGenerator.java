@@ -339,25 +339,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
     }
 
 
-    /**
-     * Reads an ontology from a given URL.
-     *
-     * @param path     of ontology to be read.
-     * @param language The syntax format of the ontology file such as {@code "TTL"}, {@code "NT"}, or {@code "RDFXML"}.
-     * @return Model instance.
-     * @throws MalformedURLException Exception for malformed URLs.
-     */
-    public static OntModel readOntology(String path, String language) throws MalformedURLException {
-        URL url = new File(path).toURI().toURL();
-        try {
-            OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-            model.read(url.toString(), language);
-            return model;
-        } catch (RiotException re) {
-            LOGGER.error("Could not parse: " + path + "\nin jena.", re);
-            return null;
-        }
-    }
+
 
 
     /**

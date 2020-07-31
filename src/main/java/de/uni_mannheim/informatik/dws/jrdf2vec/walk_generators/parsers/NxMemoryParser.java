@@ -1,5 +1,6 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import org.semanticweb.yars.nx.Node;
 import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;

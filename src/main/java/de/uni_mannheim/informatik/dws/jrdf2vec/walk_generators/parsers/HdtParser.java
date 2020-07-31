@@ -1,5 +1,6 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.IParser;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;

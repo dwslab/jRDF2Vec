@@ -1,4 +1,4 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
 import org.junit.jupiter.api.Test;

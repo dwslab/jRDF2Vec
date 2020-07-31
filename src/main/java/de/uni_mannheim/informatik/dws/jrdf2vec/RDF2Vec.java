@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
@@ -22,6 +23,11 @@ public class RDF2Vec implements IRDF2Vec {
      * File with KG triples.
      */
     private File knowledgeGraphFile;
+
+    /**
+     * Ont model reference in case that is already loaded. (not important for CLI but for API usage)
+     */
+    private OntModel ontModel;
 
     /**
      * Default: Available Processors / 2
@@ -97,28 +103,79 @@ public class RDF2Vec implements IRDF2Vec {
      */
     public RDF2Vec(File knowledgeGraphFile, File walkDirectory) {
         this.knowledgeGraphFile = knowledgeGraphFile;
-        if (walkDirectory == null || !walkDirectory.isDirectory()) {
-            LOGGER.warn("walkDirectory is not a directory. Using default.");
-            walkFilePath = WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
-        } else {
-            this.walkFilePath = walkDirectory.getAbsolutePath() + "/walk_file.gz";
-        }
+        setWalkDirectory(walkDirectory);
     }
+
+    /**
+     * Constructor
+     *
+     * @param ontModel OntModel reference.
+     * @param walkDirectory Directory to which the walks and models shall be written to.
+     */
+    public RDF2Vec(OntModel ontModel, File walkDirectory) {
+       setWalkDirectory(walkDirectory);
+       this.ontModel = ontModel;
+    }
+
+
+    /**
+     * Train a new model with the existing parameters.
+     * @param ontModel Model
+     * @param walkDirectory Directory where walks shall be generated.
+     * @return Path to model.
+     */
+    public String trainNew(OntModel ontModel, File walkDirectory){
+        setWalkDirectory(walkDirectory);
+        this.ontModel = ontModel;
+        return train();
+    }
+
+    /**
+     * Train a new model with the existing parameters.
+     * @param knowledgeGraphFile KG file (for which embedding shall be trained).
+     * @param walkDirectory Directory where walks shall be generated.
+     * @return Path to model.
+     */
+    public String trainNew(File knowledgeGraphFile, File walkDirectory){
+        this.knowledgeGraphFile = knowledgeGraphFile;
+        setWalkDirectory(walkDirectory);
+        return train();
+    }
+
 
     /**
      * Train an RDF2Vec model.
      * The model will appear in the directory where the walks reside.
+     *
+     * @return Returns the path to the trained model.
      */
-    public void train() {
-        // sanity checks
-        if (!knowledgeGraphFile.exists()) {
-            LOGGER.error("File " + knowledgeGraphFile.getAbsolutePath() + " does not exist. ABORT.");
-            return;
+    public String train() {
+        boolean useFile = true;
+        if (ontModel == null) {
+
+            // sanity checks
+            if (knowledgeGraphFile == null) {
+                LOGGER.error("Knowledge Graph File not set. ABORT.");
+                return null;
+            }
+            if (!knowledgeGraphFile.exists()) {
+                LOGGER.error("File " + knowledgeGraphFile.getAbsolutePath() + " does not exist. ABORT.");
+                return null;
+            }
+        } else {
+            useFile = false;
         }
 
         Instant before = Instant.now();
-        WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile);
+
+        WalkGeneratorDefault classicGenerator;
+        if(useFile) {
+            classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile);
+        } else {
+            classicGenerator = new WalkGeneratorDefault(this.ontModel);
+        }
         classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, getWalkFilePath());
+
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
 
@@ -136,6 +193,8 @@ public class RDF2Vec implements IRDF2Vec {
         gensim.shutDown();
         after = Instant.now();
         this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);
+
+        return fileToWrite;
     }
 
 
@@ -245,6 +304,19 @@ public class RDF2Vec implements IRDF2Vec {
     public String getRequiredTimeForLastTrainingString() {
         if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
         else return requiredTimeForLastTrainingString;
+    }
+
+    /**
+     * Set the walk file path given the directory.
+     * @param walkDirectory Directory where walks shall be generated.
+     */
+    private void setWalkDirectory(File walkDirectory){
+        if (walkDirectory == null || !walkDirectory.isDirectory()) {
+            LOGGER.warn("walkDirectory is not a directory. Using default.");
+            walkFilePath = WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+        } else {
+            this.walkFilePath = walkDirectory.getAbsolutePath() + "/walk_file.gz";
+        }
     }
 
     @Override

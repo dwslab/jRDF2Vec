@@ -1,5 +1,6 @@
-import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,6 +51,30 @@ class RDF2VecTest {
         } catch (IOException e) {
             LOGGER.info("Cleanup failed.");
             e.printStackTrace();
+        }
+    }
+
+    @Test
+    void trainWithOntModelReference(){
+        File ontologyTestFile = new File(RDF2VecTest.class.getClassLoader().getResource("pizza.owl.xml").getPath());
+        File walkDirectory = new File("./ontModelTest/");
+        walkDirectory.mkdir();
+        try {
+            RDF2Vec rdf2Vec = new RDF2Vec(Util.readOntology(ontologyTestFile, "XML"), walkDirectory);
+            String result = rdf2Vec.train();
+            assertNotNull(result);
+            assertTrue(new File(result).exists());
+            assertTrue(Gensim.getInstance().getVocabularySize(result) > 0);
+            assertTrue(Gensim.getInstance().isInVocabulary("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot", result));
+        } catch (Exception e) {
+            fail("Exception occurred with message: " + e.getMessage());
+        } finally {
+            try {
+                FileUtils.deleteDirectory(walkDirectory);
+            } catch (IOException ioe){
+                LOGGER.error("Unable to delete directory after test execution: " + walkDirectory.getAbsolutePath());
+            }
+            Gensim.shutDown();
         }
     }
 
@@ -134,6 +159,12 @@ class RDF2VecTest {
             FileUtils.deleteDirectory(new File("./extClassic"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./extClassic/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./ontModelTest"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./ontModelTest/).");
             e.printStackTrace();
         }
     }

@@ -1,7 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.DummyWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.NxMemoryParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.NxMemoryParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.dbpedia.DBpediaWalkGeneratorLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.LightEntitySelector;

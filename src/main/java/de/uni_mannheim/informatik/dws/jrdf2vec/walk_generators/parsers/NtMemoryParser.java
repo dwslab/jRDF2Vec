@@ -1,5 +1,7 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.IsearchCondition;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

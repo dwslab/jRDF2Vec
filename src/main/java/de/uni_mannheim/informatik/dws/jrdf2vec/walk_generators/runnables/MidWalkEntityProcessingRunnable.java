@@ -2,9 +2,9 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.HdtParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.NtMemoryParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.NxMemoryParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.HdtParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.NtMemoryParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.NxMemoryParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 
 /**

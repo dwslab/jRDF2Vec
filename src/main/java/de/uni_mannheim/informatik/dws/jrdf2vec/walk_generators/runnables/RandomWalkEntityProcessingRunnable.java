@@ -1,6 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.MemoryParser;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.MemoryParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
 

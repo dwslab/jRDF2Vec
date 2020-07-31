@@ -1,9 +1,15 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -127,6 +133,39 @@ public class Util {
             e.printStackTrace();
         }
         return result;
+    }
+
+
+    /**
+     * Reads an ontology from a given URL.
+     *
+     * @param path     of ontology to be read.
+     * @param language The syntax format of the ontology file such as {@code "TTL"}, {@code "NT"}, or {@code "RDFXML"}.
+     * @return Model instance.
+     * @throws MalformedURLException Exception for malformed URLs.
+     */
+    public static OntModel readOntology(String path, String language) throws MalformedURLException {
+        return readOntology(new File(path), language);
+    }
+
+    /**
+     * Reads an ontology from a given URL.
+     *
+     * @param file     of ontology to be read.
+     * @param language The syntax format of the ontology file such as {@code "TTL"}, {@code "NT"}, or {@code "RDFXML"}.
+     * @return Model instance.
+     * @throws MalformedURLException Exception for malformed URLs.
+     */
+    public static OntModel readOntology(File file, String language) throws MalformedURLException {
+        URL url = file.toURI().toURL();
+        try {
+            OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+            model.read(url.toString(), language);
+            return model;
+        } catch (RiotException re) {
+            LOGGER.error("Could not parse: " + file.getAbsolutePath() + "\nin jena.", re);
+            return null;
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
