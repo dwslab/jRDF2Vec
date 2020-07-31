@@ -5,4 +5,5 @@ de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base
 de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures
 de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light
 de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.dbpedia
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers
 de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables
