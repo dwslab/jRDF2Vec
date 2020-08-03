@@ -185,10 +185,10 @@ public class RDF2Vec implements IRDF2Vec {
             gensim = Gensim.getInstance(this.pythonServerResourceDirectory);
         } else gensim = Gensim.getInstance();
 
-        String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
+        String fileToWrite = this.getWalkFileDirectoryPath() + File.separator + "model.kv";
         gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
         if(isVectorTextFileGeneration) {
-            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + "vectors.txt");
+            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + File.separator + "vectors.txt");
         }
         gensim.shutDown();
         after = Instant.now();
@@ -238,11 +238,11 @@ public class RDF2Vec implements IRDF2Vec {
         File f = new File(this.getWalkFilePath());
         if (f != null) {
             try {
-                return f.getParentFile().getCanonicalPath() + "/";
+                return f.getParentFile().getCanonicalPath();
             } catch (Exception e) {
-                return "./walks/";
+                return "." + File.separator + "walks";
             }
-        } else return "./walks/";
+        } else return "." + File.pathSeparator + "walks";
 
     }
 
@@ -315,7 +315,7 @@ public class RDF2Vec implements IRDF2Vec {
             LOGGER.warn("walkDirectory is not a directory. Using default.");
             walkFilePath = WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
         } else {
-            this.walkFilePath = walkDirectory.getAbsolutePath() + "/walk_file.gz";
+            this.walkFilePath = walkDirectory.getAbsolutePath() + File.separator + "walk_file.gz";
         }
     }
 

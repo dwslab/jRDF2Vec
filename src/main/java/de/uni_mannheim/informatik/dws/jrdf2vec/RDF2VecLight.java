@@ -143,10 +143,10 @@ public class RDF2VecLight implements IRDF2Vec {
             gensim = Gensim.getInstance(this.resourceDirectory);
         } else gensim = Gensim.getInstance();
 
-        String fileToWrite = this.getWalkFileDirectoryPath() + "model.kv";
+        String fileToWrite = this.getWalkFileDirectoryPath() + File.separator + "model.kv";
         gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
         if(isVectorTextFileGeneration) {
-            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + "vectors.txt", entitiesFile.getAbsolutePath());
+            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + File.separator + "vectors.txt", entitiesFile.getAbsolutePath());
         }
         gensim.shutDown();
         after = Instant.now();
@@ -202,11 +202,11 @@ public class RDF2VecLight implements IRDF2Vec {
         File f = new File(this.getWalkFilePath());
         if (f != null) {
             try {
-                return f.getParentFile().getCanonicalPath() + "/";
+                return f.getParentFile().getCanonicalPath();
             } catch (Exception e) {
-                return "./walks/";
+                return "." + File.separator + "walks";
             }
-        } else return "./walks/";
+        } else return "." + File.separator + "walks";
 
     }
 

@@ -26,8 +26,8 @@ class RDF2VecTest {
     void getWalkFilePath() {
         File graphFilePath = new File(this.getClass().getClassLoader().getResource("emptyFile.txt").getPath());
         RDF2Vec rdf2vec = new RDF2Vec(graphFilePath);
-        assertEquals("./walks/walk_file.gz", rdf2vec.getWalkFilePath());
-        assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith("/walks/"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
+        assertEquals("." + File.separator + "walks" + File.separator + "walk_file.gz", rdf2vec.getWalkFilePath());
+        assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks" + File.separator) || rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
     }
 
     @Test
