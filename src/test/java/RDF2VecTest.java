@@ -2,6 +2,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.riot.Lang;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ class RDF2VecTest {
         File walkDirectory = new File("./ontModelTest/");
         walkDirectory.mkdir();
         try {
-            RDF2Vec rdf2Vec = new RDF2Vec(Util.readOntology(ontologyTestFile, "XML"), walkDirectory);
+            RDF2Vec rdf2Vec = new RDF2Vec(Util.readOntology(ontologyTestFile, Lang.RDFXML), walkDirectory);
             String result = rdf2Vec.train();
             assertNotNull(result);
             assertTrue(new File(result).exists());

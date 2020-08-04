@@ -61,7 +61,7 @@ public class NxMemoryParser extends MemoryParser {
             LOGGER.error("File does not exist. Cannot parse.");
             return;
         }
-        if(fileToReadFrom.getName().endsWith(".nt") || fileToReadFrom.getName().endsWith(".ttl")){
+        if(fileToReadFrom.getName().endsWith(".nt") || fileToReadFrom.getName().endsWith(".ttl") || fileToReadFrom.getName().endsWith(".nq")){
             NxParser parser = new NxParser();
             try {
                 parser.parse(new FileInputStream(fileToReadFrom));

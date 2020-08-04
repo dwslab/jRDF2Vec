@@ -2,6 +2,8 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.RandomWalkEntityProcessingRunnable;
@@ -90,7 +92,10 @@ public class WalkGeneratorDefault extends WalkGenerator {
             // decide on parser depending on
             try {
                 String fileName = tripleFile.getName();
-                if (fileName.toLowerCase().endsWith(".nt")) {
+                if (fileName.toLowerCase().endsWith(".nt") | fileName.toLowerCase().endsWith(".nq")) {
+                    if(fileName.toLowerCase().endsWith(".nq")){
+                        LOGGER.info("NQ File detected: Please note that the graph information will be skipped.");
+                    }
                     try {
                         LOGGER.info("Using NxParser.");
                         this.parser = new NxMemoryParser(pathToTripleFile, this);
@@ -106,18 +111,21 @@ public class WalkGeneratorDefault extends WalkGenerator {
                         this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
                     }
                 } else if (fileName.toLowerCase().endsWith(".ttl")) {
-                    this.model = readOntology(pathToTripleFile, "TTL");
+                    this.model = readOntology(pathToTripleFile, Lang.TTL);
                     this.entitySelector = new OntModelEntitySelector(this.model);
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                     NtMemoryParser.saveAsNt(this.model, newResourceFile);
+                    //this.parser = new JenaOntModelMemoryParser(this.model, this);
                     this.parser = new NtMemoryParser(newResourceFile, this);
                 } else if (fileName.toLowerCase().endsWith(".xml")) {
-                    this.model = readOntology(pathToTripleFile, "RDFXML");
+                    this.model = readOntology(pathToTripleFile, Lang.RDFXML);
                     this.entitySelector = new OntModelEntitySelector(this.model);
                     File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
+                    //this.parser = new JenaOntModelMemoryParser(this.model, this);
                     NtMemoryParser.saveAsNt(this.model, newResourceFile);
                     this.parser = new NtMemoryParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
+                }
+                else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
                     LOGGER.info("HDT file detected. Using HDT parser.");
                     try {
                         this.parser = new HdtParser(pathToTripleFile);

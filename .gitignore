@@ -91,3 +91,6 @@ bin/
 
 # mac
 .DS_Store
+
+# Playground
+Playground.java

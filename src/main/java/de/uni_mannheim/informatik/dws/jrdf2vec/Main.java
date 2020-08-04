@@ -142,6 +142,7 @@ public class Main {
         }
 
         String knowledgeGraphFilePath = getValue("-graph", args);
+        if(knowledgeGraphFilePath == null) knowledgeGraphFilePath = getValue("-g", args);;
 
         isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
         // allowing a bit more...

@@ -3,6 +3,8 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,7 +146,7 @@ public class Util {
      * @return Model instance.
      * @throws MalformedURLException Exception for malformed URLs.
      */
-    public static OntModel readOntology(String path, String language) throws MalformedURLException {
+    public static OntModel readOntology(String path, Lang language) throws MalformedURLException {
         return readOntology(new File(path), language);
     }
 
@@ -156,11 +158,11 @@ public class Util {
      * @return Model instance.
      * @throws MalformedURLException Exception for malformed URLs.
      */
-    public static OntModel readOntology(File file, String language) throws MalformedURLException {
+    public static OntModel readOntology(File file, Lang language) throws MalformedURLException {
         URL url = file.toURI().toURL();
         try {
             OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-            model.read(url.toString(), language);
+            model.read(url.toString(), "", language.getName());
             return model;
         } catch (RiotException re) {
             LOGGER.error("Could not parse: " + file.getAbsolutePath() + "\nin jena.", re);

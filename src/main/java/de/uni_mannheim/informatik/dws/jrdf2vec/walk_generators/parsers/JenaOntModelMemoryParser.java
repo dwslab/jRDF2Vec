@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
 import org.apache.jena.ontology.OntModel;
@@ -22,6 +23,18 @@ public class JenaOntModelMemoryParser extends MemoryParser {
      * Default logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(JenaOntModelMemoryParser.class);
+
+    public JenaOntModelMemoryParser(OntModel ontModel, WalkGenerator walkGenerator){
+        readDataFromOntModel(ontModel);
+        specificWalkGenerator = walkGenerator;
+    }
+
+    /**
+     * Simple Constructor
+     */
+    public JenaOntModelMemoryParser(){
+        // do nothing
+    }
 
     /**
      * Read n-triples from the given file into {@link MemoryParser#data}.
