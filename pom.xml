@@ -42,6 +42,18 @@
         <tag>HEAD</tag>
     </scm>
 
+    <!-- Required for push to mvn central -->
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <repositories>
         <!-- Central needs to be explicitly stated as first choice (otherwise there is an issue with com.github.jsonld-java) -->
         <repository>
@@ -188,6 +200,19 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Required for push to maven central -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
             </plugin>
 
             <!-- maven source plugin (required for releases) -->
