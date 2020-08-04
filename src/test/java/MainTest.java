@@ -158,6 +158,37 @@ class MainTest {
         }
     }
 
+    /**
+     * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
+     */
+    @Test
+    public void trainClassicWithNqFile(){
+        String walkPath = "./mainWalksNq/";
+        File walkDirectory = new File(walkPath);
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+        String graphFilePath = loadFile("nq_fibo_example.nq").getAbsolutePath();
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertTrue(walkDirectory.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertFalse(files.contains("vectors.txt"));
+
+        try {
+            FileUtils.forceDelete(walkDirectory);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+            fail();
+        }
+    }
+
 
     @Test
     public void testTxtVectorGeneration(){
@@ -787,6 +818,12 @@ class MainTest {
             FileUtils.deleteDirectory(new File("./mainWalks/"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./mainWalks/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./mainWalksNq/"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./mainWalksNq/).");
             e.printStackTrace();
         }
     }
