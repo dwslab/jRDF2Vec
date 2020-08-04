@@ -517,6 +517,8 @@ public class Gensim {
             return false;
         }
         String pythonCommand = getPythonCommand();
+
+
         List<String> command = Arrays.asList(pythonCommand, canonicalPath);
         ProcessBuilder pb = new ProcessBuilder(command);
         updateEnvironmentPath(pb.environment(), pythonCommand);
@@ -538,7 +540,7 @@ public class Gensim {
                     }
                 } catch (HttpHostConnectException hce) {
                     LOGGER.info("Server is not yet running. Waiting 5 seconds. Trial {} / {}", i + 1, maxTrials);
-                    TimeUnit.SECONDS.sleep(5);
+                    TimeUnit.SECONDS.sleep(10);
                 } catch (IOException ioe) {
                     LOGGER.error("Problem with http request.", ioe);
                 }

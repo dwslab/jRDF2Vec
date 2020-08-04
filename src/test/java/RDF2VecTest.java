@@ -12,6 +12,8 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,18 +34,28 @@ class RDF2VecTest {
 
     @Test
     void train() {
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
-        RDF2Vec classic = new RDF2Vec(graphFilePath);
-        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
-        configuration.setVectorDimension(10);
+        try {
+            File graphFilePath = FileUtils.toFile(this.getClass().getClassLoader().getResource("dummyGraph.nt").toURI().toURL());
+            assertTrue(graphFilePath.exists(), "Required resource not available.");
+            RDF2Vec classic = new RDF2Vec(graphFilePath);
+            Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
+            configuration.setVectorDimension(10);
 
-        classic.train();
+            classic.train();
 
-        assertTrue(new File("./walks/model").exists(), "Model file not written.");
-        assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
-        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
-        assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
-        assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
+            assertTrue(new File("./walks/model").exists(), "Model file not written.");
+            assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
+            assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+            assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
+            assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
+
+        } catch (URISyntaxException use) {
+            use.printStackTrace();
+            fail("Error while executing the test.");
+        } catch (MalformedURLException malformedURLException){
+            malformedURLException.printStackTrace();
+            fail("Error while executing the test.");
+        }
 
         // clean up
         try {
@@ -56,7 +68,14 @@ class RDF2VecTest {
 
     @Test
     void trainWithOntModelReference(){
-        File ontologyTestFile = new File(RDF2VecTest.class.getClassLoader().getResource("pizza.owl.xml").getPath());
+        File ontologyTestFile = null;
+        try {
+             ontologyTestFile = FileUtils.toFile(RDF2VecTest.class.getClassLoader().getResource("pizza.owl.xml").toURI().toURL());
+        } catch (URISyntaxException | MalformedURLException use){
+            use.printStackTrace();
+            fail("Could not load test resource.");
+        }
+        assertTrue(ontologyTestFile.exists(), "The required test resource cannot be found.");
         File walkDirectory = new File("./ontModelTest/");
         walkDirectory.mkdir();
         try {
