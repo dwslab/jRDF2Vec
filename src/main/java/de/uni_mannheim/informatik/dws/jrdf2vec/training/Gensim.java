@@ -528,7 +528,7 @@ public class Gensim {
         try {
             pb.inheritIO();
             this.serverProcess = pb.start();
-            final int maxTrials = 5;
+            final int maxTrials = 8;
             for (int i = 0; i < maxTrials; i++) {
                 HttpGet request = new HttpGet(serverUrl + "/melt_ml.html");
                 CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -540,7 +540,7 @@ public class Gensim {
                     }
                 } catch (HttpHostConnectException hce) {
                     LOGGER.info("Server is not yet running. Waiting 5 seconds. Trial {} / {}", i + 1, maxTrials);
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.SECONDS.sleep(5);
                 } catch (IOException ioe) {
                     LOGGER.error("Problem with http request.", ioe);
                 }

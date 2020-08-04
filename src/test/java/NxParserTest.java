@@ -1,3 +1,4 @@
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.yars.nx.Node;
 import org.semanticweb.yars.nx.parser.NxParser;
@@ -7,7 +8,9 @@ import org.semanticweb.yars.turtle.TurtleParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,17 +18,17 @@ public class NxParserTest {
 
     @Test
     public void testNxParserBehavior() {
-        testExecutionNx(NxParserTest.class.getClassLoader().getResource("pizza.owl.nt").getPath());
+        testExecutionNx(loadFile("pizza.owl.nt").getAbsolutePath());
     }
 
     @Test
     public void testXmlParserBehavior(){
-        testExecutionXml(NxParserTest.class.getClassLoader().getResource("pizza.owl.xml").getPath());
+        testExecutionXml(loadFile("pizza.owl.xml").getAbsolutePath());
     }
 
     @Test
     public void testTtlParserBehavior(){
-        testExecutionTtl(NxParserTest.class.getClassLoader().getResource("pizza.ttl").getPath());
+        testExecutionTtl(loadFile("pizza.ttl").getAbsolutePath());
     }
 
 
@@ -109,22 +112,21 @@ public class NxParserTest {
 
 
     /**
-     * For experiments...
-     * @param args Not required.
-     * @throws Exception For manual experiments, no handling required here.
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
      */
-    public static void main(String[] args) throws Exception {
-        String filePath = "/src/test/resources/pizza.owl.nt‚";
-        filePath = NxParserTest.class.getClassLoader().getResource("pizza.owl.nt").getPath();
-        NxParser nxp = new NxParser();
-        nxp.parse(new FileInputStream(new File(filePath)));
-
-        for (Node[] nx : nxp) {
-            // prints the subject, eg. <http://example.org/>
-            System.out.println(nx[0]);
-            System.out.println(nx[1]);
-            System.out.println(nx[2]);
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
         }
     }
+
 
 }

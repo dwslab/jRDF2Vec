@@ -1,9 +1,12 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
@@ -13,7 +16,7 @@ class WalkGeneratorDefaultTest {
 
     @Test
     void generateRandomWalksDuplicateFreeXml() {
-        File pizzaOntology = new File(getClass().getResource("/pizza.owl.xml").getFile());
+        File pizzaOntology = loadFile("pizza.owl.xml");
 
         String generatedFilePath = "./test_walks.gz";
         WalkGeneratorDefault generator = new WalkGeneratorDefault(pizzaOntology);
@@ -50,7 +53,7 @@ class WalkGeneratorDefaultTest {
 
     @Test
     void generateRandomWalksDuplicateFreeTtl() {
-        File pizzaOntology = new File(getClass().getResource("/pizza.ttl").getFile());
+        File pizzaOntology = loadFile("pizza.ttl");
 
         String generatedFilePath = "./test_walks2.gz";
         WalkGeneratorDefault generator = new WalkGeneratorDefault(pizzaOntology);
@@ -83,6 +86,23 @@ class WalkGeneratorDefaultTest {
         assertTrue(subjectsOfWalks.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot"));
         assertTrue(subjectsOfWalks.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#FourCheesesTopping"));
         generatedFile.delete();
+    }
+
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
     }
 
 }

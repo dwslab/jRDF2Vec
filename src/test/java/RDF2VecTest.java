@@ -26,36 +26,26 @@ class RDF2VecTest {
 
     @Test
     void getWalkFilePath() {
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("emptyFile.txt").getPath());
-        RDF2Vec rdf2vec = new RDF2Vec(graphFilePath);
-        assertEquals("." + File.separator + "walks" + File.separator + "walk_file.gz", rdf2vec.getWalkFilePath());
+        RDF2Vec rdf2vec = new RDF2Vec(loadFile("emptyFile.txt"));
+        // also forward slash on windows
+        assertEquals("./walks/walk_file.gz", rdf2vec.getWalkFilePath());
         assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks" + File.separator) || rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
     }
 
+
     @Test
     void train() {
-        try {
-            File graphFilePath = FileUtils.toFile(this.getClass().getClassLoader().getResource("dummyGraph.nt").toURI().toURL());
-            assertTrue(graphFilePath.exists(), "Required resource not available.");
-            RDF2Vec classic = new RDF2Vec(graphFilePath);
-            Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
-            configuration.setVectorDimension(10);
+        RDF2Vec classic = new RDF2Vec(loadFile("dummyGraph.nt"));
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
+        configuration.setVectorDimension(10);
 
-            classic.train();
+        classic.train();
 
-            assertTrue(new File("./walks/model").exists(), "Model file not written.");
-            assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
-            assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
-            assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
-            assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
-
-        } catch (URISyntaxException use) {
-            use.printStackTrace();
-            fail("Error while executing the test.");
-        } catch (MalformedURLException malformedURLException){
-            malformedURLException.printStackTrace();
-            fail("Error while executing the test.");
-        }
+        assertTrue(new File("./walks/model").exists(), "Model file not written.");
+        assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
+        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
+        assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
         // clean up
         try {
@@ -70,7 +60,7 @@ class RDF2VecTest {
     void trainWithOntModelReference(){
         File ontologyTestFile = null;
         try {
-             ontologyTestFile = FileUtils.toFile(RDF2VecTest.class.getClassLoader().getResource("pizza.owl.xml").toURI().toURL());
+            ontologyTestFile = FileUtils.toFile(RDF2VecTest.class.getClassLoader().getResource("pizza.owl.xml").toURI().toURL());
         } catch (URISyntaxException | MalformedURLException use){
             use.printStackTrace();
             fail("Could not load test resource.");
@@ -99,7 +89,7 @@ class RDF2VecTest {
 
     @Test
     void trainWithMixedInputFiles(){
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("mixedWalkDirectory").getPath());
+        File graphFilePath = loadFile("mixedWalkDirectory");
         RDF2Vec classic = new RDF2Vec(graphFilePath);
         Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
         configuration.setVectorDimension(10);
@@ -123,7 +113,7 @@ class RDF2VecTest {
 
     @Test
     void trainWithExternalResourcesDirectory(){
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
+        File graphFilePath = loadFile("dummyGraph.nt");
         File externalResourcesDirectory = new File("./extClassic/");
         externalResourcesDirectory.deleteOnExit();
         externalResourcesDirectory.mkdirs();
@@ -188,4 +178,20 @@ class RDF2VecTest {
         }
     }
 
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
+    }
 }

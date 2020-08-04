@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.DummyWalkGenerator;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -11,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,8 +32,8 @@ class NtMemoryParserTest {
 
     @org.junit.jupiter.api.Test
     void generateWalkForEntity(){
-        testWalkForEntity(getClass().getResource("/dummyGraph.nt").getFile());
-        testWalkForEntity(getClass().getResource("/dummyGraph_2.nt").getFile());
+        testWalkForEntity(loadFile("dummyGraph.nt").getAbsolutePath());
+        testWalkForEntity(loadFile("dummyGraph_2.nt").getAbsolutePath());
     }
 
     /**
@@ -60,7 +63,7 @@ class NtMemoryParserTest {
 
     @Test
     void testDepthForRandomWalks(){
-        String graphPath = getClass().getResource("/dummyGraph_3.nt").getFile();
+        String graphPath = loadFile("dummyGraph_3.nt").getAbsolutePath();
         NtMemoryParser parser = new NtMemoryParser(graphPath, new DummyWalkGenerator());
         List<String> result_1 = parser.generateDuplicateFreeRandomWalksForEntity("A", 100, 8);
         System.out.println("Walks 1");
@@ -108,7 +111,7 @@ class NtMemoryParserTest {
         try {
             // prepare file
             File fileToUse = new File("./swdf-2012-11-28.nt");
-            HDT dataSet = HDTManager.loadHDT(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            HDT dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             HdtParser.serializeDataSetAsNtFile(dataSet, fileToUse);
 
             NtMemoryParser parser = new NtMemoryParser(fileToUse, new DummyWalkGenerator());
@@ -135,7 +138,7 @@ class NtMemoryParserTest {
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
 
-            String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+            String hdtPath = loadFile("swdf-2012-11-28.hdt").getAbsolutePath();
             try {
                 HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
                 for (String walk : walks1) {
@@ -165,7 +168,7 @@ class NtMemoryParserTest {
         try {
             // prepare file
             File fileToUse = new File("./swdf-2012-11-28.nt");
-            HDT dataSet = HDTManager.loadHDT(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            HDT dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             HdtParser.serializeDataSetAsNtFile(dataSet, fileToUse);
             NtMemoryParser parser = new NtMemoryParser(fileToUse, new DummyWalkGenerator());
 
@@ -182,7 +185,7 @@ class NtMemoryParserTest {
                 for (int i = 0; i < walkArray.length; i++) {
                     walkArray[i] = walk1.get(i);
                 }
-                String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+                String hdtPath = loadFile("swdf-2012-11-28.hdt").getAbsolutePath();
                 try {
                     HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
                     for (int i = 2; i < walkArray.length - 1; i += i + 2) {
@@ -205,4 +208,20 @@ class NtMemoryParserTest {
         }
     }
 
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
+    }
 }

@@ -1,9 +1,12 @@
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
@@ -80,7 +83,7 @@ class UtilTest {
 
     @Test
     void getDimensionalityFromVectorTextFileTest() {
-        String walkDirectory = UtilTest.class.getClassLoader().getResource("freude_vectors.txt").getPath();
+        String walkDirectory = loadFile("freude_vectors.txt").getAbsolutePath();
         assertEquals(3, Util.getDimensionalityFromVectorTextFile(walkDirectory));
         assertEquals(3, Util.getDimensionalityFromVectorTextFile(new File(walkDirectory)));
     }
@@ -89,6 +92,23 @@ class UtilTest {
     void getDimensionalityFromVectorTextFileFail(){
         assertEquals(-1, Util.getDimensionalityFromVectorTextFile(""));
         assertEquals(-1, Util.getDimensionalityFromVectorTextFile(new File("")));
+    }
+
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
     }
 
 }

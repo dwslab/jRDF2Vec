@@ -17,6 +17,8 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
@@ -48,7 +50,7 @@ class MainTest {
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
-        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath};
         Main.main(args);
 
@@ -72,7 +74,7 @@ class MainTest {
 
     @Test
     void trainWithMixedInputFilesCommandLine(){
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("mixedWalkDirectory").getPath());
+        File graphFilePath = new File(loadFile("mixedWalkDirectory").getAbsolutePath());
         Main.main(new String[]{"-graph", graphFilePath.getAbsolutePath(), "-dimension", "100", "-depth", "4", "-trainingMode", "sg", "-numberOfWalks", "100", "-walkGenerationMode", "RANDOM_WALKS_DUPLICATE_FREE"});
 
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
@@ -92,7 +94,7 @@ class MainTest {
 
     @Test
     public void onlyTraining(){
-        String walkDirectory = MainTest.class.getClassLoader().getResource("walk_directory_test").getPath();
+        String walkDirectory = loadFile("walk_directory_test").getAbsolutePath();
         Main.main(new String[]{"-onlyTraining", "-walkDirectory", walkDirectory, "-dimensions", "80"});
         System.out.println(walkDirectory);
 
@@ -134,7 +136,7 @@ class MainTest {
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
-        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
         Main.main(args);
 
@@ -159,7 +161,7 @@ class MainTest {
 
     @Test
     public void testTxtVectorGeneration(){
-        String modelFilePath = this.getClass().getClassLoader().getResource("test_model_vectors.kv").getPath();
+        String modelFilePath = loadFile("test_model_vectors.kv").getAbsolutePath();
         File modelFile = new File(modelFilePath);
         if(!modelFile.exists()){
             fail("Could not find required test file.");
@@ -174,7 +176,7 @@ class MainTest {
 
     @Test
     public void testTxtVectorGenerationFail(){
-        String modelFilePath = this.getClass().getClassLoader().getResource("test_model_vectors.kv").getPath();
+        String modelFilePath = loadFile("test_model_vectors.kv").getAbsolutePath();
         File modelFile = new File(modelFilePath);
         if(!modelFile.exists()){
             fail("Could not find required test file.");
@@ -187,7 +189,7 @@ class MainTest {
 
     @Test
     public void walkGenerationClassic() {
-        File pizzaOntology = new File(getClass().getResource("/pizza.ttl").getFile());
+        File pizzaOntology = loadFile("pizza.ttl");
 
         String directoryName = "./classicWalks/";
         File walkDirectory = new File(directoryName);
@@ -298,8 +300,8 @@ class MainTest {
         File lightWalks = new File("./mainLightWalks/");
         lightWalks.mkdir();
         lightWalks.deleteOnExit();
-        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
-        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/"};
         Main.main(args);
 
@@ -328,8 +330,8 @@ class MainTest {
         File lightWalks = new File("./mainLightWalks/");
         lightWalks.mkdir();
         lightWalks.deleteOnExit();
-        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
-        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/", "-noVectorTextFileGeneration"};
         Main.main(args);
 
@@ -352,8 +354,8 @@ class MainTest {
 
     @Test
     public void parameterCheck() {
-        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
-        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100", "-minCount", "3"});
         assertEquals(100, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
         assertEquals(3, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
@@ -369,8 +371,8 @@ class MainTest {
 
     @Test
     public void parameterCheckNegative() {
-        String entityFilePath = this.getClass().getClassLoader().getResource("dummyEntities.txt").getPath();
-        String graphFilePath = this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath();
+        String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "-10", "-minCount", "-3"});
         assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
         assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
@@ -414,14 +416,14 @@ class MainTest {
     public void plainWalkGenerationLightHdtFile() {
 
         // prepare file
-        File graphFileToUse = new File(getClass().getClassLoader().getResource("./swdf-2012-11-28.hdt").getPath());
+        File graphFileToUse = loadFile("swdf-2012-11-28.hdt");
 
         // prepare directory
         File walkDirectory = new File("./walksOnly/");
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
 
-        String lightFilePath = getClass().getClassLoader().getResource("./swdf_light_entities.txt").getPath();
+        String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/"});
 
         // make sure that there is only a walk file
@@ -479,7 +481,7 @@ class MainTest {
         File graphFileToUse = new File("./swdf-2012-11-28.nt");
         HDT dataSet = null;
         try {
-            dataSet = HDTManager.loadHDT(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
             fail("Could not load HDT file.");
@@ -492,7 +494,7 @@ class MainTest {
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
 
-        String lightFilePath = getClass().getClassLoader().getResource("./swdf_light_entities.txt").getPath();
+        String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "10", "-light", lightFilePath, "-onlyWalks", "-walkDir", directoryName, "-walkGenerationMode", "mid_walks_weighted", "-depth", "3"});
 
         // make sure that there is only a walk file
@@ -568,7 +570,7 @@ class MainTest {
         File graphFileToUse = new File("./swdf-2012-11-28.nt");
         HDT dataSet = null;
         try {
-            dataSet = HDTManager.loadHDT(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
             fail("Could not load HDT file.");
@@ -581,7 +583,7 @@ class MainTest {
         walkDirectory.deleteOnExit();
 
 
-        String lightFilePath = getClass().getClassLoader().getResource("./swdf_light_entities.txt").getPath();
+        String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "1000", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/", "-walkGenerationMode", "mid_walks_duplicate_free", "-depth", "1"});
 
         // make sure that there is only a walk file
@@ -643,7 +645,7 @@ class MainTest {
         File graphFileToUse = new File("./swdf-2012-11-28.nt");
         HDT dataSet = null;
         try {
-            dataSet = HDTManager.loadHDT(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
             fail("Could not load HDT file.");
@@ -657,7 +659,7 @@ class MainTest {
         walkDirectory.deleteOnExit();
 
 
-        String lightFilePath = getClass().getClassLoader().getResource("./swdf_light_entities.txt").getPath();
+        String lightFilePath = loadFile("swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", walkDirectoryName});
 
         // make sure that there is only a walk file
@@ -712,6 +714,23 @@ class MainTest {
         assertNull(Main.getValue("hello", null));
         assertNull(Main.getValue("-hello", new String[]{"european", "union"}));
         assertEquals("union", Main.getValue("-european", new String[]{"-european", "union"}));
+    }
+
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
     }
 
     @AfterAll

@@ -1,6 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.HdtParser;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -9,7 +9,10 @@ import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -80,7 +83,7 @@ class HdtParserTest {
 
     @Test
     public void testHdtAndTestFile() {
-        String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+        String hdtPath = loadFile("swdf-2012-11-28.hdt").getAbsolutePath();
         assertNotNull(hdtPath, "Cannot find test resource.");
         try {
             HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
@@ -99,7 +102,7 @@ class HdtParserTest {
     @Test
     public void generateMidWalkForEntity() {
         try {
-            HdtParser parser = new HdtParser(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            HdtParser parser = new HdtParser(loadFile("swdf-2012-11-28.hdt"));
             String concept = "http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member";
 
             for (int depth = 1; depth < 10; depth++) {
@@ -113,7 +116,7 @@ class HdtParserTest {
                 for (int i = 0; i < walkArray.length; i++) {
                     walkArray[i] = walk1.get(i);
                 }
-                String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+                String hdtPath = loadFile("swdf-2012-11-28.hdt").getAbsolutePath();
                 try {
                     HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
                     for (int i = 2; i < walkArray.length - 1; i += i + 2) {
@@ -138,7 +141,7 @@ class HdtParserTest {
     @Test
     public void generateMidWalksForEntityDuplicateFree(){
         try {
-            HdtParser parser = new HdtParser(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            HdtParser parser = new HdtParser(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
             int numberOfWalks = 100;
             int depth = 1;
@@ -164,7 +167,7 @@ class HdtParserTest {
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
 
-            String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+            String hdtPath = loadFile("swdf-2012-11-28.hdt").getAbsolutePath();
             try {
                 HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
                 for (String walk : walks1) {
@@ -191,7 +194,7 @@ class HdtParserTest {
     @Test
     public void generateMidWalksForEntity() {
         try {
-            HdtParser parser = new HdtParser(getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath());
+            HdtParser parser = new HdtParser(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
             int numberOfWalks = 12;
             int depth = 10;
@@ -217,7 +220,7 @@ class HdtParserTest {
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
 
-            String hdtPath = getClass().getClassLoader().getResource("swdf-2012-11-28.hdt").getPath();
+            String hdtPath = loadFile("swdf-2012-11-28.hdt").getAbsolutePath();
             try {
                 HDT hdtDataSet = HDTManager.loadHDT(hdtPath);
                 for (String walk : walks1) {
@@ -257,6 +260,23 @@ class HdtParserTest {
         // default
         assertTrue(list_1.equals(list_2));
         assertFalse(list_1.equals(list_3));
+    }
+
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
     }
 
 }

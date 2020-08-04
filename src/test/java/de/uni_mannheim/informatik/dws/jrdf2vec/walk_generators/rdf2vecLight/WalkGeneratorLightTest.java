@@ -1,10 +1,13 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.rdf2vecLight;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGeneratorLight;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
@@ -18,8 +21,8 @@ class WalkGeneratorLightTest {
      */
     @Test
     void fullRunWithDBpedia(){
-        String resourceFile = getClass().getResource("/sample_dbpedia_nt_file.nt").getFile();
-        String entityFile = getClass().getResource("/sample_dbpedia_entity_file.txt").getFile();
+        String resourceFile = loadFile("sample_dbpedia_nt_file.nt").getAbsolutePath();
+        String entityFile = loadFile("sample_dbpedia_entity_file.txt").getAbsolutePath();
         WalkGeneratorLight generatorLight = new WalkGeneratorLight(resourceFile, entityFile);
         generatorLight.generateRandomMidWalks(2, 10, 3);
         File fileToReadFrom = new File("./walks/walk_file.gz");
@@ -54,11 +57,11 @@ class WalkGeneratorLightTest {
 
     @Test
     void generateRandomWalksDuplicateFreeTtlWithSelector() {
-        File pizzaOntology = new File(getClass().getResource("/pizza.ttl").getFile());
+        File pizzaOntology = loadFile("pizza.ttl");
 
         String generatedFilePath = "./test_walks_light_pizza.gz";
 
-        WalkGeneratorDefault generator = new WalkGeneratorLight(pizzaOntology, new File(getClass().getResource("/entityFileForPizzaOntology.txt").getFile()));
+        WalkGeneratorDefault generator = new WalkGeneratorLight(pizzaOntology, loadFile("entityFileForPizzaOntology.txt"));
         generator.generateRandomWalksDuplicateFree(1, 10, 5, generatedFilePath);
 
         File generatedFile = new File(generatedFilePath);
@@ -94,7 +97,7 @@ class WalkGeneratorLightTest {
 
     @Test
     void generateRandomWalksDuplicateFreeTtl() {
-        File pizzaOntology = new File(getClass().getResource("/pizza.ttl").getFile());
+        File pizzaOntology = loadFile("pizza.ttl");
 
         String generatedFilePath = "./test_walks_light_1.gz";
 
@@ -138,7 +141,7 @@ class WalkGeneratorLightTest {
     @Test
     void generateRandomMidWalksForEntities(){
         // make sure that there are no walk duplicates
-        File pizzaOntology = new File(getClass().getResource("/pizza.ttl").getFile());
+        File pizzaOntology = loadFile("pizza.ttl");
         assertTrue(pizzaOntology.exists());
 
         String generatedFilePath = "./test_walks_light_mid_test.gz";
@@ -177,5 +180,21 @@ class WalkGeneratorLightTest {
         generatedFile.delete();
     }
 
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
+    }
 
 }

@@ -10,6 +10,8 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,8 +24,8 @@ class RDF2VecLightTest {
 
     @Test
     void getWalkFilePath() {
-        File entityFilePath = new File(this.getClass().getClassLoader().getResource("emptyFile.nt").getFile());
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("emptyFile.txt").getPath());
+        File entityFilePath =loadFile("emptyFile.nt");
+        File graphFilePath = loadFile("emptyFile.txt");
         RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
         assertEquals("./walks/walk_file.gz", light.getWalkFilePath());
         assertTrue(light.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + light.getWalkFileDirectoryPath());
@@ -31,8 +33,8 @@ class RDF2VecLightTest {
 
     @Test
     void train() {
-        File entityFilePath = new File(this.getClass().getClassLoader().getResource("dummyEntities.txt").getFile());
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
+        File entityFilePath = loadFile("dummyEntities.txt");
+        File graphFilePath = loadFile("dummyGraph.nt");
         RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
         Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
         configuration.setVectorDimension(10);
@@ -55,8 +57,8 @@ class RDF2VecLightTest {
 
     @Test
     void trainWithExternalResourcesDirectory(){
-        File entityFilePath = new File(this.getClass().getClassLoader().getResource("dummyEntities.txt").getFile());
-        File graphFilePath = new File(this.getClass().getClassLoader().getResource("dummyGraph.nt").getPath());
+        File entityFilePath = loadFile("dummyEntities.txt");
+        File graphFilePath = loadFile("dummyGraph.nt");
         File externalResourcesDirectory = new File("./extLight/");
         externalResourcesDirectory.deleteOnExit();
         externalResourcesDirectory.mkdirs();
@@ -76,6 +78,22 @@ class RDF2VecLightTest {
         }
     }
 
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    private File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
+    }
 
     @AfterAll
     static void cleanUp(){
