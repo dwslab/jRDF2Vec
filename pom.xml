@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.uni-mannheim.informatik.dws</groupId>
     <artifactId>jrdf2vec</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <relativePath></relativePath>
+        <relativePath />
     </properties>
 
     <name>jRDF2Vec</name>
@@ -39,7 +37,7 @@
         <connection>scm:git:git://github.com/dwslab/jRDF2Vec.git</connection>
         <developerConnection>scm:git:git@github.com:dwslab/jRDF2Vec.git</developerConnection>
         <url>https://github.com/dwslab/jrdf2vec</url>
-        <tag>HEAD</tag>
+        <tag>jrdf2vec-1.0</tag>
     </scm>
 
     <repositories>
@@ -77,16 +75,12 @@
                 <configuration>
                     <shadedArtifactAttached>false</shadedArtifactAttached>
                     <transformers>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <mainClass>de.uni_mannheim.informatik.dws.jrdf2vec.Main</mainClass>
                         </transformer>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
                             <addHeader>false</addHeader>
                         </transformer>
                     </transformers>
