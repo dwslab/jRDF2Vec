@@ -23,7 +23,7 @@ Use the resulting jar from the `target` directory.
 
 *Minimal Example*
 ```bash
-java -jar jrdf2vec-1.0-SNAPSHOT.jar -light ./file-to-your-entities.txt -graph ./kg_file.hdt
+java -jar jrdf2vec-1.0-SNAPSHOT.jar -graph ./kg_file.hdt
 ```
 
 #### Required Parameters
