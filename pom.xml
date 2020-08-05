@@ -4,7 +4,7 @@
 
     <groupId>de.uni-mannheim.informatik.dws</groupId>
     <artifactId>jrdf2vec</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,7 +37,7 @@
         <connection>scm:git:git://github.com/dwslab/jRDF2Vec.git</connection>
         <developerConnection>scm:git:git@github.com:dwslab/jRDF2Vec.git</developerConnection>
         <url>https://github.com/dwslab/jrdf2vec</url>
-        <tag>jrdf2vec-1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <!-- Required for push to mvn central -->
