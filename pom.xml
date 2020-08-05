@@ -18,6 +18,7 @@
     <name>jRDF2Vec</name>
     <description>jRDF2Vec is a Java implementation of RDF2Vec. It supports multi-threaded, in-memory (or disk-access-based) walk generation and training.
     </description>
+    <url>https://github.com/dwslab/jrdf2vec</url>
 
     <licenses>
         <license>
