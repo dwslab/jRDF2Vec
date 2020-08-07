@@ -75,8 +75,19 @@ use the following command to generate this file:
 java -jar jrdf2vec-1.0-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
 
+## How to use the jRDF2vec as library in Java projects?
+Stable releases are available through the maven central repository:
+```
+<dependency>
+    <groupId>de.uni-mannheim.informatik.dws</groupId>
+    <artifactId>jrdf2vec</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+
 ## Run jRDF2Vec using Docker
-Optionally, Docker can be used to run jRDF2Vec.
+Optionally, Docker can be used to run jRDF2Vec. 
 
 ### Run
 
