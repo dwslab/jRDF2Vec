@@ -62,6 +62,8 @@ This parameter controls the minimum word count for the word2vec training. Unlike
 A switch which indicates whether a text file with the vectors shall be persisted on the disk. This is enabled by default. Use `-noVectorTextFileGeneration` to disable the file generation.
 - `-onlyTraining`<br/>
 If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter `-walkDirectory` must be set. If walk generation parameters are specified, they are ignored.
+- `-sample` (default: `0.0`)<br/>
+
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.

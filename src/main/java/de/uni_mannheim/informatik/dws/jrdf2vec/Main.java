@@ -88,6 +88,11 @@ public class Main {
     private static WalkGenerationMode walkGenerationMode = null;
 
     /**
+     * Sample parameter for down-sampling.
+     */
+    private static double sample = Word2VecConfiguration.SAMPLE_DEFAULT;
+
+    /**
      * If true, only walks are generated and no embeddings are trained.
      * This can be beneficial when multiple configurations (e.g. SG and CBOW) shall be trained for only one set of walks.
      */
@@ -172,8 +177,6 @@ public class Main {
             }
         }
 
-
-
         String walkDirectoryPath = getValue("-walkDir", args);
         walkDirectoryPath = (walkDirectoryPath == null) ? getValue("-walkDirectory", args) : walkDirectoryPath;
         if (walkDirectoryPath != null) {
@@ -250,6 +253,15 @@ public class Main {
             }
         } else minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
 
+        String samplingString = getValue("-sample", args);
+        if(samplingString != null){
+            try {
+                sample = Double.parseDouble(samplingString);
+            } catch (NumberFormatException nfe){
+                System.out.println("Could not parse the sample parameter. Using default (" + Word2VecConfiguration.SAMPLE_DEFAULT + ").");
+                sample = Word2VecConfiguration.SAMPLE_DEFAULT;
+            }
+        } else sample = Word2VecConfiguration.SAMPLE_DEFAULT;
 
         if(containsIgnoreCase("-noVectorTextFileGeneration", args)){
             isVectorTextFileGeneration = false;
@@ -274,6 +286,9 @@ public class Main {
 
         // setting minCount
         if (minCount > 0) configuration.setMinCount(minCount);
+
+        // set sample
+        configuration.setSample(sample);
 
         String walkGenerationModeText = getValue("-walkGenerationMode", args);
         walkGenerationModeText = (walkGenerationModeText == null) ? getValue("-walkMode", args) : walkGenerationModeText;
@@ -545,7 +560,9 @@ public class Main {
                 "    -walkDirectory <directory where walk files shall be generated/reside>\n" +
                 "    The directory where the walks shall be generated into. In case of -onlyTraining, the directory where the walks reside.\n\n" +
                 "    -onlyTraining\n" +
-                "    If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter -walkDirectory must be set. If walk generation parameters are specified, they are ignored.\n\n\n" +
+                "    If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter -walkDirectory must be set. If walk generation parameters are specified, they are ignored.\n\n" +
+                "    -sample (default: 0)\n" +
+                "    The threshold for configuring which higher-frequency words are randomly down-sampled, a useful range is (0, 0.00001).\n\n\n" +
 
 
                 "Additional Services\n" +

@@ -83,7 +83,7 @@ public class Word2VecConfiguration {
     /**
      * Default for {@link Word2VecConfiguration#sample} parameter.
      */
-    public static final double SAMPLE_DEFAULT =  0.001;
+    public static final double SAMPLE_DEFAULT =  0.0;
 
     /**
      * Default Constructor.
@@ -203,7 +203,7 @@ public class Word2VecConfiguration {
     public void setSample(double sample) {
         if(sample < 0.0) {
             LOGGER.warn("The sample must be greater than 0 or equal 0. Using default: 0.");
-            this.sample = 0.001;
+            this.sample = SAMPLE_DEFAULT;
         } else this.sample = sample;
     }
 }

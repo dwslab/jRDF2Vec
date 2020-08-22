@@ -2,6 +2,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -90,6 +91,13 @@ public class TripleDataSetMemory {
      */
     public Set<String> getUniqueSubjects(){
         return subjectToTriple.keySet();
+    }
+
+    public Set<String> getUniqueSubjectsAndObjects(){
+        HashSet<String> result = new HashSet<>(subjectToTriple.keySet().size() + objectToTriple.keySet().size());
+        result.addAll(subjectToTriple.keySet());
+        result.addAll(objectToTriple.keySet());
+        return result;
     }
 
 }

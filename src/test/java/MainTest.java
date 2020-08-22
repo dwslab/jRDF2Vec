@@ -51,7 +51,7 @@ class MainTest {
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath};
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-sample", "NOT_A_DOUBLE"};
         Main.main(args);
 
         assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec.class)");
@@ -63,6 +63,9 @@ class MainTest {
         assertTrue(files.contains("model"));
         assertTrue(files.contains("walk_file.gz"));
         assertTrue(files.contains("vectors.txt"));
+
+        // assert sample parameter
+        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getConfiguration().getSample());
 
         try {
             FileUtils.forceDelete(walkDirectory);
@@ -150,6 +153,9 @@ class MainTest {
         assertTrue(files.contains("walk_file.gz"));
         assertFalse(files.contains("vectors.txt"));
 
+        // check sample parameter
+        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getConfiguration().getSample());
+
         try {
             FileUtils.forceDelete(walkDirectory);
         } catch (IOException ioe) {
@@ -168,7 +174,7 @@ class MainTest {
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
         String graphFilePath = loadFile("nq_fibo_example.nq").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01"};
         Main.main(args);
 
         assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
@@ -180,6 +186,9 @@ class MainTest {
         assertTrue(files.contains("model"));
         assertTrue(files.contains("walk_file.gz"));
         assertFalse(files.contains("vectors.txt"));
+
+        // test sample parameter
+        assertEquals(0.01, Main.getRdf2VecInstance().getConfiguration().getSample());
 
         try {
             FileUtils.forceDelete(walkDirectory);
