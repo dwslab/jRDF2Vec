@@ -126,3 +126,12 @@ docker build -t jrdf2vec .
 
 ## Developer Documentation
 The most recent JavaDoc sites generated from the latest commit can be found <a href="https://dwslab.github.io/jRDF2Vec/">here</a>.<br/>
+
+## Frequently Asked Questions (FAQs)
+**I have Python installed, but it is not accessible via command `python`. How to resolve this?**<br/>
+Create a file `python_command.txt` in directory `./python_server` (created when first running the jar). Write the command
+to call Python 3 in the first line of the file.
+
+**The program starts and immediately shuts down. Nothing seems to happen.**<br/>
+Make sure your system is set-up correctly, in particular whether you have installed Python 3 and the required 
+dependencies.
