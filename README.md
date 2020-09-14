@@ -10,6 +10,11 @@ You can generate embeddings for any `NT`, `NQ`, `OWL/XML`, [`RDF HDT`](http://ww
 
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
 
+**How to cite?**
+```
+Portisch, Jan; Hladik, Michael; Paulheim, Heiko. RDF2Vec Light - A Lightweight Approach for Knowledge Graph Embeddings. Proceedings of the ISWC 2020 Posters & Demonstrations. 2020. [to appear]
+```
+
 ## How to use the jRDF2vec Command-Line Interface?
 Download this project, execute `mvn clean install`.
 Alternatively, you can download the packaged JAR of the latest successful commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
