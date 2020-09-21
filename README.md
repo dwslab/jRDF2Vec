@@ -10,6 +10,11 @@ You can generate embeddings for any `NT`, `NQ`, `OWL/XML`, [`RDF HDT`](http://ww
 
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
 
+**How to cite?**
+```
+Portisch, Jan; Hladik, Michael; Paulheim, Heiko. RDF2Vec Light - A Lightweight Approach for Knowledge Graph Embeddings. Proceedings of the ISWC 2020 Posters & Demonstrations. 2020. [to appear]
+```
+
 ## How to use the jRDF2vec Command-Line Interface?
 Download this project, execute `mvn clean install`.
 Alternatively, you can download the packaged JAR of the latest successful: commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
@@ -126,3 +131,12 @@ docker build -t jrdf2vec .
 
 ## Developer Documentation
 The most recent JavaDoc sites generated from the latest commit can be found <a href="https://dwslab.github.io/jRDF2Vec/">here</a>.<br/>
+
+## Frequently Asked Questions (FAQs)
+**I have Python installed, but it is not accessible via command `python`. How to resolve this?**<br/>
+Create a file `python_command.txt` in directory `./python_server` (created when first running the jar). Write the command
+to call Python 3 in the first line of the file.
+
+**The program starts and immediately shuts down. Nothing seems to happen.**<br/>
+Make sure your system is set-up correctly, in particular whether you have installed Python 3 and the required 
+dependencies.
