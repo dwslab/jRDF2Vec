@@ -12,7 +12,7 @@ Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issue
 
 ## How to use the jRDF2vec Command-Line Interface?
 Download this project, execute `mvn clean install`.
-Alternatively, you can download the packaged JAR of the latest successful commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
+Alternatively, you can download the packaged JAR of the latest successful: commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
 
 ### System Requirements
 - Java 8 or later.
@@ -77,7 +77,7 @@ use the following command to generate this file:
 java -jar jrdf2vec-1.0-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
 
-## How to use the jRDF2vec as library in Java projects?
+## How to use the jRDF2Vec as library in Java projects?
 Stable releases are available through the maven central repository:
 ```
 <dependency>
@@ -89,7 +89,7 @@ Stable releases are available through the maven central repository:
 
 
 ## Run jRDF2Vec using Docker
-Optionally, Docker can be used to run jRDF2Vec. 
+Optionally, Docker can be used to run jRDF2Vec. This functionality has been added by <a href="https://github.com/vemonet">Vincent Emonet</a>.
 
 ### Run
 
