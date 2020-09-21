@@ -1,4 +1,4 @@
-# jRDF2vec
+# jRDF2Vec
 [![Java CI](https://github.com/dwslab/jRDF2Vec/workflows/Java%20CI/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions)
 [![Coverage Status](https://coveralls.io/repos/github/dwslab/jRDF2Vec/badge.svg?branch=master)](https://coveralls.io/github/dwslab/jRDF2Vec?branch=master)
 [![License](https://img.shields.io/github/license/dwslab/jRDF2Vec)](https://github.com/dwslab/jRDF2Vec/blob/master/LICENSE)
@@ -14,8 +14,9 @@ Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issue
 ```
 Portisch, Jan; Hladik, Michael; Paulheim, Heiko. RDF2Vec Light - A Lightweight Approach for Knowledge Graph Embeddings. Proceedings of the ISWC 2020 Posters & Demonstrations. 2020. [to appear]
 ```
+An open-access version of the paper is available [here](https://arxiv.org/pdf/2009.07659.pdf).
 
-## How to use the jRDF2vec Command-Line Interface?
+## How to use the jRDF2Vec Command-Line Interface?
 Download this project, execute `mvn clean install`.
 Alternatively, you can download the packaged JAR of the latest successful: commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
 
