@@ -3,7 +3,6 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.RandomWalkEntityProcessingRunnable;

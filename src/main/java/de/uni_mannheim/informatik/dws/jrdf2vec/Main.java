@@ -10,6 +10,9 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGenerat
 
 import java.io.File;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Mini command line tool for server application.
@@ -108,8 +111,19 @@ public class Main {
      */
     private static boolean isVectorTextFileGeneration = true;
 
+    /**
+     * Args that were not parsed. Intended to show the user which parts were ignored.
+     */
+    private static HashSet<String> ignoredArguments;
 
+    /**
+     * The main method that is executed when running the JAR.
+     * @param args All the options for walk generation and training. Run with -help in order to get an overview.
+     */
     public static void main(String[] args) {
+        if(args == null ||args.length == 0) {
+            ignoredArguments = new HashSet<>();
+        } else ignoredArguments = new HashSet<>(Arrays.asList(args));
 
         if (args == null || args.length == 0) {
             System.out.println("Not enough arguments. Call '-help' to learn more about the CLI.");
@@ -128,6 +142,7 @@ public class Main {
                 transformationSource = getValue("-generateTextVectorFile", args);
             }
             if(transformationSource != null) {
+                printIfIgnoredOptionsExist();
                 generateTextVectorFile(transformationSource);
                 return;
             }
@@ -302,6 +317,7 @@ public class Main {
         //    only training
         // -------------------
         if(isOnlyTraining){
+            printIfIgnoredOptionsExist();
             System.out.println("Only training is performed, no walks are going to be generated.");
             before = Instant.now();
             String modelFilePathToWrite = walkDirectory.getAbsolutePath() + "/model.kv";
@@ -319,6 +335,7 @@ public class Main {
         // ------------------
 
         if (isOnlyWalks) {
+            printIfIgnoredOptionsExist();
             System.out.println("Only walks are being generated, training is performed.");
             String walkFile = "./walks/walk_file.gz";
 
@@ -346,10 +363,8 @@ public class Main {
             }
 
             after = Instant.now();
-
             System.out.println("\nTotal Time:");
             System.out.println(Util.getDeltaTimeString(before, after));
-
             return; // important: stop here to avoid any training.
         }
 
@@ -359,6 +374,7 @@ public class Main {
         // ------------------------------------
 
         if (lightEntityFile == null) {
+            printIfIgnoredOptionsExist();
             System.out.println("RDF2Vec Classic");
 
             RDF2Vec rdf2vec;
@@ -394,6 +410,7 @@ public class Main {
             // setting the instance to allow for better testability
             rdf2VecInstance = rdf2vec;
         } else {
+            printIfIgnoredOptionsExist();
             System.out.println("RDF2Vec Light Mode");
             RDF2VecLight rdf2VecLight;
             if (walkDirectory == null) rdf2VecLight = new RDF2VecLight(knowledgeGraphFile, lightEntityFile);
@@ -454,6 +471,18 @@ public class Main {
         Gensim.getInstance().writeModelAsTextFile(transformationSource, fileToGenerate.getAbsolutePath());
     }
 
+    /**
+     * If there are arguments that are not processed, they will be printed to the console for the user.
+     */
+    private static void printIfIgnoredOptionsExist(){
+        if (ignoredArguments != null && ignoredArguments.size() > 0){
+            System.out.println("\nThe following arguments were ignored:");
+            for(String s : ignoredArguments){
+                System.out.println("\t- " + s);
+            }
+            System.out.println();
+        }
+    }
 
     /**
      * Helper method.
@@ -472,6 +501,8 @@ public class Main {
             }
         }
         if (positionSet != -1 && arguments.length >= positionSet + 1) {
+            ignoredArguments.remove(key);
+            ignoredArguments.remove(arguments[positionSet + 1]);
             return arguments[positionSet + 1];
         } else return null;
     }
@@ -485,6 +516,18 @@ public class Main {
      */
     public static boolean containsIgnoreCase(String element, String[] array) {
         if (element == null || array == null) return false;
+
+        // remove from set of ignored options.
+        String removeFromIgnoredOptions = "";
+        for(String s : ignoredArguments){
+            if(element.equalsIgnoreCase(s)){
+                removeFromIgnoredOptions = s;
+                break;
+            }
+        }
+        ignoredArguments.remove(removeFromIgnoredOptions);
+
+        // perform the actual check
         for (String s : array) {
             if (element.equalsIgnoreCase(s)) return true;
         }
@@ -516,6 +559,14 @@ public class Main {
      */
     public static int getDepth() {
         return depth;
+    }
+
+    /**
+     * Obtain the arguments that were not (yet) parsed.
+     * @return Set of arguments that are not (yet) parsed.
+     */
+    public static HashSet<String> getIgnoredArguments() {
+        return ignoredArguments;
     }
 
     /**
@@ -575,7 +626,7 @@ public class Main {
     }
 
     /**
-     * Reset parameters (required for testing)
+     * Reset parameters (required for testing).
      */
     public static void reset() {
         configuration = new Word2VecConfiguration(Word2VecType.SG);

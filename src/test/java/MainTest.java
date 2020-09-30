@@ -416,6 +416,7 @@ class MainTest {
         Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "-10", "-minCount", "-3"});
         assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
         assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+        assertEquals(0, Main.getIgnoredArguments().size());
 
         // important: reset
         Main.reset();
@@ -439,6 +440,9 @@ class MainTest {
 
         // just making sure there is no exception thrown etc. and the program is not running after calling help.
         Main.main(new String[]{"-help"});
+
+        // check ignored arguments
+        assertEquals(0, Main.getIgnoredArguments().size());
     }
 
     @Test
@@ -465,6 +469,9 @@ class MainTest {
 
         String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/"});
+
+        // check ignored arguments
+        assertEquals(0, Main.getIgnoredArguments().size());
 
         // make sure that there is only a walk file
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
@@ -537,6 +544,9 @@ class MainTest {
         String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "10", "-light", lightFilePath, "-onlyWalks", "-walkDir", directoryName, "-walkGenerationMode", "mid_walks_weighted", "-depth", "3"});
 
+        // check ignored arguments
+        assertEquals(0, Main.getIgnoredArguments().size());
+
         // make sure that there is only a walk file
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
         assertFalse(files.contains("model.kv"));
@@ -594,6 +604,10 @@ class MainTest {
         try {
             Main.main(null);
             Main.main(new String[]{"-helloWorld"});
+
+            // check ignored arguments
+            assertEquals(1, Main.getIgnoredArguments().size());
+            Main.getIgnoredArguments().contains("-helloWorld");
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception thrown.");
@@ -625,6 +639,9 @@ class MainTest {
 
         String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "1000", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/", "-walkGenerationMode", "mid_walks_duplicate_free", "-depth", "1"});
+
+        // check ignored arguments
+        assertEquals(0, Main.getIgnoredArguments().size());
 
         // make sure that there is only a walk file
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
@@ -698,9 +715,11 @@ class MainTest {
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
 
-
         String lightFilePath = loadFile("swdf_light_entities.txt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", walkDirectoryName});
+
+        // check ignored arguments
+        assertEquals(0, Main.getIgnoredArguments().size());
 
         // make sure that there is only a walk file
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
