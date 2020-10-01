@@ -29,7 +29,7 @@ Use the resulting jar from the `target` directory.
 
 *Minimal Example*
 ```bash
-java -jar jrdf2vec-1.0-SNAPSHOT.jar -graph ./kg_file.hdt
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -graph ./kg_file.hdt
 ```
 
 #### Required Parameters
@@ -80,7 +80,7 @@ This framework requires the vectors to be present in a text file. If you have a 
 use the following command to generate this file:
 
 ```
-java -jar jrdf2vec-1.0-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
 
 ## How to use the jRDF2Vec as library in Java projects?
