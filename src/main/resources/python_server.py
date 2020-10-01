@@ -103,6 +103,7 @@ def train_word_2_vec():
         cbow_or_sg = request.headers.get('cbow_or_sg')
         min_count = request.headers.get('min_count')
         sample = request.headers.get('sample')
+        epochs = request.headers.get('epochs')
 
         sentences = MySentences(file_path)
         logging.info("Sentences object (" + file_path + ") initialized.")
@@ -115,7 +116,7 @@ def train_word_2_vec():
         logging.info("Model object initialized. Building Vocabulary...")
         model.build_vocab(sentences)
         logging.info("Vocabulary built. Training now...")
-        model.train(sentences=sentences, total_examples=model.corpus_count, epochs=model.epochs)
+        model.train(sentences=sentences, total_examples=model.corpus_count, epochs=int(epochs))
         logging.info("Model trained.")
 
         model.save(model_path)
