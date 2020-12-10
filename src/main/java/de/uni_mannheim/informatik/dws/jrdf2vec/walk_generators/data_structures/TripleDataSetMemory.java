@@ -17,13 +17,13 @@ public class TripleDataSetMemory {
         subjectToTriple = new HashMap<>();
         predicateToTriple = new HashMap<>();
         objectToTriple = new HashMap<>();
-        //triples = new HashSet<>(); // disabled for reasons of performance
+        triples = new HashSet<>(); // disabled for reasons of performance
     }
 
     HashMap<String, ArrayList<Triple>> subjectToTriple;
     HashMap<String, ArrayList<Triple>> predicateToTriple;
     HashMap<String, ArrayList<Triple>> objectToTriple;
-    //HashSet<Triple> triples;
+    HashSet<Triple> triples;
     private long size = 0;
 
     /**
@@ -41,6 +41,9 @@ public class TripleDataSetMemory {
      * @param tripleToAdd Triple to be added.
      */
     public synchronized void add(Triple tripleToAdd){
+        if(this.triples.contains(tripleToAdd)){
+            return;
+        }
         ArrayList<Triple> subjectToTripleList = subjectToTriple.get(tripleToAdd.subject);
         if(subjectToTripleList == null){
             ArrayList<Triple> newList = new ArrayList<>();
@@ -61,8 +64,22 @@ public class TripleDataSetMemory {
             newList.add(tripleToAdd);
             objectToTriple.put(tripleToAdd.object, newList);
         } else objectToTripleList.add(tripleToAdd);
-        //triples.add(tripleToAdd);
+        triples.add(tripleToAdd);
         size++;
+    }
+
+    /**
+     * Adds all triples of {@code dataToAdd} to this triple set.
+     * @param dataToAdd The data that shall be added to this triple set
+     */
+    public synchronized void addAll(TripleDataSetMemory dataToAdd){
+        for(Triple triple : dataToAdd.triples){
+            this.add(triple);
+        }
+    }
+
+    public HashSet<Triple> getAllTriples(){
+        return this.triples;
     }
 
     public ArrayList<Triple> getTriplesInvolvingSubject(String subject){

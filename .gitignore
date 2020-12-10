@@ -94,6 +94,7 @@ bin/
 
 # Playground
 Playground.java
+Main_IDE.java
 
 # loggin
 log4j.properties

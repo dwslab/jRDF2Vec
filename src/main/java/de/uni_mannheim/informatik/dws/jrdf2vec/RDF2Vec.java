@@ -197,7 +197,6 @@ public class RDF2Vec implements IRDF2Vec {
         return fileToWrite;
     }
 
-
     public File getKnowledgeGraphFile() {
         return knowledgeGraphFile;
     }

@@ -123,8 +123,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
                     //this.parser = new JenaOntModelMemoryParser(this.model, this);
                     NtMemoryParser.saveAsNt(this.model, newResourceFile);
                     this.parser = new NtMemoryParser(newResourceFile, this);
-                }
-                else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
+                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
                     LOGGER.info("HDT file detected. Using HDT parser.");
                     try {
                         this.parser = new HdtParser(pathToTripleFile);
