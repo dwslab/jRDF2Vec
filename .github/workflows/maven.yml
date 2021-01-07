@@ -12,6 +12,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
+          java-package: jdk
       - name: Cache Maven packages 📦
         uses: actions/cache@v1
         with:
@@ -26,14 +27,10 @@ jobs:
       - name: Install python dependencies 🐍
         run: pip install -r ./src/main/resources/requirements.txt
       - name: Build with Maven 🏗
-        env:
-          JAVA_HOME: /usr/local/openjdk-8
         run: mvn -B package --file pom.xml
       - name: Coveralls 🕵️‍
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
-        env:
-          JAVA_HOME: /usr/local/openjdk-8
         run: mvn javadoc:javadoc
       - name: Deploy JavaDoc 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
