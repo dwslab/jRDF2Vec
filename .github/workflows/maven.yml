@@ -30,6 +30,8 @@ jobs:
       - name: Coveralls 🕵️‍
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
+        env:
+          JAVA_HOME: /usr/local/openjdk-11
         run: mvn javadoc:javadoc
       - name: Deploy JavaDoc 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
