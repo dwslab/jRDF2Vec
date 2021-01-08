@@ -134,7 +134,7 @@ class NtMemoryParserTest {
                     }
                 }
 
-                // check whether the target entity occurs
+                // check whethe the target entity occurs
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
 
