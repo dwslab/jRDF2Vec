@@ -33,12 +33,14 @@ jobs:
       - name: Build with Maven 🏗
         run: |
           JAVA_HOME="${JAVA_HOME_ORIGINAL}"
+          JAVA_HOME_8="${JAVA_HOME_ORIGINAL}"
           mvn -B package --file pom.xml
       - name: Coveralls 🕵️‍
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
         run: |
           JAVA_HOME="${JAVA_HOME_ORIGINAL}"
+          JAVA_HOME_8="${JAVA_HOME_ORIGINAL}"          
           mvn javadoc:javadoc
       - name: Deploy JavaDoc 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
