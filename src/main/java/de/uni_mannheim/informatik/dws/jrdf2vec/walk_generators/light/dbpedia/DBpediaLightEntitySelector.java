@@ -69,7 +69,7 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
     public static String getRedirectUrl(String originalUrl){
         try {
             URLConnection con = new URL(originalUrl).openConnection();
-            LOGGER.debug("orignal url: " + con.getURL());
+            LOGGER.debug("original url: " + con.getURL());
             con.connect();
             LOGGER.debug("connected url: " + con.getURL());
             InputStream is = con.getInputStream();
