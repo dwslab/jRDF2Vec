@@ -16,7 +16,7 @@ jobs:
       - name: Save JAVA_HOME in a variable
         run: |
           JAVA_HOME_ORIGINAL="${JAVA_HOME}"
-          echo "Saved the following path to JAVA_HOME_ORIGINAL": ${JAVA_HOME_ORIGINAL}"
+          echo "Saved the following path to JAVA_HOME_ORIGINAL: ${JAVA_HOME_ORIGINAL}"
       - name: Cache Maven packages 📦
         uses: actions/cache@v1
         with:
