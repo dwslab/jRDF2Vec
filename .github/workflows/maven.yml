@@ -13,10 +13,6 @@ jobs:
         with:
           java-version: 8
           java-package: jdk
-      - name: Save JAVA_HOME in a variable
-        run: |
-          JAVA_HOME_ORIGINAL="${JAVA_HOME}"
-          echo "Saved the following path to JAVA_HOME_ORIGINAL: ${JAVA_HOME_ORIGINAL}"
       - name: Cache Maven packages 📦
         uses: actions/cache@v1
         with:
@@ -32,15 +28,11 @@ jobs:
         run: pip install -r ./src/main/resources/requirements.txt
       - name: Build with Maven 🏗
         run: |
-          JAVA_HOME="${JAVA_HOME_ORIGINAL}"
-          JAVA_HOME_8="${JAVA_HOME_ORIGINAL}"
           mvn -B package --file pom.xml
       - name: Coveralls 🕵️‍
         run: mvn coveralls:report -DrepoToken=${{ secrets.COVERALLS }}
       - name: Generate Documentation 📚
         run: |
-          JAVA_HOME="${JAVA_HOME_ORIGINAL}"
-          JAVA_HOME_8="${JAVA_HOME_ORIGINAL}"          
           mvn javadoc:javadoc
       - name: Deploy JavaDoc 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3

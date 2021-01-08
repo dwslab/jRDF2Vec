@@ -164,7 +164,6 @@
                     <show>private</show>
                     <nohelp>true</nohelp>
                     <source>8</source>
-                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                 </configuration>
                 <executions>
                     <execution>
