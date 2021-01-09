@@ -3,6 +3,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.riot.Lang;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.RandomWalkEntityProcessingRunnable;
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -69,13 +71,14 @@ public class WalkGeneratorDefault extends WalkGenerator {
         this.entitySelector = new MemoryEntitySelector(((JenaOntModelMemoryParser) parser).getData());
     }
 
+
+
     /**
      * Constructor
      *
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
     public WalkGeneratorDefault(File tripleFile) {
-        String pathToTripleFile = tripleFile.getAbsolutePath();
         if (!tripleFile.exists()) {
             LOGGER.error("The resource file you specified does not exist. ABORT.");
             return;
@@ -86,57 +89,71 @@ public class WalkGeneratorDefault extends WalkGenerator {
             this.parser = new NtMemoryParser(this);
             ((NtMemoryParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
             this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) this.parser).getData());
-            return;
         } else {
-            // decide on parser depending on
-            try {
-                String fileName = tripleFile.getName();
-                if (fileName.toLowerCase().endsWith(".nt") | fileName.toLowerCase().endsWith(".nq")) {
-                    if(fileName.toLowerCase().endsWith(".nq")){
-                        LOGGER.info("NQ File detected: Please note that the graph information will be skipped.");
-                    }
-                    try {
-                        LOGGER.info("Using NxParser.");
-                        this.parser = new NxMemoryParser(pathToTripleFile, this);
-                        this.entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
-                    } catch (Exception e) {
-                        LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
-                        this.parser = new NtMemoryParser(pathToTripleFile, this);
-                        this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
-                    }
-                    if (((MemoryParser) parser).getDataSize() == 0L) {
-                        LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
-                        this.parser = new NtMemoryParser(pathToTripleFile, this);
-                        this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
-                    }
-                } else if (fileName.toLowerCase().endsWith(".ttl")) {
-                    this.model = readOntology(pathToTripleFile, Lang.TTL);
-                    this.entitySelector = new OntModelEntitySelector(this.model);
-                    File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
-                    NtMemoryParser.saveAsNt(this.model, newResourceFile);
-                    //this.parser = new JenaOntModelMemoryParser(this.model, this);
-                    this.parser = new NtMemoryParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".xml")) {
-                    this.model = readOntology(pathToTripleFile, Lang.RDFXML);
-                    this.entitySelector = new OntModelEntitySelector(this.model);
-                    File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
-                    //this.parser = new JenaOntModelMemoryParser(this.model, this);
-                    NtMemoryParser.saveAsNt(this.model, newResourceFile);
-                    this.parser = new NtMemoryParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
-                    LOGGER.info("HDT file detected. Using HDT parser.");
-                    try {
-                        this.parser = new HdtParser(pathToTripleFile);
-                        this.entitySelector = new HdtEntitySelector(pathToTripleFile);
-                    } catch (IOException ioe) {
-                        LOGGER.error("Propagated HDT Initializer Exception", ioe);
-                    }
-                }
-                LOGGER.info("Model read into memory.");
-            } catch (MalformedURLException mue) {
-                LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
-            }
+            // decide on parser depending on file ending
+            Pair<IParser, EntitySelector> parserSelectorPair = parseSingleFile(tripleFile);
+            this.parser = parserSelectorPair.getValue0();
+            this.entitySelector = parserSelectorPair.getValue1();
         }
+    }
+
+
+    /**
+     * Given a triple file, this method determines the appropriate parser and entity selector.
+     * @param tripleFile The triple file to be processed.
+     * @return Pair with parser and entity selector.
+     */
+    private Pair<IParser, EntitySelector> parseSingleFile(File tripleFile){
+        IParser parser = null;
+        EntitySelector entitySelector = null;
+        try {
+            String pathToTripleFile = tripleFile.getAbsolutePath();
+            String fileName = tripleFile.getName();
+            if (fileName.toLowerCase().endsWith(".nt") | fileName.toLowerCase().endsWith(".nq")) {
+                if(fileName.toLowerCase().endsWith(".nq")){
+                    LOGGER.info("NQ File detected: Please note that the graph information will be skipped.");
+                }
+                try {
+                    LOGGER.info("Using NxParser.");
+                    parser = new NxMemoryParser(pathToTripleFile, this);
+                    entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
+                } catch (Exception e) {
+                    LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
+                    parser = new NtMemoryParser(pathToTripleFile, this);
+                    entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
+                }
+                if (((MemoryParser) parser).getDataSize() == 0L) {
+                    LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
+                    parser = new NtMemoryParser(pathToTripleFile, this);
+                    entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
+                }
+            } else if (fileName.toLowerCase().endsWith(".ttl")) {
+                this.model = readOntology(pathToTripleFile, Lang.TTL);
+                entitySelector = new OntModelEntitySelector(this.model);
+                File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
+                NtMemoryParser.saveAsNt(this.model, newResourceFile);
+                parser = new NtMemoryParser(newResourceFile, this);
+            } else if (fileName.toLowerCase().endsWith(".xml")) {
+                this.model = readOntology(pathToTripleFile, Lang.RDFXML);
+                entitySelector = new OntModelEntitySelector(this.model);
+                File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
+                //this.parser = new JenaOntModelMemoryParser(this.model, this);
+                NtMemoryParser.saveAsNt(this.model, newResourceFile);
+                parser = new NtMemoryParser(newResourceFile, this);
+            } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
+                LOGGER.info("HDT file detected. Using HDT parser.");
+                try {
+                    parser = new HdtParser(pathToTripleFile);
+                   entitySelector = new HdtEntitySelector(pathToTripleFile);
+                } catch (IOException ioe) {
+                    LOGGER.error("Propagated HDT Initializer Exception", ioe);
+                }
+            }
+            LOGGER.info("Model read into memory.");
+        } catch (MalformedURLException mue) {
+            LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
+        }
+        return new Pair<>(parser, entitySelector);
     }
 
     /**
@@ -269,7 +286,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
         // initialize the writer
         try {
             this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), "utf-8");
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
         } catch (Exception e1) {
             LOGGER.error("Could not initialize writer. Aborting process.", e1);
             return;

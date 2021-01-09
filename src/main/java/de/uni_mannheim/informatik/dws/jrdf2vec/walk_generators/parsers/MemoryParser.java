@@ -41,7 +41,7 @@ public abstract class MemoryParser implements IParser {
      * Indicator whether anonymous nodes shall be handled as if they were just one node.
      * E.g. _:genid413438 is handled like -&gt; ANODE
      */
-    boolean isUnifiyAnonymousNodes = false;
+    boolean isUnifyAnonymousNodes = false;
 
 
     /**
@@ -379,7 +379,7 @@ public abstract class MemoryParser implements IParser {
         // now we need to translate our walks into strings
         for (List<Triple> walk : walks) {
             String finalSentence = entity;
-            if (this.isUnifiyAnonymousNodes()) {
+            if (this.isUnifyAnonymousNodes()) {
                 for (Triple po : walk) {
                     String object = po.object;
                     if (isAnonymousNode(object)) {
@@ -452,12 +452,12 @@ public abstract class MemoryParser implements IParser {
         return isIncludeDatatypeProperties;
     }
 
-    public boolean isUnifiyAnonymousNodes() {
-        return isUnifiyAnonymousNodes;
+    public boolean isUnifyAnonymousNodes() {
+        return isUnifyAnonymousNodes;
     }
 
-    public void setUnifiyAnonymousNodes(boolean unifiyAnonymousNodes) {
-        isUnifiyAnonymousNodes = unifiyAnonymousNodes;
+    public void setUnifyAnonymousNodes(boolean unifyAnonymousNodes) {
+        isUnifyAnonymousNodes = unifyAnonymousNodes;
     }
 
     public WalkGenerator getSpecificWalkGenerator() {
