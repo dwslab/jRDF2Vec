@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import org.semanticweb.yars.nx.Node;
 import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
@@ -10,6 +9,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.T
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.function.UnaryOperator;
 
 
 /**
@@ -25,29 +25,48 @@ public class NxMemoryParser extends MemoryParser {
 
     /**
      * Constructor
-     * @param walkGenerator Walk Generator to be used.
      */
-    public NxMemoryParser(WalkGenerator walkGenerator){
-        this.specificWalkGenerator = walkGenerator;
+    public NxMemoryParser(){
         data = new TripleDataSetMemory();
+        uriShortenerFunction = new UnaryOperator<String>() {
+            @Override
+            public String apply(String s) {
+                return s;
+            }
+        };
     }
 
     /**
      * Constructor
      * @param nTripleFilePath File to be parsed.
-     * @param specificWalkGenerator Walk Generator to be used.
      */
-    public NxMemoryParser(String nTripleFilePath, WalkGenerator specificWalkGenerator){
-        this(new File(nTripleFilePath), specificWalkGenerator);
+    public NxMemoryParser(String nTripleFilePath, UnaryOperator<String> uriShortenerFunction){
+        this(new File(nTripleFilePath), uriShortenerFunction);
+    }
+
+    /**
+     * Constructor
+     * @param nTripleFilePath File to be parsed.
+     */
+    public NxMemoryParser(String nTripleFilePath){
+        this(new File(nTripleFilePath));
     }
 
     /**
      * Constructor
      * @param nTripleFile File to be parsed.
-     * @param specificWalkGenerator Walk Generator to be used.
      */
-    public NxMemoryParser(File nTripleFile, WalkGenerator specificWalkGenerator){
-        this(specificWalkGenerator);
+    public NxMemoryParser(File nTripleFile, UnaryOperator<String> uriShortenerFunction){
+        this.uriShortenerFunction = uriShortenerFunction;
+        readNtriples(nTripleFile);
+    }
+
+    /**
+     * Constructor
+     * @param nTripleFile File to be parsed.
+     */
+    public NxMemoryParser(File nTripleFile){
+        this();
         readNtriples(nTripleFile);
     }
 
@@ -69,19 +88,15 @@ public class NxMemoryParser extends MemoryParser {
                 String subject, predicate, object;
                 for (Node[] nx : parser) {
                     if(nx[2].toString().startsWith("\"")) continue;
-                    subject = specificWalkGenerator.shortenUri(removeTags(nx[0].toString()));
-                    predicate = specificWalkGenerator.shortenUri(removeTags(nx[1].toString()));
-                    object = specificWalkGenerator.shortenUri(removeTags(nx[2].toString()));
+                    subject = uriShortenerFunction.apply(removeTags(nx[0].toString()));
+                    predicate = uriShortenerFunction.apply(removeTags(nx[1].toString()));
+                    object = uriShortenerFunction.apply(removeTags(nx[2].toString()));
                     data.add(subject, predicate, object);
                 }
             } catch (FileNotFoundException fnfe){
                 LOGGER.error("Could not find file " + fileToReadFrom.getAbsolutePath(), fnfe);
             }
         }
-
-
     }
-
-
 
 }

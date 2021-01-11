@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.DummyWalkGenerator;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
@@ -41,7 +40,7 @@ class NtMemoryParserTest {
      * @param graphPath Path to NT file.
      */
     public static void testWalkForEntity(String graphPath){
-        NtMemoryParser parser = new NtMemoryParser(graphPath, new DummyWalkGenerator());
+        NtMemoryParser parser = new NtMemoryParser(graphPath);
         List<String> result_1 = parser.generateDuplicateFreeRandomWalksForEntity("A", 100, 8);
         System.out.println("Walks 1");
         for(String s : result_1) System.out.println(s);
@@ -64,7 +63,7 @@ class NtMemoryParserTest {
     @Test
     void testDepthForRandomWalks(){
         String graphPath = loadFile("dummyGraph_3.nt").getAbsolutePath();
-        NtMemoryParser parser = new NtMemoryParser(graphPath, new DummyWalkGenerator());
+        NtMemoryParser parser = new NtMemoryParser(graphPath);
         List<String> result_1 = parser.generateDuplicateFreeRandomWalksForEntity("A", 100, 8);
         System.out.println("Walks 1");
         for(String s : result_1) System.out.println(s);
@@ -114,7 +113,7 @@ class NtMemoryParserTest {
             HDT dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             HdtParser.serializeDataSetAsNtFile(dataSet, fileToUse);
 
-            NtMemoryParser parser = new NtMemoryParser(fileToUse, new DummyWalkGenerator());
+            NtMemoryParser parser = new NtMemoryParser(fileToUse);
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
             List<String> walks1 = parser.generateMidWalksForEntity(concept, 10, 12);
             assertNotNull(walks1);
@@ -134,7 +133,7 @@ class NtMemoryParserTest {
                     }
                 }
 
-                // check whether the target entity occurs
+                // check whethe the target entity occurs
                 fail("No occurrence of " + concept + " in sentence: " + walk);
             }
 
@@ -170,7 +169,7 @@ class NtMemoryParserTest {
             File fileToUse = new File("./swdf-2012-11-28.nt");
             HDT dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             HdtParser.serializeDataSetAsNtFile(dataSet, fileToUse);
-            NtMemoryParser parser = new NtMemoryParser(fileToUse, new DummyWalkGenerator());
+            NtMemoryParser parser = new NtMemoryParser(fileToUse);
 
             String concept = "http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member";
 

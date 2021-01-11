@@ -3,6 +3,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.riot.Lang;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.RandomWalkEntityProcessingRunnable;
@@ -12,9 +13,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.UnaryOperator;
 import java.util.zip.GZIPOutputStream;
 
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.readOntology;
@@ -29,11 +32,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * Default Logger.
      */
     Logger LOGGER = LoggerFactory.getLogger(WalkGeneratorDefault.class);
-
-    /**
-     * Central OntModel
-     */
-    private OntModel model;
 
     /**
      * Inject default entity selector.
@@ -63,11 +61,11 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * @param ontModel Model for which walks shall be generated.
      */
     public WalkGeneratorDefault(OntModel ontModel) {
-        this.model = ontModel;
         this.parser = new JenaOntModelMemoryParser();
-        ((JenaOntModelMemoryParser) this.parser).readDataFromOntModel(model);
+        ((JenaOntModelMemoryParser) this.parser).readDataFromOntModel(ontModel);
         this.entitySelector = new MemoryEntitySelector(((JenaOntModelMemoryParser) parser).getData());
     }
+
 
     /**
      * Constructor
@@ -75,7 +73,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
     public WalkGeneratorDefault(File tripleFile) {
-        String pathToTripleFile = tripleFile.getAbsolutePath();
         if (!tripleFile.exists()) {
             LOGGER.error("The resource file you specified does not exist. ABORT.");
             return;
@@ -83,61 +80,17 @@ public class WalkGeneratorDefault extends WalkGenerator {
         if (tripleFile.isDirectory()) {
             LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                     "if you use an entity selector that requires one ontology.");
-            this.parser = new NtMemoryParser(this);
+            this.parser = new NtMemoryParser();
             ((NtMemoryParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
             this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) this.parser).getData());
-            return;
         } else {
-            // decide on parser depending on
-            try {
-                String fileName = tripleFile.getName();
-                if (fileName.toLowerCase().endsWith(".nt") | fileName.toLowerCase().endsWith(".nq")) {
-                    if(fileName.toLowerCase().endsWith(".nq")){
-                        LOGGER.info("NQ File detected: Please note that the graph information will be skipped.");
-                    }
-                    try {
-                        LOGGER.info("Using NxParser.");
-                        this.parser = new NxMemoryParser(pathToTripleFile, this);
-                        this.entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
-                    } catch (Exception e) {
-                        LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
-                        this.parser = new NtMemoryParser(pathToTripleFile, this);
-                        this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
-                    }
-                    if (((MemoryParser) parser).getDataSize() == 0L) {
-                        LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
-                        this.parser = new NtMemoryParser(pathToTripleFile, this);
-                        this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
-                    }
-                } else if (fileName.toLowerCase().endsWith(".ttl")) {
-                    this.model = readOntology(pathToTripleFile, Lang.TTL);
-                    this.entitySelector = new OntModelEntitySelector(this.model);
-                    File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
-                    NtMemoryParser.saveAsNt(this.model, newResourceFile);
-                    //this.parser = new JenaOntModelMemoryParser(this.model, this);
-                    this.parser = new NtMemoryParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".xml")) {
-                    this.model = readOntology(pathToTripleFile, Lang.RDFXML);
-                    this.entitySelector = new OntModelEntitySelector(this.model);
-                    File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
-                    //this.parser = new JenaOntModelMemoryParser(this.model, this);
-                    NtMemoryParser.saveAsNt(this.model, newResourceFile);
-                    this.parser = new NtMemoryParser(newResourceFile, this);
-                } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
-                    LOGGER.info("HDT file detected. Using HDT parser.");
-                    try {
-                        this.parser = new HdtParser(pathToTripleFile);
-                        this.entitySelector = new HdtEntitySelector(pathToTripleFile);
-                    } catch (IOException ioe) {
-                        LOGGER.error("Propagated HDT Initializer Exception", ioe);
-                    }
-                }
-                LOGGER.info("Model read into memory.");
-            } catch (MalformedURLException mue) {
-                LOGGER.error("Path seems to be invalid. Generator not functional.", mue);
-            }
+            // decide on parser depending on file ending
+            Pair<IParser, EntitySelector> parserSelectorPair = ParserManager.parseSingleFile(tripleFile);
+            this.parser = parserSelectorPair.getValue0();
+            this.entitySelector = parserSelectorPair.getValue1();
         }
     }
+
 
     /**
      * Constructor
@@ -269,7 +222,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
         // initialize the writer
         try {
             this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), "utf-8");
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
         } catch (Exception e1) {
             LOGGER.error("Could not initialize writer. Aborting process.", e1);
             return;
@@ -305,5 +258,10 @@ public class WalkGeneratorDefault extends WalkGenerator {
     @Override
     public String shortenUri(String uri) {
         return uri;
+    }
+
+    @Override
+    public UnaryOperator<String> getUriShortenerFunction() {
+        return s -> s;
     }
 }

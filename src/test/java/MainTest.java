@@ -46,6 +46,7 @@ class MainTest {
      */
     @Test
     public void trainClassic() {
+        LOGGER.info("Running test: trainClassic()");
         String walkPath = "./mainWalks/";
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();
@@ -77,6 +78,7 @@ class MainTest {
 
     @Test
     void trainWithMixedInputFilesCommandLine(){
+        LOGGER.info("Running test: trainWithMixedInputFilesCommandLine()");
         File graphFilePath = new File(loadFile("mixedWalkDirectory").getAbsolutePath());
         Main.main(new String[]{"-graph", graphFilePath.getAbsolutePath(), "-dimension", "100", "-depth", "4", "-trainingMode", "sg", "-numberOfWalks", "100", "-walkGenerationMode", "RANDOM_WALKS_DUPLICATE_FREE"});
 
@@ -97,6 +99,7 @@ class MainTest {
 
     @Test
     public void onlyTraining(){
+        LOGGER.info("Running test: onlyTraining()");
         String walkDirectory = loadFile("walk_directory_test").getAbsolutePath();
         Main.main(new String[]{"-onlyTraining", "-walkDirectory", walkDirectory, "-dimensions", "80"});
         System.out.println(walkDirectory);
@@ -125,6 +128,7 @@ class MainTest {
      */
     @Test
     public void onlyTrainingFail(){
+        LOGGER.info("Running test: onlyTrainingFail()");
         Main.main(new String[]{"-onlyTraining"});
         Main.main(new String[]{"-onlyTraining", "-minCount", "5"});
         Main.main(new String[]{"-threads", "3", "-onlyTraining", "-minCount", "5"});
@@ -135,6 +139,7 @@ class MainTest {
      */
     @Test
     public void trainClassicNoTextVectorFile(){
+        LOGGER.info("Running test: trainClassicNoTextVectorFile()");
         String walkPath = "./mainWalks/";
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();

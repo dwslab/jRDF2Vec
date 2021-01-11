@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.IParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +8,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.T
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.UnaryOperator;
 
 /**
  * Memory based parser using the {@link TripleDataSetMemory} data structure.
@@ -27,11 +27,6 @@ public abstract class MemoryParser implements IParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryParser.class);
 
     /**
-     * Walk generator that uses the parser.
-     */
-    WalkGenerator specificWalkGenerator;
-
-    /**
      * Include datatype properties into walk generation.
      * Default false.
      */
@@ -41,7 +36,12 @@ public abstract class MemoryParser implements IParser {
      * Indicator whether anonymous nodes shall be handled as if they were just one node.
      * E.g. _:genid413438 is handled like -&gt; ANODE
      */
-    boolean isUnifiyAnonymousNodes = false;
+    boolean isUnifyAnonymousNodes = false;
+
+    /**
+     * Function to transform URIs while parsing.
+     */
+    UnaryOperator<String> uriShortenerFunction;
 
 
     /**
@@ -310,7 +310,7 @@ public abstract class MemoryParser implements IParser {
      */
     public Triple getRandomTripleForSubject(String subject) {
         if (subject == null) return null;
-        subject = specificWalkGenerator.shortenUri(removeTags(subject));
+        subject = uriShortenerFunction.apply(removeTags(subject));
         ArrayList<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
@@ -453,19 +453,11 @@ public abstract class MemoryParser implements IParser {
     }
 
     public boolean isUnifyAnonymousNodes() {
-        return isUnifiyAnonymousNodes;
+        return isUnifyAnonymousNodes;
     }
 
     public void setUnifyAnonymousNodes(boolean unifyAnonymousNodes) {
-        isUnifiyAnonymousNodes = unifyAnonymousNodes;
-    }
-
-    public WalkGenerator getSpecificWalkGenerator() {
-        return specificWalkGenerator;
-    }
-
-    public void setSpecificWalkGenerator(WalkGenerator specificWalkGenerator) {
-        this.specificWalkGenerator = specificWalkGenerator;
+        isUnifyAnonymousNodes = unifyAnonymousNodes;
     }
 
     public TripleDataSetMemory getData() {
@@ -473,6 +465,8 @@ public abstract class MemoryParser implements IParser {
     }
 
     public long getDataSize(){
-        return data.getSize();
+        if (data == null) {
+            return 0L;
+        } else return data.getSize();
     }
 }

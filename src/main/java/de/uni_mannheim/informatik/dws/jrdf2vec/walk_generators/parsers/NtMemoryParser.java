@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -40,13 +41,10 @@ public class NtMemoryParser extends MemoryParser {
 
     /**
      * Default Constructor
-     * @param walkGenerator The walk generator is used to derive a data set specific URI shortener (if desired).
-     *                      Therefore, method {@link WalkGenerator#shortenUri(String)} has to be implemented.
      */
-    public NtMemoryParser(WalkGenerator walkGenerator) {
+    public NtMemoryParser() {
         data = new TripleDataSetMemory();
 
-        specificWalkGenerator = walkGenerator;
         skipCondition = new IsearchCondition() {
             Pattern pattern = Pattern.compile("\".*\"");
 
@@ -59,6 +57,14 @@ public class NtMemoryParser extends MemoryParser {
                 return false;
             }
         };
+
+        // set default function (do nothing)
+        uriShortenerFunction = new UnaryOperator<String>() {
+            @Override
+            public String apply(String s) {
+                return s;
+            }
+        };
     }
 
 
@@ -66,10 +72,20 @@ public class NtMemoryParser extends MemoryParser {
      * Constructor
      *
      * @param pathToTripleFile The nt file to be read (not zipped).
-     * @param walkGenerator Walk generator to be used.
      */
-    public NtMemoryParser(String pathToTripleFile, WalkGenerator walkGenerator) {
-        this(walkGenerator);
+    public NtMemoryParser(String pathToTripleFile, UnaryOperator<String> uriShortenerFunction) {
+        this();
+        this.uriShortenerFunction = uriShortenerFunction;
+        readNTriples(pathToTripleFile);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param pathToTripleFile The nt file to be read (not zipped).
+     */
+    public NtMemoryParser(String pathToTripleFile) {
+        this();
         readNTriples(pathToTripleFile);
     }
 
@@ -77,10 +93,21 @@ public class NtMemoryParser extends MemoryParser {
      * Constructor
      *
      * @param tripleFile The nt file to be read (not zipped).
-     * @param walkGenerator Walk generator to be used.
      */
-    public NtMemoryParser(File tripleFile, WalkGenerator walkGenerator) {
-        this(walkGenerator);
+    public NtMemoryParser(File tripleFile, UnaryOperator<String> uriShortenerFunction) {
+        this();
+        this.uriShortenerFunction = uriShortenerFunction;
+        readNTriples(tripleFile, false);
+    }
+
+
+    /**
+     * Constructor
+     *
+     * @param tripleFile The nt file to be read (not zipped).
+     */
+    public NtMemoryParser(File tripleFile) {
+        this();
         readNTriples(tripleFile, false);
     }
 
@@ -361,9 +388,9 @@ public class NtMemoryParser extends MemoryParser {
                         LOGGER.error("Line is ignored. Parsing continues.");
                         continue nextLine;
                     }
-                    String subject = specificWalkGenerator.shortenUri(removeTags(spo[0])).intern();
-                    String predicate = specificWalkGenerator.shortenUri(removeTags(spo[1]).intern());
-                    String object = specificWalkGenerator.shortenUri(removeTags(spo[2])).intern();
+                    String subject = uriShortenerFunction.apply(removeTags(spo[0])).intern();
+                    String predicate = uriShortenerFunction.apply(removeTags(spo[1]).intern());
+                    String object = uriShortenerFunction.apply(removeTags(spo[2])).intern();
 
                     data.add(subject, predicate, object);
 

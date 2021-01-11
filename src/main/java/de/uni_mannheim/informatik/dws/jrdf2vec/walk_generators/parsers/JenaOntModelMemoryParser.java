@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
 import org.apache.jena.ontology.OntModel;
@@ -24,9 +23,12 @@ public class JenaOntModelMemoryParser extends MemoryParser {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(JenaOntModelMemoryParser.class);
 
-    public JenaOntModelMemoryParser(OntModel ontModel, WalkGenerator walkGenerator){
+    /**
+     * Constructor
+     * @param ontModel The ont model from which data shall be read.
+     */
+    public JenaOntModelMemoryParser(OntModel ontModel){
         readDataFromOntModel(ontModel);
-        specificWalkGenerator = walkGenerator;
     }
 
     /**

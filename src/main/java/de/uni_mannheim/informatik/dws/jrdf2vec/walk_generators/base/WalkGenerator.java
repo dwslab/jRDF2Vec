@@ -1,22 +1,18 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.RiotException;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.IParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.*;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.UnaryOperator;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -98,6 +94,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @return Shortened version of the URI.
      */
     public abstract String shortenUri(String uri);
+
+    /**
+     * Gets the function to be used to shorten URIs.
+     * @return Function to shorten URIs (String -&gt; String).
+     */
+    public abstract UnaryOperator<String> getUriShortenerFunction();
 
     /**
      * Generate walks for the entities that are duplicate free (i.e., no walk exists twice in the resulting file).

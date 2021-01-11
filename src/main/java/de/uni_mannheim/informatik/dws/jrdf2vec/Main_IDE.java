@@ -1,7 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.DummyWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.NxMemoryParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.dbpedia.DBpediaWalkGeneratorLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.LightEntitySelector;
@@ -16,12 +14,6 @@ public class Main_IDE {
         walkGenerationForWikidata();
     }
 
-
-    public static void checkNxParser(){
-        String filePath = "/work/jportisc/wikidata_2020_02_11/wikidata_truthy_2020_02_11.nt";
-        NxMemoryParser parser = new NxMemoryParser(filePath,new DummyWalkGenerator());
-        System.out.println("done");
-    }
 
     public static void walkGenerationForWikidata(){
         // run on dws-07

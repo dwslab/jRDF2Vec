@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.DummyWalkGenerator;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +27,7 @@ class NxMemoryParserTest {
      */
     @Test
     void generateWalkForEntity(){
-        NxMemoryParser parser = new NxMemoryParser(loadFile("dummyGraph_2.nt"), new DummyWalkGenerator());
+        NxMemoryParser parser = new NxMemoryParser(loadFile("dummyGraph_2.nt"));
         List<String> result_1 = parser.generateDuplicateFreeRandomWalksForEntity("A", 100, 8);
         System.out.println("Walks 1");
         for(String s : result_1) System.out.println(s);
@@ -56,7 +55,7 @@ class NxMemoryParserTest {
             HDT dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             HdtParser.serializeDataSetAsNtFile(dataSet, fileToUse);
 
-            NxMemoryParser parser = new NxMemoryParser(fileToUse, new DummyWalkGenerator());
+            NxMemoryParser parser = new NxMemoryParser(fileToUse);
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
             List<String> walks1 = parser.generateMidWalksForEntity(concept, 10, 12);
             assertNotNull(walks1);
@@ -113,7 +112,7 @@ class NxMemoryParserTest {
             File fileToUse = new File("./swdf-2012-11-28.nt");
             HDT dataSet = HDTManager.loadHDT(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             HdtParser.serializeDataSetAsNtFile(dataSet, fileToUse);
-            NxMemoryParser parser = new NxMemoryParser(fileToUse, new DummyWalkGenerator());
+            NxMemoryParser parser = new NxMemoryParser(fileToUse);
 
             String concept = "http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member";
 
