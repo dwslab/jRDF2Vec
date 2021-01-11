@@ -379,7 +379,7 @@ public abstract class MemoryParser implements IParser {
         // now we need to translate our walks into strings
         for (List<Triple> walk : walks) {
             String finalSentence = entity;
-            if (this.isUnifiyAnonymousNodes()) {
+            if (this.isUnifyAnonymousNodes()) {
                 for (Triple po : walk) {
                     String object = po.object;
                     if (isAnonymousNode(object)) {
@@ -452,12 +452,12 @@ public abstract class MemoryParser implements IParser {
         return isIncludeDatatypeProperties;
     }
 
-    public boolean isUnifiyAnonymousNodes() {
+    public boolean isUnifyAnonymousNodes() {
         return isUnifiyAnonymousNodes;
     }
 
-    public void setUnifiyAnonymousNodes(boolean unifiyAnonymousNodes) {
-        isUnifiyAnonymousNodes = unifiyAnonymousNodes;
+    public void setUnifyAnonymousNodes(boolean unifyAnonymousNodes) {
+        isUnifiyAnonymousNodes = unifyAnonymousNodes;
     }
 
     public WalkGenerator getSpecificWalkGenerator() {

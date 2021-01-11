@@ -10,7 +10,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGenerat
 
 import java.io.File;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
