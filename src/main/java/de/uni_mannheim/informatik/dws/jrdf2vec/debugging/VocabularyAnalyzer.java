@@ -142,10 +142,10 @@ public class VocabularyAnalyzer {
     /**
      * Read the complete vocabulary from the specified file.
      * @param pathToModel The path to the model. The model can be a text file (ending .txt) or a gensim model file (keyed vector files must have the file ending .kv).
-     * @return Triplet with: <br/>
-     *              [0] A set with the full vocabulary.<br/>
-     *              [1] Dimension<br/>
-     *              [2] True if dimension is consistent, else false.<br/>
+     * @return Triplet with: <br>
+     *              [0] A set with the full vocabulary.<br>
+     *              [1] Dimension<br>
+     *              [2] True if dimension is consistent, else false.<br>
      */
     private static Triplet<Set<String>, Integer, Boolean> getModelVocabulary(String pathToModel){
         return getModelVocabulary(new File(pathToModel));
@@ -154,10 +154,10 @@ public class VocabularyAnalyzer {
     /**
      * Read the complete vocabulary from the specified file.
      * @param modelFile The model file.
-     * @return Triplet with: <br/>
-     *              [0] A set with the full vocabulary.<br/>
-     *              [1] Dimension<br/>
-     *              [2] True if dimension is consistent, else false.<br/>
+     * @return Triplet with: <br>
+     *              [0] A set with the full vocabulary.<br>
+     *              [1] Dimension<br>
+     *              [2] True if dimension is consistent, else false.<br>
      */
     private static Triplet<Set<String>, Integer, Boolean> getModelVocabulary(File modelFile){
         Triplet<Set<String>, Integer, Boolean> result = new Triplet<>(null, -1, false);
@@ -188,10 +188,10 @@ public class VocabularyAnalyzer {
      * Parses the concepts (not the vectors) from a text model file, i.e. a UTF-8 file where the concept is followed by its vector.
      * One concept appears per line. Everything is space separated.
      * @param textModelFile The file the shall be parsed.
-     * @return Triplet with: <br/>
-     *              [0] A set with the full vocabulary.<br/>
-     *              [1] Dimension
-     *              [2] True if dimension is consistent, else false.
+     * @return Triplet with: <br>
+     *              [0] A set with the full vocabulary.<br>
+     *              [1] Dimension<br>
+     *              [2] True if dimension is consistent, else false.<br>
      */
     static Triplet<Set<String>, Integer, Boolean> readTextVectorFile(File textModelFile){
         Triplet<Set<String>, Integer, Boolean> result;
