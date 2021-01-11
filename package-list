@@ -1,4 +1,5 @@
 de.uni_mannheim.informatik.dws.jrdf2vec
+de.uni_mannheim.informatik.dws.jrdf2vec.debugging
 de.uni_mannheim.informatik.dws.jrdf2vec.training
 de.uni_mannheim.informatik.dws.jrdf2vec.util
 de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base
