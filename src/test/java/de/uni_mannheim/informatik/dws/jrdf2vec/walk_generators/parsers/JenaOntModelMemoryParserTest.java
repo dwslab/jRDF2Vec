@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +20,7 @@ class JenaOntModelMemoryParserTest {
         parser.readDataFromFile(ontologyTestFile);
         assertTrue(parser.getData().getSize() > 100);
 
-        ArrayList<Triple> triplesForArtichokeTopping = parser.getData().getTriplesInvolvingSubject("http://www.co-ode.org/ontologies/pizza/pizza.owl#ArtichokeTopping");
+        List<Triple> triplesForArtichokeTopping = parser.getData().getTriplesInvolvingSubject("http://www.co-ode.org/ontologies/pizza/pizza.owl#ArtichokeTopping");
         assertTrue(triplesForArtichokeTopping.size() > 0);
         boolean found = false;
         for (Triple triple : triplesForArtichokeTopping){

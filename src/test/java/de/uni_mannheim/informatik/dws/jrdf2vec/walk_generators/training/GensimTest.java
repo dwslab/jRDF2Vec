@@ -14,6 +14,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.HashSet;
 
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
 import static org.junit.jupiter.api.Assertions.*;
@@ -204,6 +205,7 @@ class GensimTest {
         vectorFile.delete();
     }
 
+
     @Test
     void trainWord2VecModelWithWalkDirectory() {
         String testFilePath = getPathOfResource("walk_directory_test");
@@ -230,6 +232,7 @@ class GensimTest {
         modelFile.delete();
         vectorFile.delete();
     }
+
 
     @Test
     void trainWord2VecModelSG() {
@@ -261,6 +264,7 @@ class GensimTest {
         vectorFile.delete();
     }
 
+
     @Test
     void trainWord2VecModelCBOW() {
         String testFilePath = getPathOfResource("testInputForWord2Vec.txt");
@@ -279,6 +283,7 @@ class GensimTest {
         modelFile.delete();
         vectorFile.delete();
     }
+
 
     @Test
     void externalResourcesDirectory(){
@@ -300,6 +305,9 @@ class GensimTest {
         // shut down again to keep using default resources directory
         gensim.shutDown();
 
+        // we need to restart for subsequent tests
+        gensim = gensim.getInstance();
+
         try {
             FileUtils.deleteDirectory(externalResourcesDirectory);
         } catch (IOException e) {
@@ -307,12 +315,22 @@ class GensimTest {
         }
     }
 
+
+    @Test
+    void getVocabularyTerms(){
+        String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
+        HashSet<String> result = gensim.getVocabularyTerms(pathToVectorFile);
+        assertTrue(result.size() > 0);
+        assertTrue(result.contains("Europe"));
+    }
+
+
     /**
      * Helper method to obtain the canonical path of a (test) resource.
      * @param resourceName File/directory name.
      * @return Canonical path of resource.
      */
-    private String getPathOfResource(String resourceName){
+    public String getPathOfResource(String resourceName){
         try {
             URL res = getClass().getClassLoader().getResource(resourceName);
             if(res == null) throw new IOException();
@@ -323,5 +341,6 @@ class GensimTest {
             return null;
         }
     }
+
 
 }

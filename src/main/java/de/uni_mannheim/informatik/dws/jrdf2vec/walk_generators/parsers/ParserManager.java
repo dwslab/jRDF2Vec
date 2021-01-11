@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getDeltaTimeString;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.readOntology;
 
 /**
@@ -23,6 +24,15 @@ import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.readOntology;
 public class ParserManager {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ParserManager.class);
+
+    /**
+     * Given a triple file, this method determines the appropriate parser and entity selector.
+     * @param tripleFile The triple file path of the file to be processed.
+     * @return Pair with parser and entity selector.
+     */
+    public static Pair<IParser, EntitySelector> parseSingleFile(String tripleFile){
+        return parseSingleFile(new File(tripleFile));
+    }
 
     /**
      * Given a triple file, this method determines the appropriate parser and entity selector.

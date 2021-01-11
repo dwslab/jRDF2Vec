@@ -100,10 +100,10 @@ public abstract class MemoryParser implements IParser {
             double randomPickZeroOne = ThreadLocalRandom.current().nextDouble(0.0, 1.00000001);
 
             // predecessor candidates
-            ArrayList<Triple> candidatesPredecessor = data.getTriplesInvolvingObject(nextElementPredecessor);
+            List<Triple> candidatesPredecessor = data.getTriplesInvolvingObject(nextElementPredecessor);
 
             // successor candidates
-            ArrayList<Triple> candidatesSuccessor = data.getTriplesInvolvingSubject(nextElementSuccessor);
+            List<Triple> candidatesSuccessor = data.getTriplesInvolvingSubject(nextElementSuccessor);
 
             double numberOfPredecessors = 0.0;
             double numberOfSuccessors = 0.0;
@@ -260,7 +260,7 @@ public abstract class MemoryParser implements IParser {
 
             if (randomPickZeroOne == 0) {
                 // predecessor
-                ArrayList<Triple> candidates = data.getTriplesInvolvingObject(nextElementPredecessor);
+                List<Triple> candidates = data.getTriplesInvolvingObject(nextElementPredecessor);
 
                 if (candidates != null && candidates.size() > 0) {
                     Triple drawnTriple = randomDrawFromList(candidates);
@@ -273,7 +273,7 @@ public abstract class MemoryParser implements IParser {
 
             } else {
                 // successor
-                ArrayList<Triple> candidates = data.getTriplesInvolvingSubject(nextElementSuccessor);
+                List<Triple> candidates = data.getTriplesInvolvingSubject(nextElementSuccessor);
                 if (candidates != null && candidates.size() > 0) {
                     Triple tripleToAdd = randomDrawFromList(candidates);
 
@@ -311,7 +311,7 @@ public abstract class MemoryParser implements IParser {
     public Triple getRandomTripleForSubject(String subject) {
         if (subject == null) return null;
         subject = uriShortenerFunction.apply(removeTags(subject));
-        ArrayList<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
+        List<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
             return null;
@@ -338,7 +338,7 @@ public abstract class MemoryParser implements IParser {
         for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
             // initialize with first node
             if (isFirstIteration) {
-                ArrayList<Triple> neighbours = data.getTriplesInvolvingSubject(entity);
+                List<Triple> neighbours = data.getTriplesInvolvingSubject(entity);
                 if (neighbours == null || neighbours.size() == 0) {
                     return result;
                 }
@@ -357,7 +357,7 @@ public abstract class MemoryParser implements IParser {
                 for (List<Triple> walk : walks_tmp) {
                     // get last entity
                     Triple lastTriple = walk.get(walk.size() - 1);
-                    ArrayList<Triple> nextIteration = data.getTriplesInvolvingSubject(lastTriple.object);
+                    List<Triple> nextIteration = data.getTriplesInvolvingSubject(lastTriple.object);
                     if (nextIteration != null) {
                         walks.remove(walk); // check whether this works
                         for (Triple nextStep : nextIteration) {
@@ -422,7 +422,7 @@ public abstract class MemoryParser implements IParser {
      */
     public Triple getRandomTripleForSubjectWithoutTags(String subject) {
         if (subject == null) return null;
-        ArrayList<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
+        List<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
             return null;

@@ -1,9 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * For reasons of performance, deletions are not possible currently.
@@ -17,7 +14,7 @@ public class TripleDataSetMemory {
         subjectToTriple = new HashMap<>();
         predicateToTriple = new HashMap<>();
         objectToTriple = new HashMap<>();
-        triples = new HashSet<>(); // disabled for reasons of performance
+        triples = new HashSet<>();
     }
 
     HashMap<String, ArrayList<Triple>> subjectToTriple;
@@ -82,15 +79,15 @@ public class TripleDataSetMemory {
         return this.triples;
     }
 
-    public ArrayList<Triple> getTriplesInvolvingSubject(String subject){
+    public List<Triple> getTriplesInvolvingSubject(String subject){
         return subjectToTriple.get(subject);
     }
 
-    public ArrayList<Triple> getTriplesInvolvingPredicate(String predicate){
+    public List<Triple> getTriplesInvolvingPredicate(String predicate){
         return predicateToTriple.get(predicate);
     }
 
-    public ArrayList<Triple> getTriplesInvolvingObject(String object){
+    public List<Triple> getTriplesInvolvingObject(String object){
         return objectToTriple.get(object);
     }
 
@@ -110,11 +107,31 @@ public class TripleDataSetMemory {
         return subjectToTriple.keySet();
     }
 
+    /**
+     * Obtain a set of all subjects and objects.
+     * @return Set of subjects and objects.
+     */
     public Set<String> getUniqueSubjectsAndObjects(){
         HashSet<String> result = new HashSet<>(subjectToTriple.keySet().size() + objectToTriple.keySet().size());
         result.addAll(subjectToTriple.keySet());
         result.addAll(objectToTriple.keySet());
         return result;
+    }
+
+    /**
+     * Obtain a set of all objects.
+     * @return Set of all objets.
+     */
+    public Set<String> getUniqueObjects(){
+        return objectToTriple.keySet();
+    }
+
+    /**
+     * Obtain a set of all predicates.
+     * @return Set of all predicates.
+     */
+    public Set<String> getUniquePredicates(){
+        return predicateToTriple.keySet();
     }
 
 }

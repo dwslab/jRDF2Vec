@@ -218,6 +218,17 @@ def get_similarity_given_model():
     return str(similarity)
 
 
+@app.route("/get-vocabulary-terms", methods=["GET"])
+def get_vocabulary_terms():
+    model_path = request.headers.get("model_path")
+    vector_path = request.headers.get("vector_path")
+    vectors = get_vectors(model_path, vector_path)
+    result = ""
+    for word in vectors.vocab:
+        result += word + "\n"
+    return result
+
+
 @app.route('/get-vector', methods=['GET'])
 def get_vector_given_model():
     concept = request.headers.get('concept')
@@ -432,4 +443,4 @@ def hello_demo():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=41193)
+    app.run(debug=False, port=1808)
