@@ -20,6 +20,13 @@ class VocabularyAnalyzerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(VocabularyAnalyzerTest.class);
 
     @Test
+    void analyze(){
+        VocabularyAnalyzerResult result = VocabularyAnalyzer.analyze(getPathOfResource("pizza_full_model.kv"), getPathOfResource("pizza.ttl"));
+        assertEquals(200, result.getDimension());
+        assertTrue(result.isDimensionConsistent());
+    }
+
+    @Test
     void detectMissingEntities(){
         Set<String> result = VocabularyAnalyzer.detectMissingEntities(getPathOfResource("freude_vectors.txt"), getPathOfResource("freude_vectors_incomplete_concepts.txt"));
         assertTrue(result.size() == 1);

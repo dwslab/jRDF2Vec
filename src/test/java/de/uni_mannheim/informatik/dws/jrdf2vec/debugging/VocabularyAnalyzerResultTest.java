@@ -7,25 +7,27 @@ import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class VocabularyAnalysisResultTest {
+class VocabularyAnalyzerResultTest {
 
     @Test
     void getAllNotFound() {
-        VocabularyAnalysisResult result = new VocabularyAnalysisResult();
+        VocabularyAnalyzerResult result = new VocabularyAnalyzerResult();
         result.setSubjectsNotFound(new HashSet(Arrays.asList(new String[]{"a"})));
         result.setPredicatesNotFound(new HashSet(Arrays.asList(new String[]{"b", "c"})));
         result.setObjectsNotFound(new HashSet(Arrays.asList(new String[]{"d", "e", "f"})));
         assertTrue(result.getAllAdditional().size() == 0);
         assertTrue(result.getAllNotFound().size() == 6);
+
+        String string = result.toString();
+        System.out.println(string);
+        assertNotNull(string);
     }
 
     @Test
     void getAllAdditional() {
-        VocabularyAnalysisResult result = new VocabularyAnalysisResult();
-        result.setAdditionalSubjects(new HashSet(Arrays.asList(new String[]{"a"})));
-        result.setAdditionalPredicates(new HashSet(Arrays.asList(new String[]{"b", "c"})));
-        result.setAdditionalObjects(new HashSet(Arrays.asList(new String[]{"d", "e", "f"})));
-        assertTrue(result.getAllAdditional().size() == 6);
+        VocabularyAnalyzerResult result = new VocabularyAnalyzerResult();
+        result.setAllAdditional(new HashSet(Arrays.asList(new String[]{"a", "b", "c", "d", "e", "f"})));
+        assertEquals(6, result.getAllAdditional().size());
         assertTrue(result.getAllNotFound().size() == 0);
     }
 }

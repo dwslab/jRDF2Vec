@@ -19,6 +19,8 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 
@@ -203,6 +205,43 @@ class MainTest {
         }
     }
 
+
+    @Test
+    public void analyzeVocabFail(){
+        // just making sure nothing fails
+        try {
+            Main.main(new String[]{"-analyzeVocab", "b"});
+        } catch (Exception e){
+            LOGGER.error("An exception occurred while calling the analysis wrongly. This should fail gracefully.");
+            fail(e);
+        }
+    }
+
+    @Test
+    void analyzeVocabWithInputFile(){
+        // This just tests whether everything works fine end-to-end.
+        // It is hard to check the console output for correctness.
+        // The correct results for the test cases stated here are checked in the test of the VocabularyAnalyzer!
+        try {
+            Main.main(new String[]{"-analyzeVocabulary", getPathOfResource("pizza_full_model.kv"), getPathOfResource("pizza.ttl")});
+        } catch (Exception e){
+            LOGGER.error("An exception occurred while calling the analysis. This should not fail.");
+            fail(e);
+        }
+    }
+
+    @Test
+    void analyzeVocabWithEntityFile(){
+        // This just tests whether everything works fine end-to-end.
+        // It is hard to check the console output for correctness.
+        // The correct results for the test cases stated here are checked in the test of the VocabularyAnalyzer!
+        try {
+            Main.main(new String[]{"-analyzeVocab", getPathOfResource("freude_vectors.txt"), getPathOfResource("freude_vectors_incomplete_concepts.txt")});
+        } catch (Exception e){
+            LOGGER.error("An exception occurred while calling the analysis. This should not fail.");
+            fail(e);
+        }
+    }
 
     @Test
     public void testTxtVectorGeneration(){
@@ -858,6 +897,23 @@ class MainTest {
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./mainWalksNq/).");
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Helper method to obtain the canonical path of a (test) resource.
+     * @param resourceName File/directory name.
+     * @return Canonical path of resource.
+     */
+    public String getPathOfResource(String resourceName){
+        try {
+            URL res = getClass().getClassLoader().getResource(resourceName);
+            if(res == null) throw new IOException();
+            File file = Paths.get(res.toURI()).toFile();
+            return file.getCanonicalPath();
+        } catch (URISyntaxException | IOException ex) {
+            LOGGER.info("Cannot create path of resource", ex);
+            return null;
         }
     }
 }

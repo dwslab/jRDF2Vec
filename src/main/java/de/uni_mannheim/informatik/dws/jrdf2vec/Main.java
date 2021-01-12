@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.debugging.VocabularyAnalyzer;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
@@ -120,7 +121,7 @@ public class Main {
      * @param args All the options for walk generation and training. Run with -help in order to get an overview.
      */
     public static void main(String[] args) {
-        if(args == null ||args.length == 0) {
+        if(args == null || args.length == 0) {
             ignoredArguments = new HashSet<>();
         } else ignoredArguments = new HashSet<>(Arrays.asList(args));
 
@@ -129,8 +130,16 @@ public class Main {
             return;
         }
 
+        // check for help
         if (containsIgnoreCase("-help", args) || containsIgnoreCase("--help", args) || containsIgnoreCase("-h", args)) {
             System.out.println(getHelp());
+            return;
+        }
+
+        // check for analysis request
+        if (args[0].equalsIgnoreCase("-analyzevocab") || args[0].equalsIgnoreCase("-analyzevocabulary") ||
+                args[0].equalsIgnoreCase("--analyzevocabulary") || args[0].equalsIgnoreCase("--analyzevocab")){
+            analyzeVocabulary(args);
             return;
         }
 
@@ -569,6 +578,40 @@ public class Main {
     }
 
     /**
+     * Perform the analysis of the vocabulary.
+     * @param args The CLI args.
+     */
+    public static void analyzeVocabulary(String[] args){
+        // check the amount of parameters
+        if(args.length != 3){
+            System.out.println("ERROR: Two parameters are required for -analyzeVocab! Please use the command as stated below:\n" +
+                    "-analyzeVocab <model_file> <training_file | entity_file>\n" +
+                    "Please refer to the help for more information (-help).");
+            return;
+        }
+
+        System.out.println("Report\n------");
+        System.out.println("Model file: " + args[1]);
+        System.out.println("Entity file: " + args[2] + "\n\n");
+
+        if(args[2].endsWith(".txt")){
+            System.out.println("Missing Concepts:");
+            for (String s : VocabularyAnalyzer.detectMissingEntities(args[1], args[2])){
+                System.out.println(s);
+            }
+            System.out.println("\n\n");
+            System.out.println("Additional Concepts:");
+            for (String s : VocabularyAnalyzer.detectAdditionalEntities(args[1], args[2])){
+                System.out.println(s);
+            }
+        } else {
+            System.out.println(VocabularyAnalyzer.analyze(args[1], args[2]));
+        }
+        return;
+    }
+
+
+    /**
      * Get the help text on how to use the CLI.
      * Developer note: Also add new commands to the README.
      *
@@ -621,7 +664,17 @@ public class Main {
                 "A) Generation of Text Vector File\n" +
                 "   jRDF is compatible with the evaluation framework for KG embeddings (GEval). This framework requires the vectors to be present in a text file. If you have a gensim model or vector file, you can use the following parameter to generate this file:\n\n" +
                 "       -generateTextVectorFile <model_or_vector_file>\n" +
-                "        The file path to the model or vector file that shall be used to write the vectors in a text file needs to be specified.";
+                "        The file path to the model or vector file that shall be used to write the vectors in a text file needs to be specified.\n\n" +
+                "B) Analysis of the Vocabulary\n" +
+                "   For RDF2Vec, it is not always guaranteed that all concepts in the graph appear in the embedding space.\n" +
+                "   For example, some concepts may only appear in the object position of statements and may never be reached by random walks.\n" +
+                "   In addition, the word2vec configuration parameters may filter out infrequent words depending on the configuration (see\n" +
+                "   -minCount above, for example). To analyze such rather seldom cases, you can use the `-analyzeVocab` function specified\n" +
+                "   as follows:\n\n" +
+                "       -analyzeVocab <model> <training_file|entity_file>\n" +
+                "       where <model> refers to any model representation such as gensim model file, .kv file, or .txt file. Just make sure you use the correct file endings.\n" +
+                "       where <training_file|entity_file> refers either to the NT/TTL etc. file that has been used to train the model or to a text file containing the concepts you \n" +
+                "       want to check (one concept per line in the text file, make sure the file ending is .txt).";
     }
 
     /**

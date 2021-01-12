@@ -69,7 +69,7 @@ A switch which indicates whether a text file with the vectors shall be persisted
 - `-onlyTraining`<br/>
 If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter `-walkDirectory` must be set. If walk generation parameters are specified, they are ignored.
 - `-sample` (default: `0.0`)<br/>
-
+The threshold for configuring which higher-frequency words are randomly downsampled, a useful range is, according to the gensim framework, (0, 1e-5).
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.
@@ -82,6 +82,25 @@ use the following command to generate this file:
 ```
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
+
+#### Analyzing the Embedding Vocabulary
+For RDF2Vec, it is not always guaranteed that all concepts in the graph appear in the embedding space. For example,
+some concepts may only appear in the object position of statements and may never be reached by random walks.
+In addition, the word2vec configuration parameters may filter out infrequent words depending on the configuration (see
+`-minCount` above, for example). To analyze such rather seldom cases, you can use the `-analyzeVocab` function specified
+as follows:
+
+```
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -analyzeVocab <model> <training_file|entity_file>
+```
+- `<model>` refers to any model representation such as gensim model file, `.kv` file, or `.txt` file. Just make sure
+you use the correct file endings.
+  
+- `<training_file|entity_file>` refers either to the NT/TTL etc. file that has been used to train the model *or* to a 
+text file containing the concepts you want to check (one concept per line in the text file, make sure the file ending is 
+`.txt`).
+  
+A report will be printed. For large models, you may want to redirect that into a file (`[...] &> somefile.txt)`.
 
 ## How to use the jRDF2Vec as library in Java projects?
 Stable releases are available through the maven central repository:

@@ -96,9 +96,11 @@ public class VocabularyAnalyzer {
      * @param filePathToTripleFile File path to the file with which the model has been trained.
      * @return Result of the analysis.
      */
-    public VocabularyAnalysisResult analyze(String filePathToModel, String filePathToTripleFile){
-        VocabularyAnalysisResult result = new VocabularyAnalysisResult();
+    public static VocabularyAnalyzerResult analyze(String filePathToModel, String filePathToTripleFile){
+        VocabularyAnalyzerResult result = new VocabularyAnalyzerResult();
+
         Pair<IParser, EntitySelector> parserPair = ParserManager.parseSingleFile(filePathToTripleFile);
+
         if(parserPair.getValue0().getClass() == HdtParser.class){
             LOGGER.error("Analysis is not implemented for HDT parser!");
             return result;
@@ -106,7 +108,6 @@ public class VocabularyAnalyzer {
         Triplet<Set<String>, Integer, Boolean> readInfo = getModelVocabulary(filePathToModel);
         result.setDimension(readInfo.getValue1());
         result.setDimensionConsistent(readInfo.getValue2());
-
 
         Set<String> conceptsInModel = readInfo.getValue0();
         MemoryParser parser = (MemoryParser) parserPair.getValue0();
@@ -124,20 +125,15 @@ public class VocabularyAnalyzer {
         objectsNotFound.removeAll(conceptsInModel);
         result.setObjectsNotFound(objectsNotFound);
 
-        Set<String> additionalSubjects = new HashSet<>(conceptsInModel);
-        additionalSubjects.removeAll(triples.getUniqueSubjects());
-        result.setAdditionalSubjects(additionalSubjects);
+        Set<String> additionalConcepts = new HashSet<>(conceptsInModel);
+        additionalConcepts.removeAll(triples.getUniqueSubjects());
+        additionalConcepts.removeAll(triples.getUniquePredicates());
+        additionalConcepts.removeAll(triples.getUniqueObjects());
 
-        Set<String> additionalPredicates = new HashSet<>(conceptsInModel);
-        additionalPredicates.removeAll(triples.getUniquePredicates());
-        result.setAdditionalPredicates(additionalPredicates);
-
-        Set<String> additionalObjects = new HashSet<>(conceptsInModel);
-        additionalObjects.removeAll(triples.getUniqueObjects());
-        result.setAdditionalObjects(additionalObjects);
-
+        result.setAllAdditional(additionalConcepts);
         return result;
     }
+
 
     /**
      * Read the complete vocabulary from the specified file.
@@ -171,14 +167,22 @@ public class VocabularyAnalyzer {
         if(modelFile.getAbsolutePath().endsWith(".txt")){
             return readTextVectorFile(modelFile);
         } else {
-            result.setAt0(Gensim.getInstance().getVocabularyTerms(modelFile.getAbsolutePath()));
-            if(result.getValue0().size() > 1){
-                String firstConcept = result.getValue0().stream().findFirst().get();
-                result.setAt1(Gensim.getInstance().getVector(firstConcept, modelFile.getAbsolutePath()));
-                result.setAt2(true);
+            Set<String> vocab = Gensim.getInstance().getVocabularyTerms(modelFile.getAbsolutePath());
+            if(vocab != null) {
+                result = result.setAt0(vocab);
+                System.out.println(result.getValue0());
+                if (result.getValue0().size() > 1) {
+                    String firstConcept = result.getValue0().stream().findFirst().get();
+                    result = result.setAt1(Gensim.getInstance().getVector(firstConcept, modelFile.getAbsolutePath()).length);
+                    result = result.setAt2(true);
+                } else {
+                    result = result.setAt1(-1);
+                    result = result.setAt2(false);
+                }
             } else {
-                result.setAt1(-1);
-                result.setAt2(false);
+                // vocab is null
+                result = result.setAt1(-1);
+                result = result.setAt2(false);
             }
             return result;
         }
