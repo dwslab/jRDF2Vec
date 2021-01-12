@@ -96,6 +96,16 @@ public class Main {
     private static double sample = Word2VecConfiguration.SAMPLE_DEFAULT;
 
     /**
+     * Epochs parameter.
+     */
+    private static int epochs = Word2VecConfiguration.EPOCHS_DEFAULT;
+
+    /**
+     * Window parameter.
+     */
+    private static int window = Word2VecConfiguration.WINDOW_SIZE_DEFAULT;
+
+    /**
      * If true, only walks are generated and no embeddings are trained.
      * This can be beneficial when multiple configurations (e.g. SG and CBOW) shall be trained for only one set of walks.
      */
@@ -256,9 +266,9 @@ public class Main {
         }
         System.out.println("Generating " + numberOfWalks + " walks per entity.");
 
-        String resourcesDirectroyPath = getValue("-serverResourcesDir", args);
-        if (resourcesDirectroyPath != null) {
-            File f = new File(resourcesDirectroyPath);
+        String resourcesDirectoryPath = getValue("-serverResourcesDir", args);
+        if (resourcesDirectoryPath != null) {
+            File f = new File(resourcesDirectoryPath);
             if (f.isDirectory()) {
                 resourcesDirectory = f;
             } else {
@@ -286,6 +296,26 @@ public class Main {
             }
         } else sample = Word2VecConfiguration.SAMPLE_DEFAULT;
 
+        String epochsString = getValue("-epochs", args);
+        if(epochsString != null) {
+            try {
+                epochs = Integer.parseInt(epochsString);
+            } catch (NumberFormatException nfe) {
+                System.out.println("Could not parse the epochs parameter. Using default (" + Word2VecConfiguration.EPOCHS_DEFAULT + ").");
+                epochs = Word2VecConfiguration.EPOCHS_DEFAULT;
+            }
+        }
+
+        String windowString = getValue("-window", args);
+        if(windowString != null){
+            try {
+                window = Integer.parseInt(windowString);
+            } catch (NumberFormatException nfe){
+                System.out.println("Could not parse the window parameter. Using default (" + Word2VecConfiguration.WINDOW_SIZE_DEFAULT + ").");
+                window = Word2VecConfiguration.WINDOW_SIZE_DEFAULT;
+            }
+        }
+
         if(containsIgnoreCase("-noVectorTextFileGeneration", args)){
             isVectorTextFileGeneration = false;
         } else if(containsIgnoreCase("-vectorTextFileGeneration", args)){
@@ -309,6 +339,12 @@ public class Main {
 
         // setting minCount
         if (minCount > 0) configuration.setMinCount(minCount);
+
+        // setting epochs
+        if(epochs > 0) configuration.setEpochs(epochs);
+
+        // setting the window
+        if(window > 0) configuration.setWindowSize(window);
 
         // set sample
         configuration.setSample(sample);
@@ -629,52 +665,93 @@ public class Main {
                 "Required Parameters:\n\n" +
                 "    -graph <graph_file>\n" +
                 "    The file containing the knowledge graph for which you want to generate embeddings.\n\n" +
+
                 "Optional Parameters:\n\n" +
-                "    -light <entity_file>\n" +
-                "    If you intend to use RDF2Vec Light, you have to use this switch followed by the file path ot the describing the entities for which you require an embedding space. The file should contain one entity (full URI) per line.\n\n" +
                 "    -onlyWalks\n" +
-                "    If added to the call, this switch will deactivate the training part so that only walks are generated. If training parameters are specified, they are ignored. The walk generation also works with the `-light` parameter.\n\n" +
-                "    -threads <number_of_threads> (default: (# of available processors) / 2)\n" +
-                "    This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.\n\n" +
-                "    -dimension <size_of_vector> (default: 200)\n" +
-                "    This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).\n\n" +
-                "    -depth <depth> (default: 4)\n" +
-                "    This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you can also set an odd number. A depth of 1 leads to a sentence in the form <s p o>.\n\n" +
-                "    -trainingMode <cbow|sg> (default: sg)\n" +
-                "    This parameter controls the mode to be used for the word2vec training. Allowed values are cbow and sg.\n\n" +
+                "    If added to the call, this switch will deactivate the training part so that only walks are generated. \n" +
+                "    If training parameters are specified, they are ignored. The walk generation also works with the\n" +
+                "    `-light` parameter.\n\n" +
+
+                "    -light <entity_file>\n" +
+                "    If you intend to use RDF2Vec Light, you have to use this switch followed by the file path ot the\n" +
+                "    describing the entities for which you require an embedding space. The file should contain one\n" +
+                "    entity (full URI) per line.\n\n" +
+
                 "    -numberOfWalks <number> (default: 100)\n" +
                 "    The number of walks to be performed per entity.\n\n" +
-                "    -minCount <number> (default: 1)\n" +
-                "    The minimum word count for the training. Unlike in the gensim defaults, this parameter is set to 1 because for KG embeddings, a vector for each node/arc is desired.\n\n" +
-                "    -noVectorTextFileGeneration | -vectorTextFileGeneration\n" +
-                "    A switch that indicates whether a text file with the vectors shall be persisted on the disk. This is enabled by default. Use -noVectorTextFileGeneration to disable the file generation.\n\n" +
-                "    -walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE> (default for light: MID_WALKS, default for classic: RANDOM_WALKS_DUPLICATE_FREE)\n" +
-                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms are available). Reasonable defaults are set.\n\n" +
-                "    -walkDirectory <directory where walk files shall be generated/reside>\n" +
-                "    The directory where the walks shall be generated into. In case of -onlyTraining, the directory where the walks reside.\n\n" +
-                "    -onlyTraining\n" +
-                "    If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter -walkDirectory must be set. If walk generation parameters are specified, they are ignored.\n\n" +
-                "    -sample (default: 0)\n" +
-                "    The threshold for configuring which higher-frequency words are randomly down-sampled, a useful range is (0, 0.00001).\n\n\n" +
 
+                "    -depth <depth> (default: 4)\n" +
+                "    This parameter controls the depth of each walk. Depth is defined as the number of hops. Hence, you\n" +
+                "    can also set an odd number. A depth of 1 leads to a sentence in the form <s p o>.\n\n" +
+
+                "    -walkGenerationMode <MID_WALKS | MID_WALKS_DUPLICATE_FREE | RANDOM_WALKS | RANDOM_WALKS_DUPLICATE_FREE>\n" +
+                "    (default for light: MID_WALKS, default for classic: RANDOM_WALKS_DUPLICATE_FREE)\n" +
+                "    This parameter determines the mode for the walk generation (multiple walk generation algorithms\n" +
+                "    are available). Reasonable defaults are set.\n\n" +
+
+                "    -threads <number_of_threads> (default: (# of available processors) / 2)\n" +
+                "    This parameter allows you to set the number of threads that shall be used for the walk generation\n" +
+                "    as well as for the training.\n\n" +
+
+                "    -walkDirectory <directory where walk files shall be generated/reside>\n" +
+                "    The directory where the walks shall be generated into. In case of -onlyTraining, the directory\n" +
+                "    where the walks reside.\n\n" +
+
+                "    -onlyTraining\n" +
+                "    If added to the call, this switch will deactivate the walk generation part so that only the training\n" +
+                "    is performed. The parameter -walkDirectory must be set. If walk generation parameters are specified,\n" +
+                "    they are ignored.\n\n" +
+
+                "    -trainingMode <cbow|sg> (default: sg)\n" +
+                "    This parameter controls the mode to be used for the word2vec training. Allowed values are cbow and sg.\n\n" +
+
+                "    -dimension <size_of_vector> (default: 200)\n" +
+                "    This parameter allows you to control the size of the resulting vectors (e.g. 100 for 100-dimensional vectors).\n\n" +
+
+                "    -minCount <number> (default: 1)\n" +
+                "    The minimum word count for the training. Unlike in the gensim defaults, this parameter is set to 1\n" +
+                "    because for KG embeddings, a vector for each node/arc is desired.\n\n" +
+
+                "    -noVectorTextFileGeneration | -vectorTextFileGeneration\n" +
+                "    A switch that indicates whether a text file with the vectors shall be persisted on the disk. This\n" +
+                "    is enabled by default. Use -noVectorTextFileGeneration to disable the file generation.\n\n" +
+
+                "    -sample <number> (default: 0)\n" +
+                "    The threshold for configuring which higher-frequency words are randomly down-sampled, a useful \n" +
+                "    range is (0, 0.00001).\n\n" +
+
+                "    -window <number> (default: 5)\n" +
+                "    The window size to be used for the word2vec algorithm component.\n\n" +
+
+                "    -epochs <number> (default: 5)\n" +
+                "    The epochs for the training.\n\n" +
+
+                "\n" +
 
                 "Additional Services\n" +
                 "-------------------\n\n" +
 
                 "A) Generation of Text Vector File\n" +
-                "   jRDF is compatible with the evaluation framework for KG embeddings (GEval). This framework requires the vectors to be present in a text file. If you have a gensim model or vector file, you can use the following parameter to generate this file:\n\n" +
+                "   jRDF is compatible with the evaluation framework for KG embeddings (GEval). This framework requires\n" +
+                "   the vectors to be present in a text file. If you have a gensim model or vector file, you can use the\n" +
+                "   following parameter to generate this file:\n\n" +
                 "       -generateTextVectorFile <model_or_vector_file>\n" +
-                "        The file path to the model or vector file that shall be used to write the vectors in a text file needs to be specified.\n\n" +
+                "        The file path to the model or vector file that shall be used to write the vectors in a text\n" +
+                "        file needs to be specified.\n\n" +
                 "B) Analysis of the Vocabulary\n" +
                 "   For RDF2Vec, it is not always guaranteed that all concepts in the graph appear in the embedding space.\n" +
-                "   For example, some concepts may only appear in the object position of statements and may never be reached by random walks.\n" +
-                "   In addition, the word2vec configuration parameters may filter out infrequent words depending on the configuration (see\n" +
-                "   -minCount above, for example). To analyze such rather seldom cases, you can use the `-analyzeVocab` function specified\n" +
-                "   as follows:\n\n" +
+                "   For example, some concepts may only appear in the object position of statements and may never be\n" +
+                "   reached by random walks. In addition, the word2vec configuration parameters may filter out infrequent\n" +
+                "   words depending on the configuration (see -minCount above, for example). To analyze such rather \n" +
+                "   seldom cases, you can use the `-analyzeVocab` function specified as follows:\n\n" +
                 "       -analyzeVocab <model> <training_file|entity_file>\n" +
-                "       where <model> refers to any model representation such as gensim model file, .kv file, or .txt file. Just make sure you use the correct file endings.\n" +
-                "       where <training_file|entity_file> refers either to the NT/TTL etc. file that has been used to train the model or to a text file containing the concepts you \n" +
-                "       want to check (one concept per line in the text file, make sure the file ending is .txt).";
+                "       where <model>\n" +
+                "          refers to any model representation such as gensim model file, .kv file, or .txt file\n" +
+                "          Just make sure you use the correct file endings.\n" +
+                "       where <training_file|entity_file>\n" +
+                "          refers either to the NT/TTL etc. file that has been used to train the model or to a text file.\n" +
+                "          containing the concepts you  want to check (one concept per line in the text file, make sure\n" +
+                "          the file ending is .txt).";
     }
 
     /**
