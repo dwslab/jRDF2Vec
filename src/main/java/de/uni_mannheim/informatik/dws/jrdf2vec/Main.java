@@ -214,6 +214,17 @@ public class Main {
         walkDirectoryPath = (walkDirectoryPath == null) ? getValue("-walkDirectory", args) : walkDirectoryPath;
         if (walkDirectoryPath != null) {
             walkDirectory = new File(walkDirectoryPath);
+
+            // Check whether the specified directory exists. If it does not exist, try to make the directory.
+            if(!walkDirectory.exists()){
+                System.out.println("The specified walk directory does not exist. Trying to make the directory.");
+                if(!walkDirectory.mkdirs()){
+                    System.out.println("Failed to make new walk directory. Using default.");
+                    walkDirectory = null;
+                }
+            }
+
+            // Check whether the specified directory is a directory.
             if (!walkDirectory.isDirectory()) {
                 System.out.println("Walk directory is no directory! Using default.");
                 walkDirectory = null;
