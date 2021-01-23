@@ -39,7 +39,7 @@ public class NxParserTest {
     public static void testExecutionTtl(String filePath){
         try {
             TurtleParser nxp = new TurtleParser();
-            nxp.parse(new FileReader(new File(filePath)), new URI(("http://example.com")));
+            nxp.parse(new FileReader(filePath), new URI(("http://example.com")));
 
             for (Node[] nx : nxp) {
                 assertNotNull(nx[0]);

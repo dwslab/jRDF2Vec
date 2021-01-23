@@ -7,6 +7,7 @@ import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
+import org.semanticweb.yars.nx.parser.NxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +107,15 @@ class NxMemoryParserTest {
     }
 
     @Test
+    void setLinesToCheck(){
+        NxMemoryParser parser = new NxMemoryParser();
+        parser.setLinesToCheck(20);
+        assertEquals(20, parser.getLinesToCheck());
+        parser.setLinesToCheck(-1);
+        assertEquals(NxMemoryParser.DEFAULT_CHECK_LINES, parser.getLinesToCheck());
+    }
+
+    @Test
     public void generateMidWalkForEntity() {
         try {
             // prepare file
@@ -160,7 +170,7 @@ class NxMemoryParserTest {
             File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
             assertTrue(result.exists(), "Required resource not available.");
             return result;
-        } catch (URISyntaxException | MalformedURLException exception){
+        } catch (URISyntaxException | MalformedURLException | NullPointerException exception){
             exception.printStackTrace();
             fail("Could not load file.");
             return null;
