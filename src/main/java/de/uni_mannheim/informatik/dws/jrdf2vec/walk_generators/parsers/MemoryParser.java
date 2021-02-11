@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
@@ -39,10 +38,15 @@ public abstract class MemoryParser implements IParser {
     boolean isUnifyAnonymousNodes = false;
 
     /**
+     * By default false.
+     * TODO: Include in parsers which inherit!
+     */
+    boolean isParseDatatypeProperties = false;
+
+    /**
      * Function to transform URIs while parsing.
      */
     UnaryOperator<String> uriShortenerFunction;
-
 
     /**
      * Weighted mid walk: If there are more options to go forward, it is more likely to go forward.
@@ -81,7 +85,6 @@ public abstract class MemoryParser implements IParser {
      * @return One walk as list where each element is a walk component.
      */
     public List<String> generateWeightedMidWalkForEntity(String entity, int depth) {
-
         LinkedList<String> result = new LinkedList<>();
 
         String nextElementPredecessor = entity;
@@ -100,10 +103,10 @@ public abstract class MemoryParser implements IParser {
             double randomPickZeroOne = ThreadLocalRandom.current().nextDouble(0.0, 1.00000001);
 
             // predecessor candidates
-            List<Triple> candidatesPredecessor = data.getTriplesInvolvingObject(nextElementPredecessor);
+            List<Triple> candidatesPredecessor = data.getObjectTriplesInvolvingObject(nextElementPredecessor);
 
             // successor candidates
-            List<Triple> candidatesSuccessor = data.getTriplesInvolvingSubject(nextElementSuccessor);
+            List<Triple> candidatesSuccessor = data.getObjectTriplesInvolvingSubject(nextElementSuccessor);
 
             double numberOfPredecessors = 0.0;
             double numberOfSuccessors = 0.0;
@@ -127,7 +130,6 @@ public abstract class MemoryParser implements IParser {
                     result.addFirst(drawnTriple.subject);
                     nextElementPredecessor = drawnTriple.subject;
                 }
-
             } else {
                 // successor
                 if (candidatesSuccessor != null && candidatesSuccessor.size() > 0) {
@@ -142,7 +144,6 @@ public abstract class MemoryParser implements IParser {
         }
         return result;
     }
-
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
@@ -174,7 +175,6 @@ public abstract class MemoryParser implements IParser {
         return result;
     }
 
-
     /**
      * Walks of length 1, i.e., walks that contain only one node, are ignored.
      * @param entity The entity for which walks shall be generated.
@@ -193,7 +193,6 @@ public abstract class MemoryParser implements IParser {
         return result;
     }
 
-
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
      * @param numberOfWalks The number of walks to be generated.
@@ -204,7 +203,6 @@ public abstract class MemoryParser implements IParser {
     public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
         return convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
-
 
     /**
      * Given a list of walks where a walk is represented as a List of strings, this method will convert that
@@ -231,7 +229,6 @@ public abstract class MemoryParser implements IParser {
         return new ArrayList<>(uniqueSet);
     }
 
-
     /**
      * Generates a single walk for the given entity with the given depth.
      *
@@ -240,7 +237,6 @@ public abstract class MemoryParser implements IParser {
      * @return One walk as list where each element is a walk component.
      */
     public List<String> generateMidWalkForEntity(String entity, int depth) {
-
         LinkedList<String> result = new LinkedList<>();
 
         String nextElementPredecessor = entity;
@@ -260,7 +256,7 @@ public abstract class MemoryParser implements IParser {
 
             if (randomPickZeroOne == 0) {
                 // predecessor
-                List<Triple> candidates = data.getTriplesInvolvingObject(nextElementPredecessor);
+                List<Triple> candidates = data.getObjectTriplesInvolvingObject(nextElementPredecessor);
 
                 if (candidates != null && candidates.size() > 0) {
                     Triple drawnTriple = randomDrawFromList(candidates);
@@ -270,10 +266,9 @@ public abstract class MemoryParser implements IParser {
                     result.addFirst(drawnTriple.subject);
                     nextElementPredecessor = drawnTriple.subject;
                 }
-
             } else {
                 // successor
-                List<Triple> candidates = data.getTriplesInvolvingSubject(nextElementSuccessor);
+                List<Triple> candidates = data.getObjectTriplesInvolvingSubject(nextElementSuccessor);
                 if (candidates != null && candidates.size() > 0) {
                     Triple tripleToAdd = randomDrawFromList(candidates);
 
@@ -288,7 +283,6 @@ public abstract class MemoryParser implements IParser {
         return result;
     }
 
-
     /**
      * Draw a random value from a List. This method is thread-safe.
      *
@@ -301,7 +295,6 @@ public abstract class MemoryParser implements IParser {
         return listToDrawFrom.get(randomNumber);
     }
 
-
     /**
      * Obtain a triple for the given subject.
      *
@@ -311,7 +304,7 @@ public abstract class MemoryParser implements IParser {
     public Triple getRandomTripleForSubject(String subject) {
         if (subject == null) return null;
         subject = uriShortenerFunction.apply(removeTags(subject));
-        List<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
+        List<Triple> queryResult = data.getObjectTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
             return null;
@@ -320,7 +313,6 @@ public abstract class MemoryParser implements IParser {
         LOGGER.info("(" + Thread.currentThread().getName() + ") " + randomNumber);
         return queryResult.get(randomNumber);
     }
-
 
     /**
      * Generates duplicate-free walks for the given entity.
@@ -338,7 +330,7 @@ public abstract class MemoryParser implements IParser {
         for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
             // initialize with first node
             if (isFirstIteration) {
-                List<Triple> neighbours = data.getTriplesInvolvingSubject(entity);
+                List<Triple> neighbours = data.getObjectTriplesInvolvingSubject(entity);
                 if (neighbours == null || neighbours.size() == 0) {
                     return result;
                 }
@@ -357,7 +349,7 @@ public abstract class MemoryParser implements IParser {
                 for (List<Triple> walk : walks_tmp) {
                     // get last entity
                     Triple lastTriple = walk.get(walk.size() - 1);
-                    List<Triple> nextIteration = data.getTriplesInvolvingSubject(lastTriple.object);
+                    List<Triple> nextIteration = data.getObjectTriplesInvolvingSubject(lastTriple.object);
                     if (nextIteration != null) {
                         walks.remove(walk); // check whether this works
                         for (Triple nextStep : nextIteration) {
@@ -397,7 +389,6 @@ public abstract class MemoryParser implements IParser {
         return result;
     }
 
-
     /**
      * Returns true if the given parameter follows the schema of an anonymous node
      *
@@ -411,7 +402,6 @@ public abstract class MemoryParser implements IParser {
         } else return false;
     }
 
-
     /**
      * Faster version of {@link NtMemoryParser#getRandomTripleForSubject(String)}.
      * Note that there cannot be any leading less-than or trailing greater-than signs around the subject.
@@ -422,7 +412,7 @@ public abstract class MemoryParser implements IParser {
      */
     public Triple getRandomTripleForSubjectWithoutTags(String subject) {
         if (subject == null) return null;
-        List<Triple> queryResult = data.getTriplesInvolvingSubject(subject);
+        List<Triple> queryResult = data.getObjectTriplesInvolvingSubject(subject);
         if (queryResult == null) {
             // no triple found
             return null;
@@ -445,7 +435,6 @@ public abstract class MemoryParser implements IParser {
         return stringToBeEdited;
     }
 
-
     // getters and setters below
 
     public boolean isIncludeDatatypeProperties() {
@@ -467,6 +456,6 @@ public abstract class MemoryParser implements IParser {
     public long getDataSize(){
         if (data == null) {
             return 0L;
-        } else return data.getSize();
+        } else return data.getObjectTripleSize();
     }
 }

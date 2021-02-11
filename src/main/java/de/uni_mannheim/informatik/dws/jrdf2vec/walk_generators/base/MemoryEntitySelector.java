@@ -18,6 +18,6 @@ public class MemoryEntitySelector implements EntitySelector {
 
     @Override
     public Set<String> getEntities() {
-        return data.getUniqueSubjects();
+        return data.getUniqueObjectTripleSubjects();
     }
 }

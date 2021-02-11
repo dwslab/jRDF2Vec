@@ -2,7 +2,6 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.riot.Lang;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +9,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.RandomW
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,7 +51,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     private boolean parserIsOk = true;
 
-
     /**
      * Constructor
      *
@@ -65,7 +61,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
         ((JenaOntModelMemoryParser) this.parser).readDataFromOntModel(ontModel);
         this.entitySelector = new MemoryEntitySelector(((JenaOntModelMemoryParser) parser).getData());
     }
-
 
     /**
      * Constructor
@@ -91,7 +86,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
         }
     }
 
-
     /**
      * Constructor
      *
@@ -100,7 +94,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
     public WalkGeneratorDefault(String pathToTripleFile) {
         this(new File(pathToTripleFile));
     }
-
 
     @Override
     public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {

@@ -1,7 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.IsearchCondition;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerator;
 import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +169,6 @@ public class NtMemoryParser extends MemoryParser {
         }
     }
 
-
     /**
      * A new thread will be opened for each file.
      *
@@ -181,7 +179,6 @@ public class NtMemoryParser extends MemoryParser {
     public void readNtTriplesFromDirectoryMultiThreaded(String pathToDirectory, boolean isWriteOptimizedFile) {
         this.readNtTriplesFromDirectoryMultiThreaded(new File(pathToDirectory), isWriteOptimizedFile);
     }
-
 
     /**
      * A new thread will be opened for each file.
@@ -240,7 +237,6 @@ public class NtMemoryParser extends MemoryParser {
         LOGGER.info("Data read.");
     }
 
-
     /**
      * Thread that allows concurrent file parsing (used for data sets that consist of multiple, potentially zipped
      * files).
@@ -272,7 +268,6 @@ public class NtMemoryParser extends MemoryParser {
         }
     }
 
-
     /**
      * Read the given nt file into memory. This method will add the data in the file to the existing {@link NtMemoryParser#data} store.
      *
@@ -283,7 +278,6 @@ public class NtMemoryParser extends MemoryParser {
         File fileToReadFrom = new File(pathToFile);
         readNTriples(fileToReadFrom, isGzippedFile);
     }
-
 
     /**
      * read form an optimized file.
@@ -309,14 +303,13 @@ public class NtMemoryParser extends MemoryParser {
                     String subject = parsed[0];
                     String predicate = parsed[1];
                     String object = parsed[2];
-                    data.add(subject, predicate, object);
+                    data.addObjectTriple(subject, predicate, object);
                 }
             }
         } catch (IOException ioe) {
             LOGGER.error("Could not initialize optimized reader for file " + fileToReadFrom.getName());
         }
     }
-
 
     /**
      * Read the given nt file into memory. This method will add the data in the file to the existing {@link NtMemoryParser#data} store.
@@ -329,7 +322,6 @@ public class NtMemoryParser extends MemoryParser {
             LOGGER.error("File does not exist. Cannot parse.");
             return;
         }
-
         BufferedWriter writer = null; // the writer used to write the optimized file
         if (isWriteOptimizedFile) {
             try {
@@ -392,7 +384,7 @@ public class NtMemoryParser extends MemoryParser {
                     String predicate = uriShortenerFunction.apply(removeTags(spo[1]).intern());
                     String object = uriShortenerFunction.apply(removeTags(spo[2])).intern();
 
-                    data.add(subject, predicate, object);
+                    data.addObjectTriple(subject, predicate, object);
 
                     if (isWriteOptimizedFile) {
                         writer.write(subject + " " + predicate + " " + object + "\n");
@@ -404,7 +396,7 @@ public class NtMemoryParser extends MemoryParser {
                     LOGGER.error("The problem occurred in the following line:\n" + readLine);
                 }
             } // end of while loop
-            LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.getSize() + " subjects loaded.");
+            LOGGER.info("File " + fileToReadFrom.getName() + " successfully read. " + data.getObjectTripleSize() + " subjects loaded.");
             if (isWriteOptimizedFile) {
                 writer.flush();
                 writer.close();
@@ -435,7 +427,6 @@ public class NtMemoryParser extends MemoryParser {
             stringToBeEdited = stringToBeEdited.substring(0, stringToBeEdited.length() - 1);
         return stringToBeEdited;
     }
-
 
     /**
      * Note that this function will overwrite the skip condition.

@@ -113,22 +113,22 @@ public class VocabularyAnalyzer {
         MemoryParser parser = (MemoryParser) parserPair.getValue0();
         TripleDataSetMemory triples = parser.getData();
 
-        Set<String> subjectsNotFound = new HashSet<>(triples.getUniqueSubjects());
+        Set<String> subjectsNotFound = new HashSet<>(triples.getUniqueObjectTripleSubjects());
         subjectsNotFound.removeAll(conceptsInModel);
         result.setSubjectsNotFound(subjectsNotFound);
 
-        Set<String> predicatesNotFound = new HashSet<>(triples.getUniquePredicates());
+        Set<String> predicatesNotFound = new HashSet<>(triples.getUniqueObjectTriplePredicates());
         predicatesNotFound.removeAll(conceptsInModel);
         result.setPredicatesNotFound(predicatesNotFound);
 
-        Set<String> objectsNotFound = new HashSet<>(triples.getUniqueObjects());
+        Set<String> objectsNotFound = new HashSet<>(triples.getUniqueObjectTripleObjects());
         objectsNotFound.removeAll(conceptsInModel);
         result.setObjectsNotFound(objectsNotFound);
 
         Set<String> additionalConcepts = new HashSet<>(conceptsInModel);
-        additionalConcepts.removeAll(triples.getUniqueSubjects());
-        additionalConcepts.removeAll(triples.getUniquePredicates());
-        additionalConcepts.removeAll(triples.getUniqueObjects());
+        additionalConcepts.removeAll(triples.getUniqueObjectTripleSubjects());
+        additionalConcepts.removeAll(triples.getUniqueObjectTriplePredicates());
+        additionalConcepts.removeAll(triples.getUniqueObjectTripleObjects());
 
         result.setAllAdditional(additionalConcepts);
         return result;
