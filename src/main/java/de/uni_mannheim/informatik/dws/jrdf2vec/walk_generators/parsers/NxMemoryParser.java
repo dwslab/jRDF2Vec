@@ -107,9 +107,12 @@ public class NxMemoryParser extends MemoryParser {
                 String subject, predicate, object;
                 for (Node[] nx : parser) {
 
-                    if(isIncludeDatatypeProperties() && nx[2].toString().startsWith("\"")){
+                    if(isParseDatatypeProperties && nx[2].toString().startsWith("\"")){
                         // the current triple is a datatype triple
-
+                        subject = uriShortenerFunction.apply(removeTags(nx[0].toString()));
+                        predicate = uriShortenerFunction.apply(removeTags(nx[1].toString()));
+                        object = nx[2].toString();
+                        data.addDatatypeTriple(subject, predicate, object);
 
                     } else if (nx[2].toString().startsWith("\"")) continue;
 

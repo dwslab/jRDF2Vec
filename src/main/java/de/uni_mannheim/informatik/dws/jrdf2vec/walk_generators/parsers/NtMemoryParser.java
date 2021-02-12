@@ -9,6 +9,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.T
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -41,29 +42,23 @@ public class NtMemoryParser extends MemoryParser {
     /**
      * Default Constructor
      */
-    public NtMemoryParser() {
+    public NtMemoryParser(){
+        this(false);
+    }
+
+    /**
+     * Constructor
+     * @param isParseDatatypeTriples True if datatype triples shall be parsed.
+     */
+    public NtMemoryParser(boolean isParseDatatypeTriples) {
         data = new TripleDataSetMemory();
 
-        skipCondition = new IsearchCondition() {
-            Pattern pattern = Pattern.compile("\".*\"");
-
-            @Override
-            public boolean isHit(String input) {
-                if (input.trim().startsWith("#")) return true; // just a comment line
-                if (input.trim().equals("")) return true; // empty line
-                Matcher matcher = pattern.matcher(input);
-                if (matcher.find()) return true;
-                return false;
-            }
-        };
+        // set parsing option:
+        this.isParseDatatypeProperties = !isParseDatatypeTriples; // yes, we need to set it this way to trigger initialization
+        setParseDatatypeProperties(isParseDatatypeTriples);
 
         // set default function (do nothing)
-        uriShortenerFunction = new UnaryOperator<String>() {
-            @Override
-            public String apply(String s) {
-                return s;
-            }
-        };
+        uriShortenerFunction = s -> s;
     }
 
 
@@ -99,7 +94,6 @@ public class NtMemoryParser extends MemoryParser {
         readNTriples(tripleFile, false);
     }
 
-
     /**
      * Constructor
      *
@@ -134,7 +128,6 @@ public class NtMemoryParser extends MemoryParser {
         }
     }
 
-
     /**
      * Read the given nt file into memory.
      *
@@ -143,7 +136,6 @@ public class NtMemoryParser extends MemoryParser {
     public void readNTriples(String pathToFile) {
         readNTriples(pathToFile, false);
     }
-
 
     /**
      * Will load all .nt and .gz files from the given directory.
@@ -172,7 +164,7 @@ public class NtMemoryParser extends MemoryParser {
     /**
      * A new thread will be opened for each file.
      *
-     * @param pathToDirectory The path to the directory in which the individual data files reside.
+     * @param pathToDirectory      The path to the directory in which the individual data files reside.
      * @param isWriteOptimizedFile Indicator whether an optimized file shall be written for quick parsing later on
      *                             (will be written in ./optimized/)
      */
@@ -183,7 +175,7 @@ public class NtMemoryParser extends MemoryParser {
     /**
      * A new thread will be opened for each file.
      *
-     * @param directoryOfDataSets The directory in which the individual data files reside.
+     * @param directoryOfDataSets  The directory in which the individual data files reside.
      * @param isWriteOptimizedFile Indicator whether an optimized file shall be written for quick parsing later on
      *                             (will be written in ./optimized/)
      */
@@ -281,6 +273,7 @@ public class NtMemoryParser extends MemoryParser {
 
     /**
      * read form an optimized file.
+     *
      * @param fileToReadFrom Optimized file.
      */
     public void readNTriplesOptimized(File fileToReadFrom) {
@@ -337,7 +330,6 @@ public class NtMemoryParser extends MemoryParser {
             }
         }
 
-        Pattern datatypePattern = Pattern.compile("\".*");
         try {
             BufferedReader reader;
             if (isGzippedFile) {
@@ -360,7 +352,8 @@ public class NtMemoryParser extends MemoryParser {
                     // remove the dot at the end of a statement
                     readLine = readLine.replaceAll("(?<=>)*[ ]*.[ ]*$", "");
 
-
+                    // legacy function:
+                    /*
                     if (isIncludeDatatypeProperties) {
                         datatypeMatcher = datatypePattern.matcher(readLine);
                         if (datatypeMatcher.find()) {
@@ -369,27 +362,37 @@ public class NtMemoryParser extends MemoryParser {
                             readLine = readLine.replace(datatypeValue, newDatatypeValue);
                         }
                     }
+                    */
 
                     String[] spo = readLine.split(" ");
-                    if (spo.length != 3) {
-                        LOGGER.error("Error in file " + fileToReadFrom.getName() + " in line " + lineNumber + " while parsing the following line:\n" + readLine + "\n Required tokens: 3\nActual tokens: " + spo.length);
-                        int i = 1;
-                        for (String token : spo) {
-                            LOGGER.error("Token " + i++ + ": " + token);
+                    if (isParseDatatypeProperties) {
+                        String subject = uriShortenerFunction.apply(removeTags(spo[0])).intern();
+                        String predicate = uriShortenerFunction.apply(removeTags(spo[1]).intern());
+                        String[]  objectTokens = Arrays.copyOfRange(spo, 2, spo.length);
+                        String object = String.join(" ", objectTokens);
+                        if (isWriteOptimizedFile) {
+                            writer.write(subject + " " + predicate + " " + object + "\n");
                         }
-                        LOGGER.error("Line is ignored. Parsing continues.");
-                        continue nextLine;
+                        data.addDatatypeTriple(subject, predicate, object);
+
+                    } else {
+                        if (spo.length != 3) {
+                            LOGGER.error("Error in file " + fileToReadFrom.getName() + " in line " + lineNumber + " while parsing the following line:\n" + readLine + "\n Required tokens: 3\nActual tokens: " + spo.length);
+                            int i = 1;
+                            for (String token : spo) {
+                                LOGGER.error("Token " + i++ + ": " + token);
+                            }
+                            LOGGER.error("Line is ignored. Parsing continues.");
+                            continue nextLine;
+                        }
+                        String subject = uriShortenerFunction.apply(removeTags(spo[0])).intern();
+                        String predicate = uriShortenerFunction.apply(removeTags(spo[1]).intern());
+                        String object = uriShortenerFunction.apply(removeTags(spo[2])).intern();
+                        data.addObjectTriple(subject, predicate, object);
+                        if (isWriteOptimizedFile) {
+                            writer.write(subject + " " + predicate + " " + object + "\n");
+                        }
                     }
-                    String subject = uriShortenerFunction.apply(removeTags(spo[0])).intern();
-                    String predicate = uriShortenerFunction.apply(removeTags(spo[1]).intern());
-                    String object = uriShortenerFunction.apply(removeTags(spo[2])).intern();
-
-                    data.addObjectTriple(subject, predicate, object);
-
-                    if (isWriteOptimizedFile) {
-                        writer.write(subject + " " + predicate + " " + object + "\n");
-                    }
-
                 } catch (Exception e) {
                     // it is important that the parsing continues no matter what happens
                     LOGGER.error("A problem occurred while parsing line number " + lineNumber + " of file " + fileToReadFrom.getName(), e);
@@ -433,16 +436,34 @@ public class NtMemoryParser extends MemoryParser {
      *
      * @param includeDatatypeProperties Indicator whether data type properties shall be included in the walk generation.
      */
-    public void setIncludeDatatypeProperties(boolean includeDatatypeProperties) {
+    @Override
+    public void setParseDatatypeProperties(boolean includeDatatypeProperties) {
+        // return if nothing changed:
+        if(isParseDatatypeProperties() == includeDatatypeProperties) return;
+
         LOGGER.warn("Overwriting skip condition.");
-        skipCondition = new IsearchCondition() {
-            @Override
-            public boolean isHit(String input) {
+
+        // from false to true:
+        if(includeDatatypeProperties) {
+            skipCondition = input -> {
                 if (input.trim().startsWith("#")) return true; // just a comment line
                 if (input.trim().equals("")) return true; // empty line
                 return false;
-            }
-        };
-        isIncludeDatatypeProperties = includeDatatypeProperties;
+            };
+        } else {
+            skipCondition = new IsearchCondition() {
+                Pattern pattern = Pattern.compile("\".*\"");
+
+                @Override
+                public boolean isHit(String input) {
+                    if (input.trim().startsWith("#")) return true; // just a comment line
+                    if (input.trim().equals("")) return true; // empty line
+                    Matcher matcher = pattern.matcher(input);
+                    if (matcher.find()) return true;
+                    return false;
+                }
+            };
+        }
+        super.isParseDatatypeProperties = includeDatatypeProperties;
     }
 }

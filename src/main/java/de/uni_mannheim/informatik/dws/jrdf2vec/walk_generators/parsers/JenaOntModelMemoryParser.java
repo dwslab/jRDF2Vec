@@ -69,9 +69,24 @@ public class JenaOntModelMemoryParser extends MemoryParser {
             Statement statement = iterator.nextStatement();
 
             // skip datatype properties
-            if(statement.getObject().isLiteral()){
-                continue;
-            }
+            if(isParseDatatypeProperties() && statement.getObject().isLiteral()) {
+                // handling of the subject
+                Resource subjectResource = statement.getSubject();
+                String subject = null;
+                if(subjectResource.isAnon()){
+                    subject = subjectResource.getId().toString();
+                } else {
+                    subject = statement.getSubject().getURI();
+                }
+
+                // handling of the predicate
+                String predicate = statement.getPredicate().getURI();
+
+                // handling of the (string) object
+                String object = statement.getObject().asLiteral().getLexicalForm();
+
+                data.addDatatypeTriple(subject, predicate, object);
+            } else if(statement.getObject().isLiteral()) continue;
 
             // handling of the subject
             Resource subjectResource = statement.getSubject();
@@ -82,9 +97,11 @@ public class JenaOntModelMemoryParser extends MemoryParser {
                 subject = statement.getSubject().getURI();
             }
 
+            // handling of the predicate
             String predicate = statement.getPredicate().getURI();
 
-            String object = null;
+            //  handling of the object
+            String object;
             RDFNode objectResource = statement.getObject();
             if(objectResource.isAnon()){
                 object = objectResource.asResource().getId().toString();

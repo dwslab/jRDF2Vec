@@ -26,12 +26,6 @@ public abstract class MemoryParser implements IParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MemoryParser.class);
 
     /**
-     * Include datatype properties into walk generation.
-     * Default false.
-     */
-    boolean isIncludeDatatypeProperties = false;
-
-    /**
      * Indicator whether anonymous nodes shall be handled as if they were just one node.
      * E.g. _:genid413438 is handled like -&gt; ANODE
      */
@@ -437,10 +431,6 @@ public abstract class MemoryParser implements IParser {
 
     // getters and setters below
 
-    public boolean isIncludeDatatypeProperties() {
-        return isIncludeDatatypeProperties;
-    }
-
     public boolean isUnifyAnonymousNodes() {
         return isUnifyAnonymousNodes;
     }
@@ -451,6 +441,14 @@ public abstract class MemoryParser implements IParser {
 
     public TripleDataSetMemory getData() {
         return data;
+    }
+
+    public boolean isParseDatatypeProperties() {
+        return isParseDatatypeProperties;
+    }
+
+    public void setParseDatatypeProperties(boolean parseDatatypeProperties) {
+        isParseDatatypeProperties = parseDatatypeProperties;
     }
 
     public long getDataSize(){
