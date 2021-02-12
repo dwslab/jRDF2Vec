@@ -54,7 +54,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     private boolean parserIsOk = true;
 
-
     /**
      * Constructor
      *
@@ -65,7 +64,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
         ((JenaOntModelMemoryParser) this.parser).readDataFromOntModel(ontModel);
         this.entitySelector = new MemoryEntitySelector(((JenaOntModelMemoryParser) parser).getData());
     }
-
 
     /**
      * Constructor

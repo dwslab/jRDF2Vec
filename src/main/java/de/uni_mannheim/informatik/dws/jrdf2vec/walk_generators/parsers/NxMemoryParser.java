@@ -39,7 +39,6 @@ public class NxMemoryParser extends MemoryParser {
      */
     private int linesToCheck = DEFAULT_CHECK_LINES;
 
-
     /**
      * Constructor
      */
@@ -112,7 +111,13 @@ public class NxMemoryParser extends MemoryParser {
                 parser.parse(new FileInputStream(fileToReadFrom));
                 String subject, predicate, object;
                 for (Node[] nx : parser) {
-                    if (nx[2].toString().startsWith("\"")) continue;
+
+                    if(isIncludeDatatypeProperties() && nx[2].toString().startsWith("\"")){
+                        // the current triple is a datatype triple
+
+
+                    } else if (nx[2].toString().startsWith("\"")) continue;
+
                     subject = uriShortenerFunction.apply(removeTags(nx[0].toString()));
                     predicate = uriShortenerFunction.apply(removeTags(nx[1].toString()));
                     object = uriShortenerFunction.apply(removeTags(nx[2].toString()));

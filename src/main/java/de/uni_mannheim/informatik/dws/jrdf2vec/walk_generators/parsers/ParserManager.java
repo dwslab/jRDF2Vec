@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getDeltaTimeString;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.readOntology;
 
 /**
