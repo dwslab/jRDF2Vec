@@ -140,7 +140,6 @@ public abstract class WalkGenerator implements IWalkGenerator {
         this.close();
     }
 
-
     /**
      * Generate walks for the entities.
      *
@@ -180,7 +179,6 @@ public abstract class WalkGenerator implements IWalkGenerator {
         this.close();
     }
 
-
     /**
      * Generate walks for the entities.
      *
@@ -219,7 +217,6 @@ public abstract class WalkGenerator implements IWalkGenerator {
         }
         this.close();
     }
-
 
     /**
      * Generate walks for the entities that are free of duplicates (i.e., no walk exists twice in the resulting file).
@@ -340,10 +337,6 @@ public abstract class WalkGenerator implements IWalkGenerator {
         }
     }
 
-
-
-
-
     /**
      * Close resources.
      */
@@ -356,5 +349,4 @@ public abstract class WalkGenerator implements IWalkGenerator {
             LOGGER.error("There was an error when closing the writer.", ioe);
         }
     }
-
 }

@@ -22,6 +22,7 @@ import java.util.function.UnaryOperator;
  */
 public class NxMemoryParser extends MemoryParser {
 
+
     /**
      * Default logger
      */
@@ -44,12 +45,7 @@ public class NxMemoryParser extends MemoryParser {
      */
     public NxMemoryParser() {
         data = new TripleDataSetMemory();
-        uriShortenerFunction = new UnaryOperator<String>() {
-            @Override
-            public String apply(String s) {
-                return s;
-            }
-        };
+        uriShortenerFunction = s -> s;
     }
 
     /**
@@ -90,7 +86,6 @@ public class NxMemoryParser extends MemoryParser {
         readNtriples(nTripleFile);
     }
 
-
     /**
      * Read n-triples from the given file.
      *
@@ -121,7 +116,7 @@ public class NxMemoryParser extends MemoryParser {
                     subject = uriShortenerFunction.apply(removeTags(nx[0].toString()));
                     predicate = uriShortenerFunction.apply(removeTags(nx[1].toString()));
                     object = uriShortenerFunction.apply(removeTags(nx[2].toString()));
-                    data.add(subject, predicate, object);
+                    data.addObjectTriple(subject, predicate, object);
                 }
             } catch (FileNotFoundException fnfe) {
                 LOGGER.error("Could not find file " + fileToReadFrom.getAbsolutePath(), fnfe);

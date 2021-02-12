@@ -205,7 +205,6 @@ class MainTest {
         }
     }
 
-
     @Test
     public void analyzeVocabFail(){
         // just making sure nothing fails

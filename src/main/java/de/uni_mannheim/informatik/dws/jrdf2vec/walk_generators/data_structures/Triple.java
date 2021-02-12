@@ -1,5 +1,8 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures;
 
+/**
+ * Data structure for a triple whereby the object can be a string or a URI.
+ */
 public class Triple {
 
     /**
@@ -30,5 +33,4 @@ public class Triple {
     public int hashCode(){
         return (subject + "_1").hashCode() + (predicate + "_2").hashCode() + (object + "_2").hashCode();
     }
-
 }

@@ -18,9 +18,9 @@ class JenaOntModelMemoryParserTest {
         File ontologyTestFile = loadFile("pizza.owl.xml");
         JenaOntModelMemoryParser parser = new JenaOntModelMemoryParser();
         parser.readDataFromFile(ontologyTestFile);
-        assertTrue(parser.getData().getSize() > 100);
+        assertTrue(parser.getData().getObjectTripleSize() > 100);
 
-        List<Triple> triplesForArtichokeTopping = parser.getData().getTriplesInvolvingSubject("http://www.co-ode.org/ontologies/pizza/pizza.owl#ArtichokeTopping");
+        List<Triple> triplesForArtichokeTopping = parser.getData().getObjectTriplesInvolvingSubject("http://www.co-ode.org/ontologies/pizza/pizza.owl#ArtichokeTopping");
         assertTrue(triplesForArtichokeTopping.size() > 0);
         boolean found = false;
         for (Triple triple : triplesForArtichokeTopping){

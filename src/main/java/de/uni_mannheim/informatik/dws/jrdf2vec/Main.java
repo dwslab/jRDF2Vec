@@ -127,6 +127,12 @@ public class Main {
     private static HashSet<String> ignoredArguments;
 
     /**
+     * If true, text will be included in the embeddings.
+     * This is an extension to RDF2vec classic, therefore it is false by default.
+     */
+    private static boolean isEmbedText = false;
+
+    /**
      * The main method that is executed when running the JAR.
      * @param args All the options for walk generation and training. Run with -help in order to get an overview.
      */
@@ -164,6 +170,10 @@ public class Main {
                 generateTextVectorFile(transformationSource);
                 return;
             }
+        }
+
+        if(containsIgnoreCase("-embedText", args) || containsIgnoreCase("-text", args) || containsIgnoreCase("--embedText", args)){
+            isEmbedText = true;
         }
 
         if(containsIgnoreCase("-onlyTraining", args)){

@@ -92,7 +92,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
                 object = statement.getObject().asResource().getURI();
             }
 
-            data.add(new Triple(subject, predicate, object));
+            data.addObjectTriple(new Triple(subject, predicate, object));
         }
     }
 
