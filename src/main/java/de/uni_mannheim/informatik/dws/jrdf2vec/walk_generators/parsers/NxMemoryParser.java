@@ -89,6 +89,15 @@ public class NxMemoryParser extends MemoryParser {
     /**
      * Read n-triples from the given file.
      *
+     * @param filePathToReadFrom File from which will be read.
+     */
+    public void readNTriples(String filePathToReadFrom){
+        readNtriples(new File(filePathToReadFrom));
+    }
+
+    /**
+     * Read n-triples from the given file.
+     *
      * @param fileToReadFrom File from which will be read.
      */
     public void readNtriples(File fileToReadFrom) {
@@ -111,7 +120,7 @@ public class NxMemoryParser extends MemoryParser {
                         // the current triple is a datatype triple
                         subject = uriShortenerFunction.apply(removeTags(nx[0].toString()));
                         predicate = uriShortenerFunction.apply(removeTags(nx[1].toString()));
-                        object = nx[2].toString();
+                        object = getTextProcessingFunction().apply(nx[2].toString());
                         data.addDatatypeTriple(subject, predicate, object);
 
                     } else if (nx[2].toString().startsWith("\"")) continue;

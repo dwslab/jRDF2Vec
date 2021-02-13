@@ -1,5 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -176,4 +180,28 @@ class NxMemoryParserTest {
         }
     }
 
+    @Test
+    void testDatatypeTripleParsing(){
+        NxMemoryParser parser = new NxMemoryParser();
+        parser.setParseDatatypeProperties(true);
+        assertTrue(parser.isParseDatatypeProperties);
+        parser.readNtriples(loadFile("dummyGraph_with_labels.nt"));
+        TripleDataSetMemory result = parser.getData();
+        assertNotNull(result);
+        Map<String, Set<String>> datatypeTuplesForW = result.getDatatypeTuplesForSubject("W");
+        assertEquals(2, datatypeTuplesForW.size());
+        assertFalse(datatypeTuplesForW.containsKey("P7"));
+        assertTrue(datatypeTuplesForW.containsKey("rdfs:label"));
+        assertTrue(datatypeTuplesForW.containsKey("rdf:Description"));
+
+        // make sure we only parse if the mode is true
+        parser = new NxMemoryParser();
+        parser.setParseDatatypeProperties(false);
+        assertFalse(parser.isParseDatatypeProperties());
+        parser.readNTriples(loadFile("dummyGraph_with_labels.nt").getAbsolutePath());
+        result = parser.getData();
+        assertEquals(0, result.getUniqueDatatypeTripleSubjects().size());
+        assertTrue(result.getAllObjectTriples().contains(new Triple("W","P7", "V2")));
+        assertFalse(result.getUniqueObjectTriplePredicates().contains("rdfs:label"));
+    }
 }
