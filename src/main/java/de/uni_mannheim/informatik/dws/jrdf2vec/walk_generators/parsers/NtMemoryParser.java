@@ -54,8 +54,7 @@ public class NtMemoryParser extends MemoryParser {
         data = new TripleDataSetMemory();
 
         // set parsing option:
-        this.isParseDatatypeProperties = !isParseDatatypeTriples; // yes, we need to set it this way to trigger initialization
-        setParseDatatypeProperties(isParseDatatypeTriples);
+        setParseDatatypePropertiesNoCheck(isParseDatatypeTriples);
 
         // set default function (do nothing)
         uriShortenerFunction = s -> s;
@@ -365,11 +364,11 @@ public class NtMemoryParser extends MemoryParser {
                     */
 
                     String[] spo = readLine.split(" ");
-                    if (isParseDatatypeProperties) {
+                    if (isParseDatatypeProperties && spo[2].startsWith("\"")) {
                         String subject = uriShortenerFunction.apply(removeTags(spo[0])).intern();
                         String predicate = uriShortenerFunction.apply(removeTags(spo[1]).intern());
                         String[]  objectTokens = Arrays.copyOfRange(spo, 2, spo.length);
-                        String object = String.join(" ", objectTokens);
+                        String object = textProcessingFunction.apply(String.join(" ", objectTokens));
                         if (isWriteOptimizedFile) {
                             writer.write(subject + " " + predicate + " " + object + "\n");
                         }
@@ -440,9 +439,15 @@ public class NtMemoryParser extends MemoryParser {
     public void setParseDatatypeProperties(boolean includeDatatypeProperties) {
         // return if nothing changed:
         if(isParseDatatypeProperties() == includeDatatypeProperties) return;
-
         LOGGER.warn("Overwriting skip condition.");
+        setParseDatatypePropertiesNoCheck(includeDatatypeProperties);
+    }
 
+    /**
+     * Overwrite the skip condition without checking for current state.
+     * @param includeDatatypeProperties Indicator whether data type properties shall be included in the walk generation.
+     */
+    private void setParseDatatypePropertiesNoCheck(boolean includeDatatypeProperties){
         // from false to true:
         if(includeDatatypeProperties) {
             skipCondition = input -> {

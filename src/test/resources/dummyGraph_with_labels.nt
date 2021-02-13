@@ -1,0 +1,41 @@
+# Graph 1
+<A> <P1> <B> .
+<B> <P2> <C> .
+<C> <P3> <D> .
+<A> <P4> <E> .
+<E> <P5> <D> .
+<E> <P6> <F> .
+
+# Graph 2
+<Z> <P7> <Y1> .
+<Z> <P7> <Y2> .
+<Z> <P7> <Y3> .
+<Z> <P7> <Y4> .
+<Z> <P7> <Y5> .
+<Y1> <P8> <X1> .
+<Y2> <P8> <X2> .
+<Y3> <P8> <X3> .
+<Y4> <P8> <X4> .
+<Y5> <P8> <X5> .
+
+
+# Graph 3
+<W> <P7> <V1> .
+<W> <P7> <V2> .
+<W> <P7> <V3> .
+<W> <P7> <V4> .
+<W> <P7> <V5> .
+<W> <P7> <V6> .
+<W> <P7> <V7> .
+<V1> <P8> <U1> .
+<V2> <P8> <U2> .
+<V3> <P8> <U3> .
+<V4> <P8> <U4> .
+<V5> <P8> <U5> .
+
+# labels
+<W> <rdfs:label> "Gedichte"@de .
+<W> <rdf:Description> "Freude schöner Götterfunken, Tochter aus Elysium, wir betreten feuertrunken, Himmlische, dein Heiligtum! Deine Zauber binden wieder was die Mode streng geteilt. Alle Menschen werden Brüder, wo dein sanfter Flügel weilt." .
+<W> <rdf:Description> "Wer reitet so spät durch Nacht und Wind? Es ist der Vater mit seinem Kind; er hat den Knaben wohl in dem Arm, er fasst ihn sicher, er hält in warm."
+<V1> <http://www.example.de/amount> "1"^<http://www.w3.org/2001/XMLSchema#nonNegativeInteger> .
+<V1> <http://www.example.de/price> "10.55"^^xsd:double .

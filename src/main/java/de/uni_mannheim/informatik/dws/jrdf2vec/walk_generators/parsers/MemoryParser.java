@@ -43,6 +43,11 @@ public abstract class MemoryParser implements IParser {
     UnaryOperator<String> uriShortenerFunction;
 
     /**
+     * Function to transform data type text.
+     */
+    UnaryOperator<String> textProcessingFunction = new TextProcessor();
+
+    /**
      * Weighted mid walk: If there are more options to go forward, it is more likely to go forward.
      * @param entity The entity for which walks shall be generated.
      * @param depth The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
@@ -455,5 +460,13 @@ public abstract class MemoryParser implements IParser {
         if (data == null) {
             return 0L;
         } else return data.getObjectTripleSize();
+    }
+
+    public UnaryOperator<String> getTextProcessingFunction() {
+        return textProcessingFunction;
+    }
+
+    public void setTextProcessingFunction(UnaryOperator<String> textProcessingFunction) {
+        this.textProcessingFunction = textProcessingFunction;
     }
 }
