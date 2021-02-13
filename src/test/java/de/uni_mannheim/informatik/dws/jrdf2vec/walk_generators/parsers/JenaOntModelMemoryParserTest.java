@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.Triple;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,4 +53,29 @@ class JenaOntModelMemoryParserTest {
             return null;
         }
     }
+
+    @Test
+    void testDatatypeTripleParsing(){
+        JenaOntModelMemoryParser parser = new JenaOntModelMemoryParser();
+        parser.setParseDatatypeProperties(true);
+        assertTrue(parser.isParseDatatypeProperties);
+        parser.readDataFromFile(loadFile("dummyGraph_with_labels.nt"), "N-TRIPLES");
+        TripleDataSetMemory result = parser.getData();
+        assertNotNull(result);
+        Map<String, Set<String>> datatypeTuplesForW = result.getDatatypeTuplesForSubject("W");
+        assertEquals(2, datatypeTuplesForW.size());
+        assertFalse(datatypeTuplesForW.containsKey("P7"));
+        assertTrue(datatypeTuplesForW.containsKey("rdfs:label"));
+        assertTrue(datatypeTuplesForW.containsKey("rdf:Description"));
+
+        // make sure we only parse if the mode is true
+        parser = new JenaOntModelMemoryParser();
+        assertFalse(parser.isParseDatatypeProperties);
+        parser.readDataFromFile(loadFile("dummyGraph_with_labels.nt"), "N-TRIPLES");
+        result = parser.getData();
+        assertEquals(0, result.getUniqueDatatypeTripleSubjects().size());
+        assertTrue(result.getAllObjectTriples().contains(new Triple("W","P7", "V2")));
+        assertFalse(result.getUniqueObjectTriplePredicates().contains("rdfs:label"));
+    }
+
 }

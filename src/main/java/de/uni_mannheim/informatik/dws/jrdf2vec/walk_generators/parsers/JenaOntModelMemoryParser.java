@@ -40,9 +40,49 @@ public class JenaOntModelMemoryParser extends MemoryParser {
 
     /**
      * Read n-triples from the given file into {@link MemoryParser#data}.
+     * @param fileToReadFrom File from which will be read (RDF/XML).
+     */
+    public void readDataFromFile(String fileToReadFrom){
+        readDataFromFile(new File(fileToReadFrom));
+    }
+
+    /**
+     * Read n-triples from the given file into {@link MemoryParser#data}.
      * @param fileToReadFrom File from which will be read (must be any RDF file such as NT, XML etc.).
+     * @param format Predefined values are:
+     *               <ul>
+     *                  <li>"RDF/XML"</li>
+     *                  <li>"RDF/XML-ABBREV"</li>
+     *                  <li>"N-TRIPLE"</li>
+     *                  <li>"TURTLE"</li>
+     *               </ul>
+     *               The default value, represented by null, is "RDF/XML".
+     */
+    public void readDataFromFile(String fileToReadFrom, String format){
+        readDataFromFile(new File(fileToReadFrom), format);
+    }
+
+    /**
+     * Read n-triples from the given file into {@link MemoryParser#data}.
+     * @param fileToReadFrom File from which will be read (RDF/XML).
      */
     public void readDataFromFile(File fileToReadFrom){
+        readDataFromFile(fileToReadFrom, null);
+    }
+
+    /**
+     * Read n-triples from the given file into {@link MemoryParser#data}.
+     * @param fileToReadFrom File from which will be read (must be any RDF file such as NT, XML etc.).
+     * @param format Predefined values are:
+     *               <ul>
+     *                  <li>"RDF/XML"</li>
+     *                  <li>"RDF/XML-ABBREV"</li>
+     *                  <li>"N-TRIPLE"</li>
+     *                  <li>"TURTLE"</li>
+     *               </ul>
+     *               The default value, represented by null, is "RDF/XML".
+     */
+    public void readDataFromFile(File fileToReadFrom, String format){
         if(!fileToReadFrom.exists()){
             LOGGER.error("The specified file does not exist. Aborting Parsing.");
             return;
@@ -50,7 +90,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
         try {
             URL url = fileToReadFrom.toURI().toURL();
             OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-            model.read(url.toString());
+            model.read(url.toString(), null, format);
             readDataFromOntModel(model);
         } catch (MalformedURLException mue){
             LOGGER.error("Could not read from the specified file. A malformed URL exception occurred.", mue);
@@ -68,7 +108,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
         for(StmtIterator iterator = model.listStatements(); iterator.hasNext();){
             Statement statement = iterator.nextStatement();
 
-            // skip datatype properties
+            // parse datatype properties
             if(isParseDatatypeProperties() && statement.getObject().isLiteral()) {
                 // handling of the subject
                 Resource subjectResource = statement.getSubject();
@@ -83,9 +123,10 @@ public class JenaOntModelMemoryParser extends MemoryParser {
                 String predicate = statement.getPredicate().getURI();
 
                 // handling of the (string) object
-                String object = statement.getObject().asLiteral().getLexicalForm();
+                String object = textProcessingFunction.apply(statement.getObject().asLiteral().getLexicalForm());
 
                 data.addDatatypeTriple(subject, predicate, object);
+                continue;
             } else if(statement.getObject().isLiteral()) continue;
 
             // handling of the subject
