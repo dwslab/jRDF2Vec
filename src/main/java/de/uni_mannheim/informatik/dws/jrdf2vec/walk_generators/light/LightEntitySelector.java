@@ -13,6 +13,7 @@ import java.util.HashSet;
  */
 public class LightEntitySelector implements EntitySelector {
 
+
     /**
      * The entities for which walks will be generated.
      */
@@ -74,15 +75,12 @@ public class LightEntitySelector implements EntitySelector {
             while((readLine = reader.readLine()) != null){
                 result.add(readLine);
             }
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Failed to read file.", e);
         } catch (IOException e) {
             LOGGER.error("Failed to read file.", e);
         }
         LOGGER.info("Number of read entities: " + result.size());
         return result;
     }
-
 
     /**
      * Constructor
@@ -95,10 +93,9 @@ public class LightEntitySelector implements EntitySelector {
 
     @Override
     public HashSet<String> getEntities() {
-        if(this.entitiesToProcess != null) return this.entitiesToProcess;
-        else {
+        if(this.entitiesToProcess == null) {
             this.entitiesToProcess = readEntitiesFromFile(this.entityFile);
-            return this.entitiesToProcess;
         }
+        return this.entitiesToProcess;
     }
 }

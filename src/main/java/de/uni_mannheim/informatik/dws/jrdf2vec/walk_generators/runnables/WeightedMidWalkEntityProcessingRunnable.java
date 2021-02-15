@@ -8,6 +8,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerato
 
 public class WeightedMidWalkEntityProcessingRunnable implements Runnable{
 
+
     /**
      * Default Logger
      */

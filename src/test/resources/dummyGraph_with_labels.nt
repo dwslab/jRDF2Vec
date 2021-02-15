@@ -35,7 +35,7 @@
 
 # labels
 <W> <rdfs:label> "Gedichte"@de .
-<W> <rdf:Description> "Wer reitet so spät durch Nacht und Wind? Es ist der Vater mit seinem Kind; er hat den Knaben wohl in dem Arm, er fasst ihn sicher, er hält in warm."@de .
+<W> <rdf:Description> "Wer reitet so spät durch Nacht und Wind? Es ist der Vater mit seinem Kind; er hat den Knaben wohl in dem Arm, er fasst ihn sicher, er hält ihn warm."@de  .
 <W> <rdf:Description> "Freude schöner Götterfunken, Tochter aus Elysium, wir betreten feuertrunken, Himmlische, dein Heiligtum! Deine Zauber binden wieder was die Mode streng geteilt. Alle Menschen werden Brüder, wo dein sanfter Flügel weilt."@de .
 <V1> <http://www.example.de/amount> "1"^^<http://www.w3.org/2001/XMLSchema#nonNegativeInteger> .
 <V1> <http://www.example.de/price> "10.55"^^<http://www.w3.org/2001/XMLSchema#decimal> .

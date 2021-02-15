@@ -36,7 +36,7 @@ public interface IRDF2Vec {
      * Obtain the Word2Vec Configuration
      * @return The configuration object.
      */
-    Word2VecConfiguration getConfiguration();
+    Word2VecConfiguration getWord2VecConfiguration();
 
     /**
      * Obtain the indicator of whether a vector text file will be generated.

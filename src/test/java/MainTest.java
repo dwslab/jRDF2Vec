@@ -68,7 +68,7 @@ class MainTest {
         assertTrue(files.contains("vectors.txt"));
 
         // assert sample parameter
-        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getConfiguration().getSample());
+        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
 
         try {
             FileUtils.forceDelete(walkDirectory);
@@ -161,7 +161,7 @@ class MainTest {
         assertFalse(files.contains("vectors.txt"));
 
         // check sample parameter
-        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getConfiguration().getSample());
+        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
 
         try {
             FileUtils.forceDelete(walkDirectory);
@@ -195,7 +195,7 @@ class MainTest {
         assertFalse(files.contains("vectors.txt"));
 
         // test sample parameter
-        assertEquals(0.01, Main.getRdf2VecInstance().getConfiguration().getSample());
+        assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
 
         try {
             FileUtils.forceDelete(walkDirectory);
@@ -441,7 +441,7 @@ class MainTest {
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100", "-minCount", "3"});
         assertEquals(100, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-        assertEquals(3, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+        assertEquals(3, ((RDF2VecLight) Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
 
         // important: reset
         Main.reset();
@@ -449,7 +449,7 @@ class MainTest {
         // without light option
         Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "100", "-minCount", "2"});
         assertEquals(100, ((RDF2Vec) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-        assertEquals(2, ((RDF2Vec) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+        assertEquals(2, ((RDF2Vec) Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
     }
 
     @Test
@@ -458,7 +458,7 @@ class MainTest {
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "-10", "-minCount", "-3"});
         assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, ((RDF2VecLight) Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, ((RDF2VecLight) Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
         assertEquals(0, Main.getIgnoredArguments().size());
 
         // important: reset
@@ -467,7 +467,7 @@ class MainTest {
         // without light option
         Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "abc", "-minCount", "abc"});
         assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, (Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, (Main.getRdf2VecInstance()).getConfiguration().getMinCount());
+        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, (Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
     }
 
     @Test

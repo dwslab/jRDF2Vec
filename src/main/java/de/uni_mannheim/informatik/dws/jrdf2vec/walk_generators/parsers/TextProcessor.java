@@ -2,6 +2,9 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
 import java.util.function.UnaryOperator;
 
+/**
+ * Simple processor for datatpye property values.
+ */
 public class TextProcessor implements UnaryOperator<String> {
 
     private static final String[] stopwords = {"a", "the"};
@@ -11,6 +14,7 @@ public class TextProcessor implements UnaryOperator<String> {
 
         // remove language annotations
         s = s.replaceAll("\"@.{2}.*\\..*$", ""); // regex: "@.{2}.*\..*$
+        s = s.replaceAll("\"@[A-Za-z]{2}$", "");
 
         // remove type annotations
         s = s.replaceAll("\"\\^\\^.*\\..*$", ""); // regex: "\^\^.*\..*$

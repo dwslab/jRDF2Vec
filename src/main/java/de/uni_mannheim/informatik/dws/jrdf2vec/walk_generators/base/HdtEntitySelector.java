@@ -17,6 +17,7 @@ import java.util.Set;
  */
 public class HdtEntitySelector implements EntitySelector {
 
+
     /**
      * Default logger.
      */
@@ -26,7 +27,6 @@ public class HdtEntitySelector implements EntitySelector {
      * The data set to be used by the parser.
      */
     HDT hdtDataSet;
-
 
     /**
      * Constructor
@@ -49,7 +49,6 @@ public class HdtEntitySelector implements EntitySelector {
         IteratorTripleString iterator = null;
         try {
             iterator = hdtDataSet.search("", "", "");
-
             TripleString ts;
             while (iterator.hasNext()) {
                 ts = iterator.next();

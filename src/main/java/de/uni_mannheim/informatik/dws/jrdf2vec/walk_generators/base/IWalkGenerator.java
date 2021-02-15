@@ -12,9 +12,11 @@ public interface IWalkGenerator {
      * @param numberOfWalksPerEntity The number of walks that shall be performed per entity.
      * @param depth The depth of each walk. Depth 1 leads to three elements in the walk, depth 2 leads to 5 elements in
      *              the walk.
+     * @param textWalkLength Length of text walks. Note that unlike depth, here only the number of tokens in the walk
+     *                       are counted (not node hops!). Typically the window size would be used as text walk length.
      * @param walkFile The walk file.
      */
-     void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalksPerEntity, int depth, String walkFile);
+     void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalksPerEntity, int depth, int textWalkLength, String walkFile);
 
     /**
      * The walk file(s) will be persisted in "./walks".
@@ -105,4 +107,18 @@ public interface IWalkGenerator {
      */
     void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten);
 
+    /**
+     * Generate text walks.
+     * @param numberOfThreads he number of threads to be used.
+     * @param walkLength The length of the walks (!= hops). An example for a walk of length 3 would be "s → p → o"
+     */
+    void generateTextWalks(int numberOfThreads, int walkLength);
+
+    /**
+     * Generate text walks.
+     * @param numberOfThreads he number of threads to be used.
+     * @param walkLength The length of the walks (!= hops). An example for a walk of length 3 would be "s → p → o"
+     * @param filePathOfFileToBeWritten The path to the file that shall be written.
+     */
+    void generateTextWalks(int numberOfThreads, int walkLength, String filePathOfFileToBeWritten);
 }

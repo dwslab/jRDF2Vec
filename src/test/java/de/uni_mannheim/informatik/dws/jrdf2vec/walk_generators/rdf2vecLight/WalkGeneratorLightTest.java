@@ -16,37 +16,39 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WalkGeneratorLightTest {
 
+
     /**
      * Requires a working internet connection.
      */
     @Test
-    void fullRunWithDBpedia(){
+    void fullRunWithDBpedia() {
         String resourceFile = loadFile("sample_dbpedia_nt_file.nt").getAbsolutePath();
         String entityFile = loadFile("sample_dbpedia_entity_file.txt").getAbsolutePath();
         WalkGeneratorLight generatorLight = new WalkGeneratorLight(resourceFile, entityFile);
         generatorLight.generateRandomMidWalks(2, 10, 3);
+        generatorLight.close();
         File fileToReadFrom = new File("./walks/walk_file.gz");
         GZIPInputStream gzip;
         try {
             gzip = new GZIPInputStream(new FileInputStream(fileToReadFrom));
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
-        String readLine;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
+            String readLine;
 
-        HashSet<String> entities = new HashSet<>();
-        entities.add("http://dbpedia.org/resource/Illinois_Tool_Works");
-        entities.add("http://dbpedia.org/resource/Host_Hotels_&_Resorts");
-        entities.add("http://dbpedia.org/resource/State_Bank_of_India");
-        entities.add("http://dbpedia.org/resource/Amp");
-        entities.add("http://dbpedia.org/resource/SQM");
-        while((readLine = reader.readLine()) != null){
-            String[] tokens = readLine.split(" ");
-            assertTrue(tokens.length <= 7);
-            for(String token : tokens){
-                entities.remove(token);
+            HashSet<String> entities = new HashSet<>();
+            entities.add("http://dbpedia.org/resource/Illinois_Tool_Works");
+            entities.add("http://dbpedia.org/resource/Host_Hotels_&_Resorts");
+            entities.add("http://dbpedia.org/resource/State_Bank_of_India");
+            entities.add("http://dbpedia.org/resource/Amp");
+            entities.add("http://dbpedia.org/resource/SQM");
+            while ((readLine = reader.readLine()) != null) {
+                String[] tokens = readLine.split(" ");
+                assertTrue(tokens.length <= 7);
+                for (String token : tokens) {
+                    entities.remove(token);
+                }
             }
-        }
-        assertTrue(entities.size() == 1, "Not all 4 entities occurred in the walks (note that Amp cannot be found).");
+            assertTrue(entities.size() == 1, "Not all 4 entities occurred in the walks (note that Amp cannot be found).");
         } catch (IOException e) {
             e.printStackTrace();
             fail("Problem occurred while reading the walk file.", e);
@@ -63,6 +65,7 @@ class WalkGeneratorLightTest {
 
         WalkGeneratorDefault generator = new WalkGeneratorLight(pizzaOntology, loadFile("entityFileForPizzaOntology.txt"));
         generator.generateRandomWalksDuplicateFree(1, 10, 5, generatedFilePath);
+        generator.close();
 
         File generatedFile = new File(generatedFilePath);
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
@@ -82,7 +85,7 @@ class WalkGeneratorLightTest {
             while ((readLine = reader.readLine()) != null) {
                 subjectsOfWalks.add(readLine.split(" ")[0]);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             fail("Could not read gzipped file.");
         }
@@ -106,6 +109,7 @@ class WalkGeneratorLightTest {
 
         WalkGeneratorDefault generator = new WalkGeneratorLight(pizzaOntology, entities);
         generator.generateRandomWalksDuplicateFree(8, 5, 5, generatedFilePath);
+        generator.close();
 
         File generatedFile = new File(generatedFilePath);
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
@@ -125,7 +129,7 @@ class WalkGeneratorLightTest {
             while ((readLine = reader.readLine()) != null) {
                 subjectsOfWalks.add(readLine.split(" ")[0]);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             fail("Could not read gzipped file.");
         }
@@ -139,7 +143,7 @@ class WalkGeneratorLightTest {
 
 
     @Test
-    void generateRandomMidWalksForEntities(){
+    void generateRandomMidWalksForEntities() {
         // make sure that there are no walk duplicates
         File pizzaOntology = loadFile("pizza.ttl");
         assertTrue(pizzaOntology.exists());
@@ -151,7 +155,7 @@ class WalkGeneratorLightTest {
 
         WalkGeneratorDefault generator = new WalkGeneratorLight(pizzaOntology, entities);
         generator.generateRandomMidWalks(1, 1000, 1, generatedFilePath);
-
+        generator.close();
         File generatedFile = new File(generatedFilePath);
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
 
@@ -171,7 +175,7 @@ class WalkGeneratorLightTest {
                 numberOfLines++;
                 assertTrue(readLine.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot"));
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             fail("Could not read gzipped file.");
         }
@@ -182,15 +186,16 @@ class WalkGeneratorLightTest {
 
     /**
      * Helper function to load files in class path that contain spaces.
+     *
      * @param fileName Name of the file.
      * @return File in case of success, else null.
      */
-    private File loadFile(String fileName){
+    private File loadFile(String fileName) {
         try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            File result = FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
             assertTrue(result.exists(), "Required resource not available.");
             return result;
-        } catch (URISyntaxException | MalformedURLException exception){
+        } catch (URISyntaxException | MalformedURLException exception) {
             exception.printStackTrace();
             fail("Could not load file.");
             return null;

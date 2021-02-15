@@ -7,6 +7,7 @@ import java.util.Set;
  */
 public interface EntitySelector {
 
+
     /**
      * Obtain all entities for which walks shall be generated.
      * @return The entities to be returned.

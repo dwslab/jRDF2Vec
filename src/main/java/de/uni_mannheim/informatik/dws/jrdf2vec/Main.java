@@ -418,13 +418,13 @@ public class Main {
                 // light walk generation:
                 WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile);
                 walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
-                generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, walkFile);
+                generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
 
             } else {
                 // classic walk generation
-                WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile);
+                WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile, isEmbedText);
                 walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE : walkGenerationMode;
-                classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, walkFile);
+                classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
             }
 
             after = Instant.now();

@@ -4,24 +4,27 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Static methods providing basic functionality to be used by multiple classes.
  */
 public class Util {
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Util.class);
 
@@ -79,7 +82,6 @@ public class Util {
         }
         return linesRead;
     }
-
 
     /**
      * Given a vector text file, this method determines the dimensionality within the file based on the first valid line.
@@ -139,7 +141,6 @@ public class Util {
         return result;
     }
 
-
     /**
      * Reads an ontology from a given URL.
      *
@@ -170,6 +171,34 @@ public class Util {
             LOGGER.error("Could not parse: " + file.getAbsolutePath() + "\nin jena.", re);
             return null;
         }
+    }
+
+    /**
+     * Reads each line of the gzipped file into a list.
+     * @param file File to be read from.
+     * @return List. Each entry refers to one line in the file.
+     */
+    public static List<String> readLinesFromGzippedFile(File file){
+        GZIPInputStream gzip = null;
+        try {
+            gzip = new GZIPInputStream(new FileInputStream(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Input stream to verify file could not be established.");
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+        String readLine;
+        List<String> result = new ArrayList<>();
+        try {
+            while ((readLine = reader.readLine()) != null) {
+                result.add(readLine);
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+            fail("Could not read gzipped file.");
+        }
+        return result;
     }
 
 }

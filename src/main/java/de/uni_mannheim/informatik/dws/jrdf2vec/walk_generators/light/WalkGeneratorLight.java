@@ -12,6 +12,7 @@ import java.util.HashSet;
  */
 public class WalkGeneratorLight extends WalkGeneratorDefault {
 
+
     /**
      * Default Logger
      */

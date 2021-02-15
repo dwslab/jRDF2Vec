@@ -65,6 +65,7 @@ public class NtMemoryParser extends MemoryParser {
      * Constructor
      *
      * @param pathToTripleFile The nt file to be read (not zipped).
+     * @param uriShortenerFunction The URI shortener function.
      */
     public NtMemoryParser(String pathToTripleFile, UnaryOperator<String> uriShortenerFunction) {
         this();
@@ -78,7 +79,16 @@ public class NtMemoryParser extends MemoryParser {
      * @param pathToTripleFile The nt file to be read (not zipped).
      */
     public NtMemoryParser(String pathToTripleFile) {
-        this();
+        this(pathToTripleFile, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param pathToTripleFile The nt file to be read (not zipped).
+     */
+    public NtMemoryParser(String pathToTripleFile, boolean isParseDatatypeTriples) {
+        this(isParseDatatypeTriples);
         readNTriples(pathToTripleFile);
     }
 
@@ -86,6 +96,7 @@ public class NtMemoryParser extends MemoryParser {
      * Constructor
      *
      * @param tripleFile The nt file to be read (not zipped).
+     * @param uriShortenerFunction The URI shortener function which maps from String to String.
      */
     public NtMemoryParser(File tripleFile, UnaryOperator<String> uriShortenerFunction) {
         this();
@@ -93,13 +104,18 @@ public class NtMemoryParser extends MemoryParser {
         readNTriples(tripleFile, false);
     }
 
+    public NtMemoryParser(File tripleFile){
+        this(tripleFile, false);
+    }
+
     /**
      * Constructor
      *
      * @param tripleFile The nt file to be read (not zipped).
+     * @param isParseDatatypeTriples True if datatype triples shall also be parsed.
      */
-    public NtMemoryParser(File tripleFile) {
-        this();
+    public NtMemoryParser(File tripleFile, boolean isParseDatatypeTriples) {
+        this(isParseDatatypeTriples);
         readNTriples(tripleFile, false);
     }
 
@@ -133,6 +149,10 @@ public class NtMemoryParser extends MemoryParser {
      * @param pathToFile Path to the file.
      */
     public void readNTriples(String pathToFile) {
+        readNTriples(pathToFile, false);
+    }
+
+    public void readNTriples(File pathToFile) {
         readNTriples(pathToFile, false);
     }
 

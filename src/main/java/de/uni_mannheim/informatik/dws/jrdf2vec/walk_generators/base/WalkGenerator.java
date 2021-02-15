@@ -87,6 +87,9 @@ public abstract class WalkGenerator implements IWalkGenerator {
      */
     public String filePath;
 
+    private int timeout = 10;
+    private TimeUnit timeoutUnit = TimeUnit.DAYS;
+
     /**
      * Given a URI, a short version is created.
      *
@@ -110,17 +113,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
      */
     public void generateRandomMidWalksForEntitiesDuplicateFree(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
-
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
-        }
+        setOutputFileWriter();
 
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
                 0, TimeUnit.SECONDS,
@@ -132,12 +125,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
         }
         pool.shutdown();
         try {
-            pool.awaitTermination(10, TimeUnit.DAYS);
+            pool.awaitTermination(timeout, timeoutUnit);
         } catch (InterruptedException e) {
             LOGGER.error("Interrupted Exception");
             e.printStackTrace();
         }
-        this.close();
+        flushWriter();
     }
 
     /**
@@ -149,17 +142,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
      */
     public void generateWeightedMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
-
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
-        }
+        setOutputFileWriter();
 
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
                 0, TimeUnit.SECONDS,
@@ -171,12 +154,38 @@ public abstract class WalkGenerator implements IWalkGenerator {
         }
         pool.shutdown();
         try {
-            pool.awaitTermination(10, TimeUnit.DAYS);
+            pool.awaitTermination(timeout, timeoutUnit);
         } catch (InterruptedException e) {
             LOGGER.error("Interrupted Exception");
             e.printStackTrace();
         }
-        this.close();
+        flushWriter();
+    }
+
+    /**
+     * Generates text walks for the given entities.
+     *
+     * @param entities The set of entities for which text walks (datatype property based walks) shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param walkLength The length of each walks
+     */
+    public void generateTextWalksForEntities(Set<String> entities, int numberOfThreads, int walkLength){
+        setOutputFileWriter();
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
+                0, TimeUnit.SECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
+        for (String entity : entities) {
+            DatatypeWalkEntityProcessingRunnable runnable = new DatatypeWalkEntityProcessingRunnable(this, entity, walkLength);
+            pool.execute(runnable);
+        }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(timeout, timeoutUnit);
+        } catch (InterruptedException e) {
+            LOGGER.error("Interrupted Exception");
+            e.printStackTrace();
+        }
+        flushWriter();
     }
 
     /**
@@ -188,17 +197,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
      */
     public void generateRandomMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
-
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
-        }
+        setOutputFileWriter();
 
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
                 0, TimeUnit.SECONDS,
@@ -210,12 +209,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
         }
         pool.shutdown();
         try {
-            pool.awaitTermination(10, TimeUnit.DAYS);
+            pool.awaitTermination(timeout, timeoutUnit);
         } catch (InterruptedException e) {
             LOGGER.error("Interrupted Exception");
             e.printStackTrace();
         }
-        this.close();
+        flushWriter();
     }
 
     /**
@@ -227,17 +226,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
     public void generateDuplicateFreeWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
-
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
-        }
+        setOutputFileWriter();
 
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
                 0, TimeUnit.SECONDS,
@@ -249,12 +238,12 @@ public abstract class WalkGenerator implements IWalkGenerator {
         }
         pool.shutdown();
         try {
-            pool.awaitTermination(10, TimeUnit.DAYS);
+            pool.awaitTermination(timeout, timeoutUnit);
         } catch (InterruptedException e) {
             LOGGER.error("Interrupted Exception");
             e.printStackTrace();
         }
-        this.close();
+        flushWriter();
     }
 
     /**
@@ -266,17 +255,7 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
      */
     public void generateWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
-
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
-        }
+        setOutputFileWriter();
 
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
                 0, TimeUnit.SECONDS,
@@ -289,12 +268,42 @@ public abstract class WalkGenerator implements IWalkGenerator {
         pool.shutdown();
 
         try {
-            pool.awaitTermination(10, TimeUnit.DAYS);
+            pool.awaitTermination(timeout, timeoutUnit);
         } catch (InterruptedException e) {
             LOGGER.error("Interrupted Exception");
             e.printStackTrace();
         }
-        this.close();
+        flushWriter();
+    }
+
+    /**
+     * Flushes the walk writer.
+     */
+    void flushWriter(){
+        if(this.writer != null){
+            try {
+                this.writer.flush();
+            } catch (IOException e) {
+                LOGGER.error("Could not flush writer.", e);
+            }
+        }
+    }
+
+    /**
+     * Initialize {@link WalkGenerator#writer}.
+     */
+    void setOutputFileWriter(){
+        File outputFile = new File(filePath);
+        outputFile.getParentFile().mkdirs();
+
+        // initialize the writer
+        try {
+            this.writer = new OutputStreamWriter(new GZIPOutputStream(
+                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
+        } catch (Exception e1) {
+            LOGGER.error("Could not initialize writer. Aborting process.", e1);
+            return;
+        }
     }
 
     /**

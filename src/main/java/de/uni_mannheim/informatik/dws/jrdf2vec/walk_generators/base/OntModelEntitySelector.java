@@ -28,7 +28,7 @@ public class OntModelEntitySelector implements EntitySelector {
      * Obtain the entities in this case: Lexical Entry instances.
      * This method will create a cache.
      *
-     * @return Entities as String.
+     * @return Set of entities as String.
      */
     public HashSet<String> getEntities() {
         HashSet<String> result = new HashSet<>(100000);

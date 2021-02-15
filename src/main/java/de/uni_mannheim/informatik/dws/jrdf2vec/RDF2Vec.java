@@ -19,6 +19,7 @@ import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkG
  */
 public class RDF2Vec implements IRDF2Vec {
 
+
     /**
      * File with KG triples.
      */
@@ -96,6 +97,11 @@ public class RDF2Vec implements IRDF2Vec {
     boolean isVectorTextFileGeneration = true;
 
     /**
+     * Indicator whether text walks (based on datatype properties) shall be generated.
+     */
+    private boolean isGenerateTextWalks = false;
+
+    /**
      * Constructor
      *
      * @param knowledgeGraphFile File to the knowledge graph.
@@ -142,7 +148,6 @@ public class RDF2Vec implements IRDF2Vec {
         return train();
     }
 
-
     /**
      * Train an RDF2Vec model.
      * The model will appear in the directory where the walks reside.
@@ -170,11 +175,12 @@ public class RDF2Vec implements IRDF2Vec {
 
         WalkGeneratorDefault classicGenerator;
         if(useFile) {
-            classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile);
+            classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile, isGenerateTextWalks);
         } else {
-            classicGenerator = new WalkGeneratorDefault(this.ontModel);
+            classicGenerator = new WalkGeneratorDefault(this.ontModel, isGenerateTextWalks);
         }
-        classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, getWalkFilePath());
+
+        classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), getWalkFilePath());
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
@@ -271,7 +277,7 @@ public class RDF2Vec implements IRDF2Vec {
         this.walkFilePath = walkFilePath;
     }
 
-    public Word2VecConfiguration getConfiguration() {
+    public Word2VecConfiguration getWord2VecConfiguration() {
         return configuration;
     }
 
@@ -334,5 +340,13 @@ public class RDF2Vec implements IRDF2Vec {
 
     public void setVectorTextFileGeneration(boolean vectorTextFileGeneration) {
         isVectorTextFileGeneration = vectorTextFileGeneration;
+    }
+
+    public boolean isGenerateTextWalks() {
+        return isGenerateTextWalks;
+    }
+
+    public void setGenerateTextWalks(boolean generateTextWalks) {
+        isGenerateTextWalks = generateTextWalks;
     }
 }

@@ -12,6 +12,7 @@ class TextProcessorTest {
        assertEquals("hello world", tp.apply("\"Hello World!\"@de ."));
        assertEquals("hello world", tp.apply("\" Hello World!\". "));
        assertEquals("151", tp.apply("\"1.51\"^^<something> . "));
+       assertEquals("gedichte", tp.apply("\"Gedichte\"@de ."));
     }
 
 }

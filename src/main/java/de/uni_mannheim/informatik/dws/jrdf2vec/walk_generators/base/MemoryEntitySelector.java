@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class MemoryEntitySelector implements EntitySelector {
 
+
     /**
      * Constructor.
      * @param data Triple data set to be used.
@@ -18,6 +19,6 @@ public class MemoryEntitySelector implements EntitySelector {
 
     @Override
     public Set<String> getEntities() {
-        return data.getUniqueObjectTripleSubjects();
+        return data.getUniqueSubjects();
     }
 }

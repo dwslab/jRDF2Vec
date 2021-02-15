@@ -52,6 +52,7 @@ public class NxMemoryParser extends MemoryParser {
      * Constructor
      *
      * @param nTripleFilePath File to be parsed.
+     * @param uriShortenerFunction The URI shortener function which maps from String to String.
      */
     public NxMemoryParser(String nTripleFilePath, UnaryOperator<String> uriShortenerFunction) {
         this(new File(nTripleFilePath), uriShortenerFunction);
@@ -63,13 +64,24 @@ public class NxMemoryParser extends MemoryParser {
      * @param nTripleFilePath File to be parsed.
      */
     public NxMemoryParser(String nTripleFilePath) {
-        this(new File(nTripleFilePath));
+        this(new File(nTripleFilePath), false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param nTripleFilePath File to be parsed.
+     * @param isParseDatatypeTriples True if datatype triples shall also be parsed.
+     */
+    public NxMemoryParser(String nTripleFilePath, boolean isParseDatatypeTriples) {
+        this(new File(nTripleFilePath), isParseDatatypeTriples);
     }
 
     /**
      * Constructor
      *
      * @param nTripleFile File to be parsed.
+     * @param uriShortenerFunction The URI shortener function which maps from String to String.
      */
     public NxMemoryParser(File nTripleFile, UnaryOperator<String> uriShortenerFunction) {
         this.uriShortenerFunction = uriShortenerFunction;
@@ -78,11 +90,20 @@ public class NxMemoryParser extends MemoryParser {
 
     /**
      * Constructor
+     * @param nTripleFile The N-TRIPLES file.
+     */
+    public NxMemoryParser(File nTripleFile){
+        this(nTripleFile, false);
+    }
+
+    /**
+     * Constructor
      *
      * @param nTripleFile File to be parsed.
      */
-    public NxMemoryParser(File nTripleFile) {
+    public NxMemoryParser(File nTripleFile, boolean isParseDatatypeTriples) {
         this();
+        this.setParseDatatypeProperties(isParseDatatypeTriples);
         readNtriples(nTripleFile);
     }
 

@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class HdtParser implements IParser {
 
+
     /**
      * Default logger.
      */
@@ -26,7 +27,6 @@ public class HdtParser implements IParser {
      * The data set to be used by the parser.
      */
     HDT hdtDataSet;
-
 
     /**
      * Constructor
@@ -53,7 +53,6 @@ public class HdtParser implements IParser {
         this(hdtFile.getAbsolutePath());
     }
 
-
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
      * @param numberOfWalks The number of walks to be generated.
@@ -64,7 +63,6 @@ public class HdtParser implements IParser {
     public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
         return convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
-
 
     /**
      * Given a list of walks where a walk is represented as a List of strings, this method will convert that
@@ -90,7 +88,6 @@ public class HdtParser implements IParser {
         }
         return new ArrayList<>(uniqueSet);
     }
-
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
@@ -144,8 +141,6 @@ public class HdtParser implements IParser {
         }
         return result;
     }
-
-
 
     /**
      * Generates a single walk for the given entity with the given depth.
@@ -243,7 +238,6 @@ public class HdtParser implements IParser {
         return iterator.next();
     }
 
-
     /**
      * Writes the given hdt data set as nt file.
      * @param dataSet Set to read.
@@ -273,5 +267,4 @@ public class HdtParser implements IParser {
             LOGGER.error("Could not write file.", e);
         }
     }
-
 }

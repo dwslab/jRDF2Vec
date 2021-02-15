@@ -314,6 +314,52 @@ public abstract class MemoryParser implements IParser {
     }
 
     /**
+     * Generate text walks. This only works if datatype triples/properties were parsed previously.
+     * @param entity The entity for which walks shall be generated.
+     * @param depth Must be &gt; 2.
+     * @return List of walks.
+     */
+    public List<String> generateTextWalksForEntity(String entity, int depth){
+        List<String> result = new ArrayList<>();
+        Set<String> datatypeSubjects = this.data.getUniqueDatatypeTripleSubjects();
+        if(!datatypeSubjects.contains(entity)){
+            return result;
+        }
+        Map<String, Set<String>> tuples = this.data.getDatatypeTuplesForSubject(entity);
+
+        for(Map.Entry<String, Set<String>> entry : tuples.entrySet()){
+            String predicate = entry.getKey();
+            Set<String> texts = entry.getValue();
+            StringBuffer walk = getNewBufferWalk(entity, predicate);
+            int currentWalkLength = 2;
+            for(String text : texts){
+                for(String token : text.split(" ")){
+                    walk.append(" " + token);
+                    currentWalkLength++;
+                    if(currentWalkLength == depth){
+                        result.add(walk.toString());
+                        walk = getNewBufferWalk(entity, predicate);
+                        currentWalkLength = 2;
+                    }
+                }
+                if(walk.length() > entity.length() + predicate.length() + 1){
+                    result.add(walk.toString());
+                    walk = getNewBufferWalk(entity, predicate);
+                    currentWalkLength = 2;
+                }
+            }
+        }
+        return result;
+    }
+
+    private StringBuffer getNewBufferWalk(String subject, String predicate){
+        StringBuffer walk = new StringBuffer();
+        walk.append(subject);
+        walk.append(" " + predicate);
+        return walk;
+    }
+
+    /**
      * Generates duplicate-free walks for the given entity.
      *
      * @param entity        The entity for which walks shall be generated.

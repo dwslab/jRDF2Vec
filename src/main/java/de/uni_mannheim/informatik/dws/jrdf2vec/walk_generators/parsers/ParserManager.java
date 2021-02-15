@@ -30,7 +30,17 @@ public class ParserManager {
      * @return Pair with parser and entity selector.
      */
     public static Pair<IParser, EntitySelector> parseSingleFile(String tripleFile){
-        return parseSingleFile(new File(tripleFile));
+        return parseSingleFile(new File(tripleFile), false);
+    }
+
+    /**
+     * Given a triple file, this method determines the appropriate parser and entity selector.
+     * @param tripleFile The triple file path of the file to be processed.
+     * @param isParseDatatypeTriples True if datatype triples shall also be parsed.
+     * @return Pair with parser and entity selector.
+     */
+    public static Pair<IParser, EntitySelector> parseSingleFile(String tripleFile, boolean isParseDatatypeTriples){
+        return parseSingleFile(new File(tripleFile), isParseDatatypeTriples);
     }
 
     /**
@@ -38,7 +48,7 @@ public class ParserManager {
      * @param tripleFile The triple file to be processed.
      * @return Pair with parser and entity selector.
      */
-    public static Pair<IParser, EntitySelector> parseSingleFile(File tripleFile){
+    public static Pair<IParser, EntitySelector> parseSingleFile(File tripleFile, boolean isParseDatatypeTriples){
         IParser parser = null;
         EntitySelector entitySelector = null;
         try {
@@ -50,16 +60,16 @@ public class ParserManager {
                 }
                 try {
                     LOGGER.info("Using NxParser.");
-                    parser = new NxMemoryParser(pathToTripleFile);
+                    parser = new NxMemoryParser(pathToTripleFile, isParseDatatypeTriples);
                     entitySelector = new MemoryEntitySelector(((NxMemoryParser) parser).getData());
                 } catch (Exception e) {
                     LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
-                    parser = new NtMemoryParser(pathToTripleFile);
+                    parser = new NtMemoryParser(pathToTripleFile, isParseDatatypeTriples);
                     entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
                 }
                 if (((MemoryParser) parser).getDataSize() == 0L) {
                     LOGGER.error("There was a problem using the default NxParser. Retry with slower NtParser.");
-                    parser = new NtMemoryParser(pathToTripleFile);
+                    parser = new NtMemoryParser(pathToTripleFile, isParseDatatypeTriples);
                     entitySelector = new MemoryEntitySelector(((NtMemoryParser) parser).getData());
                 }
             } else if (fileName.toLowerCase().endsWith(".ttl")) {
@@ -67,14 +77,14 @@ public class ParserManager {
                 entitySelector = new OntModelEntitySelector(model);
                 File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                 NtMemoryParser.saveAsNt(model, newResourceFile);
-                parser = new NtMemoryParser(newResourceFile);
+                parser = new NtMemoryParser(newResourceFile, isParseDatatypeTriples);
             } else if (fileName.toLowerCase().endsWith(".xml")) {
                 OntModel model = readOntology(pathToTripleFile, Lang.RDFXML);
                 entitySelector = new OntModelEntitySelector(model);
                 File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                 //this.parser = new JenaOntModelMemoryParser(this.model, this);
                 NtMemoryParser.saveAsNt(model, newResourceFile);
-                parser = new NtMemoryParser(newResourceFile);
+                parser = new NtMemoryParser(newResourceFile, isParseDatatypeTriples);
             } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
                 LOGGER.info("HDT file detected. Using HDT parser.");
                 try {

@@ -71,11 +71,33 @@ class JenaOntModelMemoryParserTest {
         // make sure we only parse if the mode is true
         parser = new JenaOntModelMemoryParser();
         assertFalse(parser.isParseDatatypeProperties);
-        parser.readDataFromFile(loadFile("dummyGraph_with_labels.nt"), "N-TRIPLES");
+        parser.readDataFromFile(loadFile("dummyGraph_with_labels.nt").toString(), "N-TRIPLES");
         result = parser.getData();
         assertEquals(0, result.getUniqueDatatypeTripleSubjects().size());
         assertTrue(result.getAllObjectTriples().contains(new Triple("W","P7", "V2")));
         assertFalse(result.getUniqueObjectTriplePredicates().contains("rdfs:label"));
+    }
+
+    @Test
+    void generateTextWalksForEntity(){
+        JenaOntModelMemoryParser parser = new JenaOntModelMemoryParser();
+        parser.setParseDatatypeProperties(true);
+        assertTrue(parser.isParseDatatypeProperties);
+        parser.readDataFromFile(loadFile("dummyGraph_with_labels.nt"), "N-TRIPLES");
+
+        // walk depth 8
+        List<String> result = parser.generateTextWalksForEntity("W", 8);
+        assertNotNull(result);
+        assertTrue(result.contains("W rdfs:label gedichte"));
+        assertTrue(result.contains("W rdf:Description wer reitet so spät durch nacht"));
+        assertFalse(result.contains("W rdf:Description wer reitet"));
+
+        // walk depth 4
+        result = parser.generateTextWalksForEntity("W", 4);
+        assertNotNull(result);
+        assertTrue(result.contains("W rdfs:label gedichte"));
+        assertTrue(result.contains("W rdf:Description wer reitet"));
+        assertFalse(result.contains("W rdf:Description wer reitet so spät durch nacht"));
     }
 
 }

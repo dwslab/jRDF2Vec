@@ -9,8 +9,9 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
  *     There must be a runnable for each walk generation option.
  * </li>
  * <li>
- *      The must be a resolution in evey implementation of {@link IWalkGenerator#generateWalks(WalkGenerationMode, int, int, int, String)} that shall support this walk mode.
- *      This affects, for example {@link WalkGeneratorDefault#generateWalks(WalkGenerationMode, int, int, int, String)} or {@link de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGeneratorLight#generateWalks(WalkGenerationMode, int, int, int, String)}.
+ *      The must be a resolution in evey implementation of {@link IWalkGenerator#generateWalks(WalkGenerationMode, int, int, int, int, String)} that shall support this walk mode.
+ *      This affects, for example {@link WalkGeneratorDefault#generateWalks(WalkGenerationMode, int, int, int, int, String)} or
+ *      {@link de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGeneratorLight#generateWalks(WalkGenerationMode, int, int, int, int, String)}.
  * </li>
  * </ul>
  */

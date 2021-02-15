@@ -8,22 +8,18 @@ import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables.RandomWalkEntityProcessingRunnable;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
-import java.util.zip.GZIPOutputStream;
 
-import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.readOntology;
 
 /**
  * Default Walk Generator.
  * Intended to work on any data set.
  */
 public class WalkGeneratorDefault extends WalkGenerator {
+
 
     /**
      * Default Logger.
@@ -52,22 +48,47 @@ public class WalkGeneratorDefault extends WalkGenerator {
     private boolean parserIsOk = true;
 
     /**
+     * Indicator whether text walks (based on datatype properties) shall be generated.
+     */
+    private boolean isGenerateTextWalks = false;
+
+    /**
      * Constructor
-     *
      * @param ontModel Model for which walks shall be generated.
      */
-    public WalkGeneratorDefault(OntModel ontModel) {
+    public WalkGeneratorDefault(OntModel ontModel){
+        this(ontModel, false);
+    }
+
+    /**
+     * Constructor for OntModel.
+     *
+     * @param ontModel Model for which walks shall be generated.
+     * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
+     */
+    public WalkGeneratorDefault(OntModel ontModel, boolean isGenerateTextWalks) {
         this.parser = new JenaOntModelMemoryParser();
+        ((JenaOntModelMemoryParser) this.parser).setParseDatatypeProperties(isGenerateTextWalks);
         ((JenaOntModelMemoryParser) this.parser).readDataFromOntModel(ontModel);
         this.entitySelector = new MemoryEntitySelector(((JenaOntModelMemoryParser) parser).getData());
+        this.setGenerateTextWalks(isGenerateTextWalks);
     }
 
     /**
      * Constructor
-     *
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
-    public WalkGeneratorDefault(File tripleFile) {
+    public WalkGeneratorDefault(File tripleFile){
+        this(tripleFile, false);
+    }
+
+    /**
+     * Constructor for triple file.
+     *
+     * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
+     * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
+     */
+    public WalkGeneratorDefault(File tripleFile, boolean isGenerateTextWalks) {
         if (!tripleFile.exists()) {
             LOGGER.error("The resource file you specified does not exist. ABORT.");
             return;
@@ -75,19 +96,20 @@ public class WalkGeneratorDefault extends WalkGenerator {
         if (tripleFile.isDirectory()) {
             LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                     "if you use an entity selector that requires one ontology.");
-            this.parser = new NtMemoryParser();
+            this.parser = new NtMemoryParser(isGenerateTextWalks);
             ((NtMemoryParser) this.parser).readNtTriplesFromDirectoryMultiThreaded(tripleFile, false);
             this.entitySelector = new MemoryEntitySelector(((NtMemoryParser) this.parser).getData());
         } else {
             // decide on parser depending on file ending
-            Pair<IParser, EntitySelector> parserSelectorPair = ParserManager.parseSingleFile(tripleFile);
+            Pair<IParser, EntitySelector> parserSelectorPair = ParserManager.parseSingleFile(tripleFile, isGenerateTextWalks);
             this.parser = parserSelectorPair.getValue0();
             this.entitySelector = parserSelectorPair.getValue1();
         }
+        this.setGenerateTextWalks(isGenerateTextWalks);
     }
 
     /**
-     * Constructor
+     * Constructor for path to triple file.
      *
      * @param pathToTripleFile The path to the NT file.
      */
@@ -96,28 +118,34 @@ public class WalkGeneratorDefault extends WalkGenerator {
     }
 
     @Override
-    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, String walkFile) {
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, int textWalkLength, String walkFile) {
         if (generationMode == null) {
             System.out.println("walkGeneration mode is null... Using default: RANDOM_WALKS_DUPLICATE_FREE");
             this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
         } else if (generationMode == WalkGenerationMode.MID_WALKS) {
-            System.out.println("generate random mid walks...");
+            System.out.println("Generate random mid walks...");
             this.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
         } else if (generationMode == WalkGenerationMode.MID_WALKS_DUPLICATE_FREE) {
-            System.out.println("generate random mid walks duplicate free...");
+            System.out.println("Generate random mid walks duplicate free...");
             this.generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
         } else if (generationMode == WalkGenerationMode.RANDOM_WALKS) {
-            System.out.println("generate random walks...");
+            System.out.println("Generate random walks...");
             this.generateRandomWalks(numberOfThreads, numberOfWalks, depth, walkFile);
         } else if (generationMode == WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE) {
-            System.out.println("generate random walks duplicate free...");
+            System.out.println("Generate random walks duplicate free...");
             this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
         } else if (generationMode == WalkGenerationMode.MID_WALKS_WEIGHTED) {
-            System.out.println("generate weighted mid walks...");
+            System.out.println("Generate weighted mid walks...");
             this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
         } else {
-            System.out.println("ERROR. Cannot identify the walkGenenerationMode chosen. Aborting program.");
+            System.out.println("ERROR. Cannot identify the \"walkGenenerationMode\" chosen. Aborting program.");
         }
+
+        if(isGenerateTextWalks()){
+            this.generateTextWalks(numberOfThreads, textWalkLength);
+        }
+
+        this.close();
     }
 
     @Override
@@ -149,14 +177,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if (this.parser == null) {
-            LOGGER.error("Parser not initialized. Aborting program");
-            return;
-        }
-        if (!parserIsOk) {
-            LOGGER.error("Will not execute walk generation due to parser initialization error.");
-            return;
-        }
+        if(!isParserOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateRandomMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
@@ -168,14 +189,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if (this.parser == null) {
-            LOGGER.error("Parser not initialized. Aborting program");
-            return;
-        }
-        if (!parserIsOk) {
-            LOGGER.error("Will not execute walk generation due to parser initialization error.");
-            return;
-        }
+        if(!isParserOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateWeightedMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
@@ -187,18 +201,38 @@ public class WalkGeneratorDefault extends WalkGenerator {
 
     @Override
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if (this.parser == null) {
-            LOGGER.error("Parser not initialized. Aborting program");
-            return;
-        }
-        if (!parserIsOk) {
-            LOGGER.error("Will not execute walk generation due to parser initialization error.");
-            return;
-        }
+        if(!isParserOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateRandomMidWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
+    @Override
+    public void generateTextWalks(int numberOfThreads, int walkLength) {
+        generateTextWalks(numberOfThreads, walkLength, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+    }
+
+    @Override
+    public void generateTextWalks(int numberOfThreads, int walkLength, String filePathOfFileToBeWritten) {
+        if(!isParserOk()) return;
+        this.filePath = filePathOfFileToBeWritten;
+        generateTextWalksForEntities(entitySelector.getEntities(), numberOfThreads, walkLength);
+    }
+
+    /**
+     * Helper method to check parser and manage log output.
+     * @return True if parser is ok, false if parser is not ok.
+     */
+    private boolean isParserOk(){
+        if (this.parser == null) {
+            LOGGER.error("Parser not initialized. Aborting program");
+            return false;
+        }
+        if (!parserIsOk) {
+            LOGGER.error("Will not execute walk generation due to parser initialization error.");
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Generate walks for the entities.
@@ -209,17 +243,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
      * @param walkLength      The length of each walk.
      */
     public void generateRandomWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
-
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
-        }
+        super.setOutputFileWriter();
 
         // thread pool
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
@@ -238,9 +262,8 @@ public class WalkGeneratorDefault extends WalkGenerator {
             LOGGER.error("Interrupted Exception");
             e.printStackTrace();
         }
-        this.close();
+        super.flushWriter();
     }
-
 
     /**
      * Default: Do not change URIs.
@@ -256,5 +279,13 @@ public class WalkGeneratorDefault extends WalkGenerator {
     @Override
     public UnaryOperator<String> getUriShortenerFunction() {
         return s -> s;
+    }
+
+    public boolean isGenerateTextWalks() {
+        return isGenerateTextWalks;
+    }
+
+    public void setGenerateTextWalks(boolean generateTextWalks) {
+        isGenerateTextWalks = generateTextWalks;
     }
 }

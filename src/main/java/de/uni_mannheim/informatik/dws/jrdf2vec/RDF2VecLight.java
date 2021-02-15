@@ -132,7 +132,7 @@ public class RDF2VecLight implements IRDF2Vec {
 
         Instant before = Instant.now();
         WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, entitiesFile);
-        generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, this.getWalkFilePath());
+        generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), this.getWalkFilePath());
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
@@ -236,7 +236,7 @@ public class RDF2VecLight implements IRDF2Vec {
         this.walkFilePath = walkFilePath;
     }
 
-    public Word2VecConfiguration getConfiguration() {
+    public Word2VecConfiguration getWord2VecConfiguration() {
         return configuration;
     }
 

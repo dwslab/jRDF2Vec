@@ -12,6 +12,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerato
  */
 public class MidWalkEntityProcessingRunnable implements Runnable {
 
+
     /**
      * Default Logger
      */

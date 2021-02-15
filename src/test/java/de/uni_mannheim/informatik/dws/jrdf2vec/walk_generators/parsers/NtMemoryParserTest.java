@@ -251,4 +251,26 @@ class NtMemoryParserTest {
         assertTrue(result.getAllObjectTriples().contains(new Triple("W","P7", "V2")));
         assertFalse(result.getUniqueObjectTriplePredicates().contains("rdfs:label"));
     }
+
+    @Test
+    void generateTextWalksForEntity(){
+        NtMemoryParser parser = new NtMemoryParser();
+        parser.setParseDatatypeProperties(true);
+        assertTrue(parser.isParseDatatypeProperties);
+        parser.readNTriples(loadFile("dummyGraph_with_labels.nt"));
+
+        // walk depth 8
+        List<String> result = parser.generateTextWalksForEntity("W", 8);
+        assertNotNull(result);
+        assertTrue(result.contains("W rdfs:label gedichte"));
+        assertTrue(result.contains("W rdf:Description wer reitet so spät durch nacht"));
+        assertFalse(result.contains("W rdf:Description wer reitet"));
+
+        // walk depth 4
+        result = parser.generateTextWalksForEntity("W", 4);
+        assertNotNull(result);
+        assertTrue(result.contains("W rdfs:label gedichte"));
+        assertTrue(result.contains("W rdf:Description wer reitet"));
+        assertFalse(result.contains("W rdf:Description wer reitet so spät durch nacht"));
+    }
 }

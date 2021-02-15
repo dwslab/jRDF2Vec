@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class RandomWalkEntityProcessingRunnable implements Runnable {
 
+
     /**
      * Entity that is processed by this thread.
      */

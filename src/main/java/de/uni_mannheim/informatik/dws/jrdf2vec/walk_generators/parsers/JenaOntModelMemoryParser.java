@@ -5,6 +5,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.T
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.*;
+import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,24 +19,35 @@ import java.net.URL;
  */
 public class JenaOntModelMemoryParser extends MemoryParser {
 
+
     /**
      * Default logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(JenaOntModelMemoryParser.class);
 
     /**
-     * Constructor
-     * @param ontModel The ont model from which data shall be read.
-     */
-    public JenaOntModelMemoryParser(OntModel ontModel){
-        readDataFromOntModel(ontModel);
-    }
-
-    /**
      * Simple Constructor
      */
     public JenaOntModelMemoryParser(){
         // do nothing
+    }
+
+    /**
+     * Constructor
+     * @param ontModel The ont model from which data shall be read.
+     */
+    public JenaOntModelMemoryParser(OntModel ontModel){
+        this(ontModel, false);
+    }
+
+    /**
+     * Constructor
+     * @param ontModel The ont model from which data shall be read.
+     * @param isParseDatatypeProperties True if datatype properties shall also be parsed.
+     */
+    public JenaOntModelMemoryParser(OntModel ontModel, boolean isParseDatatypeProperties){
+        this.setParseDatatypeProperties(isParseDatatypeProperties);
+        readDataFromOntModel(ontModel);
     }
 
     /**
@@ -49,7 +61,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
     /**
      * Read n-triples from the given file into {@link MemoryParser#data}.
      * @param fileToReadFrom File from which will be read (must be any RDF file such as NT, XML etc.).
-     * @param format Predefined values are:
+     * @param format Predefined values are those in {@link Lang} such as:
      *               <ul>
      *                  <li>"RDF/XML"</li>
      *                  <li>"RDF/XML-ABBREV"</li>
@@ -73,7 +85,7 @@ public class JenaOntModelMemoryParser extends MemoryParser {
     /**
      * Read n-triples from the given file into {@link MemoryParser#data}.
      * @param fileToReadFrom File from which will be read (must be any RDF file such as NT, XML etc.).
-     * @param format Predefined values are:
+     * @param format Predefined values are those in {@link Lang} such as:
      *               <ul>
      *                  <li>"RDF/XML"</li>
      *                  <li>"RDF/XML-ABBREV"</li>
@@ -153,5 +165,4 @@ public class JenaOntModelMemoryParser extends MemoryParser {
             data.addObjectTriple(new Triple(subject, predicate, object));
         }
     }
-
 }
