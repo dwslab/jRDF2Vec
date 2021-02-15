@@ -8,7 +8,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerato
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -16,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WalkGeneratorDefaultTest {
+
 
     @Test
     void generateRandomWalksDuplicateFreeXml() {
@@ -92,8 +92,6 @@ class WalkGeneratorDefaultTest {
         assertTrue(subjectsOfWalks.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#FourCheesesTopping"));
         generatedFile.delete();
     }
-
-
 
     @Test
     void generateTextWalks(){

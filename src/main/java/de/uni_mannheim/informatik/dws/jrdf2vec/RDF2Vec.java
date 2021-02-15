@@ -62,6 +62,11 @@ public class RDF2Vec implements IRDF2Vec {
     File pythonServerResourceDirectory = null;
 
     /**
+     * True if datatype properties shall be parsed and included into the embedding space.
+     */
+    boolean isEmbedText = false;
+
+    /**
      * Logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(RDF2Vec.class);
@@ -95,11 +100,6 @@ public class RDF2Vec implements IRDF2Vec {
      * This is, for example, required when using the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation framework for KG embeddings</a>.
      */
     boolean isVectorTextFileGeneration = true;
-
-    /**
-     * Indicator whether text walks (based on datatype properties) shall be generated.
-     */
-    private boolean isGenerateTextWalks = false;
 
     /**
      * Constructor
@@ -175,9 +175,9 @@ public class RDF2Vec implements IRDF2Vec {
 
         WalkGeneratorDefault classicGenerator;
         if(useFile) {
-            classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile, isGenerateTextWalks);
+            classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile, isEmbedText());
         } else {
-            classicGenerator = new WalkGeneratorDefault(this.ontModel, isGenerateTextWalks);
+            classicGenerator = new WalkGeneratorDefault(this.ontModel, isEmbedText());
         }
 
         classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), getWalkFilePath());
@@ -196,7 +196,7 @@ public class RDF2Vec implements IRDF2Vec {
         if(isVectorTextFileGeneration) {
             gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + File.separator + "vectors.txt");
         }
-        gensim.shutDown();
+        Gensim.shutDown();
         after = Instant.now();
         this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);
 
@@ -342,11 +342,13 @@ public class RDF2Vec implements IRDF2Vec {
         isVectorTextFileGeneration = vectorTextFileGeneration;
     }
 
-    public boolean isGenerateTextWalks() {
-        return isGenerateTextWalks;
+    @Override
+    public boolean isEmbedText() {
+        return isEmbedText;
     }
 
-    public void setGenerateTextWalks(boolean generateTextWalks) {
-        isGenerateTextWalks = generateTextWalks;
+    @Override
+    public void setEmbedText(boolean embedText) {
+        isEmbedText = embedText;
     }
 }

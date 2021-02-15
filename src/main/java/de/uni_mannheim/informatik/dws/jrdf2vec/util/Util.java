@@ -173,12 +173,21 @@ public class Util {
         }
     }
 
+    public static List<String> readLinesFromGzippedFile(String filePath){
+        return readLinesFromGzippedFile(new File(filePath));
+    }
+
     /**
      * Reads each line of the gzipped file into a list.
      * @param file File to be read from.
      * @return List. Each entry refers to one line in the file.
      */
     public static List<String> readLinesFromGzippedFile(File file){
+        List<String> result = new ArrayList<>();
+        if(file == null){
+            LOGGER.error("The file is null. Cannot read from file.");
+            return result;
+        }
         GZIPInputStream gzip = null;
         try {
             gzip = new GZIPInputStream(new FileInputStream(file));
@@ -189,7 +198,6 @@ public class Util {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
         String readLine;
-        List<String> result = new ArrayList<>();
         try {
             while ((readLine = reader.readLine()) != null) {
                 result.add(readLine);
@@ -200,5 +208,4 @@ public class Util {
         }
         return result;
     }
-
 }

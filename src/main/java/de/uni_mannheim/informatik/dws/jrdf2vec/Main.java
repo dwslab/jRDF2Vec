@@ -172,7 +172,12 @@ public class Main {
             }
         }
 
-        if(containsIgnoreCase("-embedText", args) || containsIgnoreCase("-text", args) || containsIgnoreCase("--embedText", args)){
+        if(containsIgnoreCase("-embedText", args) ||
+                containsIgnoreCase("-text", args) ||
+                containsIgnoreCase("--text", args) ||
+                containsIgnoreCase("--embedText", args) ||
+                containsIgnoreCase("-textEmbeddings", args) ||
+                containsIgnoreCase("--textEmbeddings", args)) {
             isEmbedText = true;
         }
 
@@ -416,7 +421,7 @@ public class Main {
             // now distinguish light/non-light
             if (lightEntityFile != null) {
                 // light walk generation:
-                WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile);
+                WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile, isEmbedText);
                 walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
 
@@ -458,6 +463,9 @@ public class Main {
             // setting the walk generation mode
             rdf2vec.setWalkGenerationMode(walkGenerationMode);
 
+            // setting the text embedding option
+            rdf2vec.setEmbedText(isEmbedText);
+
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
 
@@ -498,6 +506,9 @@ public class Main {
 
             // setting the walk generation mode
             rdf2VecLight.setWalkGenerationMode(walkGenerationMode);
+
+            // setting the text embedding option
+            rdf2VecLight.setEmbedText(isEmbedText);
 
             rdf2VecLight.setConfiguration(configuration);
             before = Instant.now();

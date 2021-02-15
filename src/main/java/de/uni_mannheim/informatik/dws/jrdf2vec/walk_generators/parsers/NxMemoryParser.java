@@ -143,7 +143,7 @@ public class NxMemoryParser extends MemoryParser {
                         predicate = uriShortenerFunction.apply(removeTags(nx[1].toString()));
                         object = getTextProcessingFunction().apply(nx[2].toString());
                         data.addDatatypeTriple(subject, predicate, object);
-
+                        continue;
                     } else if (nx[2].toString().startsWith("\"")) continue;
 
                     subject = uriShortenerFunction.apply(removeTags(nx[0].toString()));

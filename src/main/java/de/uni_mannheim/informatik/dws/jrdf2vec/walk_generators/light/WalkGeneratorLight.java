@@ -24,7 +24,17 @@ public class WalkGeneratorLight extends WalkGeneratorDefault {
      * @param pathToEntitiesFile Path to the file with entities for which walks shall be generated. One entity per line. No tags around the entities.
      */
     public WalkGeneratorLight(String pathToTripleFile, String pathToEntitiesFile){
-        this(new File(pathToTripleFile), new File(pathToEntitiesFile));
+        this(pathToTripleFile, pathToEntitiesFile, false);
+    }
+
+    /**
+     * Constructor
+     * @param pathToTripleFile Path to the data file.
+     * @param pathToEntitiesFile Path to the file with entities for which walks shall be generated. One entity per line. No tags around the entities.
+     * @param isGenerateTextWalks True if datatype properties shall be parsed and text walks shall be generated.
+     */
+    public WalkGeneratorLight(String pathToTripleFile, String pathToEntitiesFile, boolean isGenerateTextWalks){
+        this(new File(pathToTripleFile), new File(pathToEntitiesFile), isGenerateTextWalks);
     }
 
     /**
@@ -33,7 +43,17 @@ public class WalkGeneratorLight extends WalkGeneratorDefault {
      * @param entitiesFile File with entities for which walks shall be generated. One entity per line. No tags around the entities.
      */
     public WalkGeneratorLight(File tripleFile, File entitiesFile){
-        super(tripleFile);
+        this(tripleFile, entitiesFile, false);
+    }
+
+    /**
+     * Constructor
+     * @param tripleFile Data file.
+     * @param entitiesFile File with entities for which walks shall be generated. One entity per line. No tags around the entities.
+     * @param isGenerateTextWalks True if datatype properties shall be parsed and text walks shall be generated.
+     */
+    public WalkGeneratorLight(File tripleFile, File entitiesFile, boolean isGenerateTextWalks){
+        super(tripleFile, isGenerateTextWalks);
         if(!tripleFile.exists()){
             LOGGER.error("The data file does not exist: " + tripleFile.getName() + "\nProgram will fail.");
         }

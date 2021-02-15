@@ -40,6 +40,11 @@ public class RDF2VecLight implements IRDF2Vec {
     int numberOfWalksPerEntity = 100;
 
     /**
+     * Indicator whether text walks (based on datatype properties) shall be generated and used for training.
+     */
+    boolean isEmbedText;
+
+    /**
      * Number of hops. You can also use uneven numbers.
      * Depth 1: node -&gt; edge -&gt; node.
      */
@@ -96,7 +101,6 @@ public class RDF2VecLight implements IRDF2Vec {
         this(knowledgeGraphFile, entitiesFile, null);
     }
 
-
     /**
      * Constructor
      *
@@ -131,7 +135,7 @@ public class RDF2VecLight implements IRDF2Vec {
         }
 
         Instant before = Instant.now();
-        WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, entitiesFile);
+        WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, entitiesFile, isEmbedText());
         generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), this.getWalkFilePath());
 
         Instant after = Instant.now();
@@ -148,11 +152,10 @@ public class RDF2VecLight implements IRDF2Vec {
         if(isVectorTextFileGeneration) {
             gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + File.separator + "vectors.txt", entitiesFile.getAbsolutePath());
         }
-        gensim.shutDown();
+        Gensim.shutDown();
         after = Instant.now();
         this.requiredTimeForLastTrainingString = Util.getDeltaTimeString(before, after);
     }
-
 
     public File getEntitiesFile() {
         return entitiesFile;
@@ -180,6 +183,16 @@ public class RDF2VecLight implements IRDF2Vec {
 
     public int getNumberOfWalksPerEntity() {
         return numberOfWalksPerEntity;
+    }
+
+    @Override
+    public boolean isEmbedText() {
+        return this.isEmbedText;
+    }
+
+    @Override
+    public void setEmbedText(boolean embedText) {
+        this.isEmbedText = embedText;
     }
 
     public void setNumberOfWalksPerEntity(int numberOfWalksPerEntity) {

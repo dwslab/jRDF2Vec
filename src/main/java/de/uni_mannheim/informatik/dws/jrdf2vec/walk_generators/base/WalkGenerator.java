@@ -293,16 +293,19 @@ public abstract class WalkGenerator implements IWalkGenerator {
      * Initialize {@link WalkGenerator#writer}.
      */
     void setOutputFileWriter(){
-        File outputFile = new File(filePath);
-        outputFile.getParentFile().mkdirs();
+        // only act if the writer has not yet been initialized.
+        if(this.writer == null) {
+            File outputFile = new File(filePath);
+            outputFile.getParentFile().mkdirs();
 
-        // initialize the writer
-        try {
-            this.writer = new OutputStreamWriter(new GZIPOutputStream(
-                    new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
-        } catch (Exception e1) {
-            LOGGER.error("Could not initialize writer. Aborting process.", e1);
-            return;
+            // initialize the writer
+            try {
+                this.writer = new OutputStreamWriter(new GZIPOutputStream(
+                        new FileOutputStream(outputFile, false)), StandardCharsets.UTF_8);
+            } catch (Exception e1) {
+                LOGGER.error("Could not initialize writer. Aborting process.", e1);
+                return;
+            }
         }
     }
 

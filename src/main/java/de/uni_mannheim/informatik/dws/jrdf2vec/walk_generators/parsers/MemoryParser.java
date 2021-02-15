@@ -334,7 +334,7 @@ public abstract class MemoryParser implements IParser {
             int currentWalkLength = 2;
             for(String text : texts){
                 for(String token : text.split(" ")){
-                    walk.append(" " + token);
+                    walk.append(" " + this.textProcessingFunction.apply(token));
                     currentWalkLength++;
                     if(currentWalkLength == depth){
                         result.add(walk.toString());

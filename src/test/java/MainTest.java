@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test of the command line functionality.
  */
 class MainTest {
+
 
     /**
      * Logger
@@ -193,6 +195,103 @@ class MainTest {
         assertTrue(files.contains("model"));
         assertTrue(files.contains("walk_file.gz"));
         assertFalse(files.contains("vectors.txt"));
+
+        // test sample parameter
+        assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
+
+        try {
+            FileUtils.forceDelete(walkDirectory);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+            fail();
+        }
+    }
+
+    /**
+     * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
+     */
+    @Test
+    public void trainClassicWithNtFileTextGeneration(){
+        String walkPath = "./mainWalksNtText/";
+        File walkDirectory = new File(walkPath);
+        walkDirectory.deleteOnExit();
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+        String graphFilePath = loadFile("dummyGraph_with_labels.nt").getAbsolutePath();
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertEquals(8, Main.getRdf2VecInstance().getWord2VecConfiguration().getWindowSize());
+        assertTrue(walkDirectory.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertFalse(files.contains("vectors.txt"));
+
+        // assert that a text walk has been written
+        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file.gz"));
+
+        // make sure that we do not paste mass text
+        for(String line : lines){
+            assertTrue(line.split(" ").length <= 8);
+        }
+
+        // look for specific walk
+        assertTrue(lines.contains("W rdf:Description freude schöner götterfunken tochter aus elysium"));
+
+        // test sample parameter
+        assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
+
+        try {
+            FileUtils.forceDelete(walkDirectory);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+            fail();
+        }
+    }
+
+    /**
+     * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
+     */
+    @Test
+    public void trainLightWithNtFileTextGeneration(){
+        String walkPath = "./mainWalksNtText_light/";
+        File walkDirectory = new File(walkPath);
+        walkDirectory.deleteOnExit();
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+        String graphFilePath = loadFile("dummyGraph_with_labels.nt").getAbsolutePath();
+        String entityFilePath = loadFile("dummyGraph_with_labels_light_entities.txt").getAbsolutePath();
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-light", entityFilePath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2VecLight.class)");
+        assertEquals(8, Main.getRdf2VecInstance().getWord2VecConfiguration().getWindowSize());
+        assertTrue(walkDirectory.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertFalse(files.contains("vectors.txt"));
+
+        // assert that a text walk has been written
+        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file.gz"));
+
+        // make sure that we do not paste mass text
+        for(String line : lines){
+            String[] splitLine = line.split(" ");
+            assertTrue(splitLine.length <= 8);
+            assertTrue(splitLine[0].equals("W") || splitLine[0].equals("Z"));
+        }
+
+        // look for specific walk
+        assertTrue(lines.contains("W rdf:Description freude schöner götterfunken tochter aus elysium"));
 
         // test sample parameter
         assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
@@ -376,7 +475,6 @@ class MainTest {
             LOGGER.error("Error while trying to delete ./classicWalks/");
         }
     }
-
 
     @Test
     public void trainLight() {
@@ -798,10 +896,10 @@ class MainTest {
             reader.close();
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();
-            fail("Could not read from walk file.");
+            fail("Could not read from walk file, file not found exception.", fnfe);
         } catch (IOException e) {
             e.printStackTrace();
-            fail("Could not read from walk file.");
+            fail("Could not read from walk file.", e);
         }
 
         // clean up
@@ -837,6 +935,18 @@ class MainTest {
 
     @AfterAll
     static void cleanUp() {
+        try {
+            FileUtils.deleteDirectory(new File("./mainWalksNtText_light/"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./mainWalksNtText_light/).");
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.deleteDirectory(new File("./mainWalksNtText/"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./mainWalksNtText/).");
+            e.printStackTrace();
+        }
         try {
             FileUtils.deleteDirectory(new File("./walks"));
         } catch (IOException e) {

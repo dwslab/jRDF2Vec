@@ -194,6 +194,11 @@ class NxMemoryParserTest {
         assertTrue(datatypeTuplesForW.containsKey("rdfs:label"));
         assertTrue(datatypeTuplesForW.containsKey("rdf:Description"));
 
+        for(Triple triple : result.getObjectTriplesInvolvingSubject("W")){
+            assertFalse(triple.predicate.equals("rdf:Description"));
+            assertFalse(triple.predicate.equals("rdfs:label"));
+        }
+
         // make sure we only parse if the mode is true
         parser = new NxMemoryParser();
         parser.setParseDatatypeProperties(false);

@@ -257,13 +257,7 @@ public class HdtParser implements IParser {
             }
             writer.flush();
             writer.close();
-        } catch (NotFoundException nfe) {
-            LOGGER.error("Could not write file.", nfe);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Could not write file.", e);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Could not write file.", e);
-        } catch (IOException e) {
+        } catch (IOException | NotFoundException e) {
             LOGGER.error("Could not write file.", e);
         }
     }
