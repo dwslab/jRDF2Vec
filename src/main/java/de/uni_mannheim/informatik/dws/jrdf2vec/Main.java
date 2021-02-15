@@ -729,6 +729,9 @@ public class Main {
                 "    The directory where the walks shall be generated into. In case of -onlyTraining, the directory\n" +
                 "    where the walks reside.\n\n" +
 
+                "    -embedText\n" +
+                "    If added to the call, this switch will also generate walks that contain textual fragments of datatype properties.\n\n" +
+
                 "    -onlyTraining\n" +
                 "    If added to the call, this switch will deactivate the walk generation part so that only the training\n" +
                 "    is performed. The parameter -walkDirectory must be set. If walk generation parameters are specified,\n" +

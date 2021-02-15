@@ -56,6 +56,8 @@ This parameter determines the mode for the walk generation (multiple walk genera
 This parameter allows you to set the number of threads that shall be used for the walk generation as well as for the training.
 - `-walkDirectory <directory where walk files shall be generated/reside>`<br/>
 The directory where the walks shall be generated into. In case of `-onlyTraining`, the directory where the walks reside.
+- `-embedText`<br>
+If added to the call, this switch will also generate walks that contain textual fragments of datatype properties.
 
 **Parameters for the Training Configuration**
 - `-onlyTraining`<br/>
