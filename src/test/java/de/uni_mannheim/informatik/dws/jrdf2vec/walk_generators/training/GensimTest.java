@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GensimTest {
 
+
     private static Gensim gensim;
 
     @BeforeAll
@@ -42,6 +43,7 @@ class GensimTest {
      */
     void isInVocabulary() {
         gensim.setVectorCaching(true);
+
         // test case 1: model file
         String pathToModel = getPathOfResource("test_model");
         assertTrue(gensim.isInVocabulary("Europe", pathToModel));
@@ -61,8 +63,12 @@ class GensimTest {
      */
     void isInVocabularyNoCaching() {
         gensim.setVectorCaching(false);
+
         // test case 1: model file
         String pathToModel = getPathOfResource("test_model");
+        assertNotNull(pathToModel);
+        File modelFile = new File(pathToModel);
+        assertTrue(modelFile.exists());
         assertTrue(gensim.isInVocabulary("Europe", pathToModel));
         assertTrue(gensim.isInVocabulary("united", pathToModel));
         assertFalse(gensim.isInVocabulary("China", pathToModel));
@@ -73,7 +79,6 @@ class GensimTest {
         assertTrue(gensim.isInVocabulary("united", pathToVectorFile));
         assertFalse(gensim.isInVocabulary("China", pathToVectorFile));
     }
-
 
     @Test
     /**
@@ -126,11 +131,10 @@ class GensimTest {
         assertTrue(similarity > 0);
     }
 
-
-    @Test
     /**
      * Default test with cache.
      */
+    @Test
     void getVector() {
         gensim.setVectorCaching(true);
         // test case 1: vector file
@@ -150,11 +154,10 @@ class GensimTest {
         assertEquals(100, europeVector.length);
     }
 
-
-    @Test
     /**
      * Test without cache.
      */
+    @Test
     void getVectorNoCaching() {
         gensim.setVectorCaching(false);
         // test case 1: vector file
@@ -205,7 +208,6 @@ class GensimTest {
         vectorFile.delete();
     }
 
-
     @Test
     void trainWord2VecModelWithWalkDirectory() {
         String testFilePath = getPathOfResource("walk_directory_test");
@@ -232,7 +234,6 @@ class GensimTest {
         modelFile.delete();
         vectorFile.delete();
     }
-
 
     @Test
     void trainWord2VecModelSG() {
@@ -264,7 +265,6 @@ class GensimTest {
         vectorFile.delete();
     }
 
-
     @Test
     void trainWord2VecModelCBOW() {
         String testFilePath = getPathOfResource("testInputForWord2Vec.txt");
@@ -283,7 +283,6 @@ class GensimTest {
         modelFile.delete();
         vectorFile.delete();
     }
-
 
     @Test
     void externalResourcesDirectory(){
@@ -315,7 +314,6 @@ class GensimTest {
         }
     }
 
-
     @Test
     void getVocabularyTerms(){
         String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
@@ -323,7 +321,6 @@ class GensimTest {
         assertTrue(result.size() > 0);
         assertTrue(result.contains("Europe"));
     }
-
 
     /**
      * Helper method to obtain the canonical path of a (test) resource.
@@ -341,6 +338,4 @@ class GensimTest {
             return null;
         }
     }
-
-
 }

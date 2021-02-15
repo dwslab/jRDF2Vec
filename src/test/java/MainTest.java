@@ -207,6 +207,45 @@ class MainTest {
         }
     }
 
+    @Test
+    public void trainClassicWithOwlFileTextGeneration(){
+        String walkPath = "./mainWalksOwlText/";
+        File walkDirectory = new File(walkPath);
+        walkDirectory.deleteOnExit();
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+        String graphFilePath = loadFile("pizza.owl.xml").getAbsolutePath();
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "5"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertEquals(5, Main.getRdf2VecInstance().getWord2VecConfiguration().getWindowSize());
+        assertTrue(walkDirectory.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(walkDirectory.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertFalse(files.contains("vectors.txt"));
+
+        // assert that a text walk has been written
+        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file.gz"));
+
+        // look for specific walk
+        assertTrue(lines.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#Siciliana http://www.w3.org/2004/02/skos/core#altLabel siciliana"));
+
+        // test sample parameter
+        assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
+
+        try {
+            FileUtils.forceDelete(walkDirectory);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+            fail();
+        }
+    }
+
     /**
      * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
      */
@@ -641,9 +680,9 @@ class MainTest {
                     pcmCount++;
             }
 
-            assertTrue(100 <= heikoCount && heikoCount <= 300);
-            assertTrue(100 <= heinerCount && heinerCount <= 300);
-            assertTrue(100 <= pcmCount && pcmCount <= 300);
+            assertTrue(100 <= heikoCount);
+            assertTrue(100 <= heinerCount);
+            assertTrue(100 <= pcmCount);
 
             reader.close();
         } catch (FileNotFoundException fnfe) {
@@ -721,14 +760,14 @@ class MainTest {
             }
 
             assertTrue(numberOfLines > 10);
-            assertTrue(10 <= heikoCount && heikoCount < 30, "heikoCount not within boundaries. Value: " + heikoCount);
-            assertTrue(10 <= heinerCount && heinerCount < 30, "heinerCount not within boundaries. Values: " + heinerCount);
-            assertTrue(10 <= pcmCount && pcmCount < 30, "pcmCount not within boundaries. Values: " + pcmCount);
+            assertTrue(10 <= heikoCount, "heikoCount not within boundaries. Value: " + heikoCount);
+            assertTrue(10 <= heinerCount, "heinerCount not within boundaries. Values: " + heinerCount);
+            assertTrue(10 <= pcmCount, "pcmCount not within boundaries. Values: " + pcmCount);
 
             reader.close();
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();
-            fail("Could not read from walk file.");
+            fail("Could not read from walk file due to a file not found exception.");
         } catch (IOException e) {
             e.printStackTrace();
             fail("Could not read from walk file.");
@@ -814,9 +853,9 @@ class MainTest {
                     pcmCount++;
             }
 
-            assertTrue(1 <= heikoCount && heikoCount < 1000, "heikoCount not within boundaries. Value: " + heikoCount);
-            assertTrue(1 <= heinerCount && heinerCount < 1000, "heinerCount not within boundaries. Values: " + heinerCount);
-            assertTrue(1 <= pcmCount && pcmCount < 1000, "pcmCount not within boundaries. Values: " + pcmCount);
+            assertTrue(1 <= heikoCount, "heikoCount not within boundaries. Value: " + heikoCount);
+            assertTrue(1 <= heinerCount, "heinerCount not within boundaries. Values: " + heinerCount);
+            assertTrue(1 <= pcmCount, "pcmCount not within boundaries. Values: " + pcmCount);
 
             reader.close();
         } catch (FileNotFoundException fnfe) {
@@ -831,7 +870,6 @@ class MainTest {
         graphFileToUse.delete();
         walkDirectory.delete();
     }
-
 
     /**
      * Plain generation of walks.
@@ -889,9 +927,9 @@ class MainTest {
                     pcmCount++;
             }
 
-            assertTrue(100 <= heikoCount && heikoCount <= 300);
-            assertTrue(100 <= heinerCount && heinerCount <= 300);
-            assertTrue(100 <= pcmCount && pcmCount <= 300);
+            assertTrue(100 <= heikoCount);
+            assertTrue(100 <= heinerCount);
+            assertTrue(100 <= pcmCount);
 
             reader.close();
         } catch (FileNotFoundException fnfe) {
@@ -935,6 +973,12 @@ class MainTest {
 
     @AfterAll
     static void cleanUp() {
+        try {
+            FileUtils.deleteDirectory(new File("./mainWalksOwlText/"));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory ./mainWalksOwlText/).");
+            e.printStackTrace();
+        }
         try {
             FileUtils.deleteDirectory(new File("./mainWalksNtText_light/"));
         } catch (IOException e) {

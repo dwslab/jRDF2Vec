@@ -39,7 +39,7 @@ public class Gensim {
     /**
      * Default resources directory (where the python files will be copied to by default).
      */
-    private static final String DEFAULT_RESOURCES_DIRECTORY = "./python-server/";
+    private static final String DEFAULT_RESOURCES_DIRECTORY = "." + File.separator + "python-server" + File.separator;
 
     /**
      * Constructor
@@ -227,7 +227,6 @@ public class Gensim {
         return -1.0;
     }
 
-
     /**
      * Returns the full vocabulary of the specified model as HashSet (e.g. for fast indexing).
      * Be aware that this operation can be very memory-consuming for very large models.
@@ -263,7 +262,6 @@ public class Gensim {
             return result;
         }
     }
-
 
     /**
      * Returns the vector of a concept.
@@ -472,7 +470,6 @@ public class Gensim {
         return instance;
     }
 
-
     /**
      * Shut down the service.
      */
@@ -501,7 +498,6 @@ public class Gensim {
      */
     private static Process serverProcess;
 
-
     /**
      * Export a resource embedded into a Jar file to the local file path.
      *
@@ -525,7 +521,6 @@ public class Gensim {
                     + baseDirectory.getAbsolutePath() + ")", ex);
         }
     }
-
 
     /**
      * Initializes the server.
@@ -557,7 +552,6 @@ public class Gensim {
             return false;
         }
         String pythonCommand = getPythonCommand();
-
 
         List<String> command = Arrays.asList(pythonCommand, canonicalPath);
         ProcessBuilder pb = new ProcessBuilder(command);
