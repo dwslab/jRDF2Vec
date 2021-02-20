@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public class Util {
     }
 
     /**
-     * Reads each line of the gzipped file into a list.
+     * Reads each line of the gzipped file into a list. The file must be UTF-8 encoded.
      * @param file File to be read from.
      * @return List. Each entry refers to one line in the file.
      */
@@ -196,7 +197,7 @@ public class Util {
             fail("Input stream to verify file could not be established.");
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
         String readLine;
         try {
             while ((readLine = reader.readLine()) != null) {
@@ -205,6 +206,11 @@ public class Util {
         } catch (IOException e){
             e.printStackTrace();
             fail("Could not read gzipped file.");
+        }
+        try {
+            reader.close();
+        } catch (IOException e) {
+            LOGGER.error("A problem occurred while trying to close the file reader.", e);
         }
         return result;
     }

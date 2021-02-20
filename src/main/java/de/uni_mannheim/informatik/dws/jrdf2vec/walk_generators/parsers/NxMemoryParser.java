@@ -8,10 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -133,7 +131,7 @@ public class NxMemoryParser extends MemoryParser {
         if (fileToReadFrom.getName().endsWith(".nt") || fileToReadFrom.getName().endsWith(".ttl") || fileToReadFrom.getName().endsWith(".nq")) {
             NxParser parser = new NxParser();
             try {
-                parser.parse(new FileInputStream(fileToReadFrom));
+                parser.parse(new InputStreamReader(new FileInputStream(fileToReadFrom), StandardCharsets.UTF_8));
                 String subject, predicate, object;
                 for (Node[] nx : parser) {
 

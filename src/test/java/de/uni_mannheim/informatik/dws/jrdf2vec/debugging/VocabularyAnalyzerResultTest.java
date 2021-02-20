@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VocabularyAnalyzerResultTest {
 
+
     @Test
     void getAllNotFound() {
         VocabularyAnalyzerResult result = new VocabularyAnalyzerResult();
@@ -19,8 +20,8 @@ class VocabularyAnalyzerResultTest {
         assertTrue(result.getAllNotFound().size() == 6);
 
         String string = result.toString();
-        System.out.println(string);
         assertNotNull(string);
+        //System.out.println(string);
     }
 
     @Test
