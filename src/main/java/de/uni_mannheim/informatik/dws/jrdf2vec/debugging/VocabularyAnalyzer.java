@@ -70,7 +70,7 @@ public class VocabularyAnalyzer {
     static Set<String> readSetFromFile(File file) {
         HashSet<String> result = new HashSet<>();
         if (!file.exists()) {
-            System.out.println("File does not exist.");
+            LOGGER.error("File does not exist.");
             return result;
         }
         try {

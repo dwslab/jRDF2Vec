@@ -45,12 +45,18 @@ class VocabularyAnalyzerTest {
     }
 
     @Test
+    void readSetFromFile(){
+        // Error case
+        assertEquals(VocabularyAnalyzer.readSetFromFile("xzy_not_existing.txt").size(), 0);
+    }
+
+    @Test
     void readTextVectorFile() {
         Triplet<Set<String>, Integer, Boolean> result = VocabularyAnalyzer.readTextVectorFile(new File(getPathOfResource("freude_vectors.txt")));
         Set<String> concepts = result.getValue0();
-        assertTrue(concepts.size() == 12);
+        assertEquals(12, concepts.size());
         assertTrue(concepts.contains("betreten"));
-        assertTrue(result.getValue1() == 3);
+        assertEquals(3, (int) result.getValue1());
         assertTrue(result.getValue2());
     }
 
