@@ -60,7 +60,6 @@ public class NtMemoryParser extends MemoryParser {
         uriShortenerFunction = s -> s;
     }
 
-
     /**
      * Constructor
      *

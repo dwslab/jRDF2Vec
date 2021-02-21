@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NxMemoryParserTest {
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(NxMemoryParserTest.class);
 
     /**
@@ -221,7 +222,8 @@ class NxMemoryParserTest {
         List<String> result = parser.generateTextWalksForEntity("W", 8);
         assertNotNull(result);
         assertTrue(result.contains("W rdfs:label gedichte"));
-        assertTrue(result.contains("W rdf:Description wer reitet so spät durch nacht"));
+        String expectedSentence = "W rdf:Description wer reitet so spät durch nacht";
+        assertTrue(result.contains(expectedSentence), "Could not find String '" + expectedSentence + "'.\n" + transformToString(result) + "\nNumber of walks: " + result.size());
         assertFalse(result.contains("W rdf:Description wer reitet"));
 
         // walk depth 4
@@ -231,4 +233,18 @@ class NxMemoryParserTest {
         assertTrue(result.contains("W rdf:Description wer reitet"));
         assertFalse(result.contains("W rdf:Description wer reitet so spät durch nacht"));
     }
+
+    /**
+     * Write the
+     * @param toBeTransformed
+     * @return
+     */
+    private String transformToString(List<String> toBeTransformed){
+        StringBuffer buffer = new StringBuffer();
+        for(String s : toBeTransformed){
+            buffer.append(s).append("\n");
+        }
+        return buffer.toString();
+    }
+
 }

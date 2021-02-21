@@ -407,13 +407,13 @@ public class Main {
         if (isOnlyWalks) {
             printIfIgnoredOptionsExist();
             System.out.println("Only walks are being generated, training is performed.");
-            String walkFile = "./walks/walk_file.gz";
+            String walkFile = "." + File.separator + "walks" + File.separator + "walk_file.gz";
 
             // handle the walk directory
             if (walkDirectory == null || !walkDirectory.isDirectory()) {
                 System.out.println("walkDirectory is not a directory. Using default: " + walkFile);
             } else {
-                walkFile = walkDirectory.getAbsolutePath() + "/walk_file.gz";
+                walkFile = walkDirectory.getAbsolutePath() + File.separator + "walk_file.gz";
             }
 
             before = Instant.now();

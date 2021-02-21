@@ -21,6 +21,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
@@ -210,11 +211,10 @@ class MainTest {
 
     @Test
     public void trainClassicWithOwlFileTextGeneration(){
-        String walkPath = "./mainWalksOwlText/";
+        String walkPath = "." + File.separator + "mainWalksOwlText" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
         walkDirectory.mkdir();
-        walkDirectory.deleteOnExit();
         String graphFilePath = loadFile("pizza.owl.xml").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "5"};
         Main.main(args);
@@ -243,7 +243,6 @@ class MainTest {
             FileUtils.forceDelete(walkDirectory);
         } catch (IOException ioe) {
             LOGGER.error("Failed to clean up after test.", ioe);
-            fail();
         }
     }
 
@@ -252,11 +251,11 @@ class MainTest {
      */
     @Test
     public void trainClassicWithNtFileTextGeneration(){
-        String walkPath = "./mainWalksNtText/";
+        Main.reset();
+        String walkPath = "." + File.separator + "mainWalksNtText" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
         walkDirectory.mkdir();
-        walkDirectory.deleteOnExit();
         String graphFilePath = loadFile("dummyGraph_with_labels.nt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
         Main.main(args);
@@ -290,7 +289,6 @@ class MainTest {
             FileUtils.forceDelete(walkDirectory);
         } catch (IOException ioe) {
             LOGGER.error("Failed to clean up after test.", ioe);
-            fail();
         }
     }
 
@@ -299,11 +297,10 @@ class MainTest {
      */
     @Test
     public void trainLightWithNtFileTextGeneration(){
-        String walkPath = "./mainWalksNtText_light/";
+        String walkPath = "." + File.separator +  "mainWalksNtText_light" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
         walkDirectory.mkdir();
-        walkDirectory.deleteOnExit();
         String graphFilePath = loadFile("dummyGraph_with_labels.nt").getAbsolutePath();
         String entityFilePath = loadFile("dummyGraph_with_labels_light_entities.txt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-light", entityFilePath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
@@ -331,7 +328,8 @@ class MainTest {
         }
 
         // look for specific walk
-        assertTrue(lines.contains("W rdf:Description freude schöner götterfunken tochter aus elysium"));
+        String expectedString = "W rdf:Description freude schöner götterfunken tochter aus elysium";
+        assertTrue(lines.contains(expectedString), "Could not find the expected line: '" + expectedString + "'\nIn the walks\n:" + transformToString(lines) );
 
         // test sample parameter
         assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
@@ -340,8 +338,20 @@ class MainTest {
             FileUtils.forceDelete(walkDirectory);
         } catch (IOException ioe) {
             LOGGER.error("Failed to clean up after test.", ioe);
-            fail();
         }
+    }
+
+    /**
+     * Write the
+     * @param toBeTransformed
+     * @return
+     */
+    private String transformToString(List<String> toBeTransformed){
+        StringBuffer buffer = new StringBuffer();
+        for(String s : toBeTransformed){
+            buffer.append(s).append("\n");
+        }
+        return buffer.toString();
     }
 
     @Test
