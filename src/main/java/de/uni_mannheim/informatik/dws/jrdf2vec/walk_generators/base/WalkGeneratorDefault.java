@@ -34,12 +34,12 @@ public class WalkGeneratorDefault extends WalkGenerator {
     /**
      * If not specified differently, this directory will be used to persist walks.
      */
-    public final static String DEFAULT_WALK_DIRECTORY = "./walks";
+    public final static String DEFAULT_WALK_DIRECTORY = "." + File.separator + "walks";
 
     /**
      * If not specified differently, this file will be used to persists walks.
      */
-    public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = DEFAULT_WALK_DIRECTORY + "/walk_file.gz";
+    public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = DEFAULT_WALK_DIRECTORY + File.separator + "walk_file.gz";
 
     /**
      * Can be set to false if there are problems with the parser to make sure that generation functions do not
@@ -224,7 +224,7 @@ public class WalkGeneratorDefault extends WalkGenerator {
      */
     private boolean isParserOk(){
         if (this.parser == null) {
-            LOGGER.error("Parser not initialized. Aborting program");
+            LOGGER.error("Parser not initialized. Aborting program.");
             return false;
         }
         if (!parserIsOk) {

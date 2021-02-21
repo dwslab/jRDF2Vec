@@ -29,7 +29,7 @@ class RDF2VecTest {
     void getWalkFilePath() {
         RDF2Vec rdf2vec = new RDF2Vec(loadFile("emptyFile.txt"));
         // also forward slash on windows
-        assertEquals("./walks/walk_file.gz", rdf2vec.getWalkFilePath());
+        assertEquals("." + File.separator + "walks" + File.separator + "walk_file.gz", rdf2vec.getWalkFilePath());
         assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks" + File.separator) || rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
     }
 
@@ -96,9 +96,9 @@ class RDF2VecTest {
 
         classic.train();
 
-        assertTrue(new File("./walks/model").exists(), "Model file not written.");
-        assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
-        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertTrue(new File("." + File.separator + "walks" + File.separator + "model").exists(), "Model file not written.");
+        assertTrue(new File("." + File.separator + "walks" + File.separator + "model.kv").exists(), "Vector file not written.");
+        assertTrue(new File("." + File.separator + "walks" + File.separator + "walk_file.gz").exists(), "Walk file not written.");
         assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
         assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
@@ -106,7 +106,7 @@ class RDF2VecTest {
         try {
             FileUtils.deleteDirectory(new File("./walks"));
         } catch (IOException e) {
-            LOGGER.info("Cleanup failed.");
+            LOGGER.info("Cleanup failed.", e);
             e.printStackTrace();
         }
     }
@@ -114,7 +114,7 @@ class RDF2VecTest {
     @Test
     void trainWithExternalResourcesDirectory(){
         File graphFilePath = loadFile("dummyGraph.nt");
-        File externalResourcesDirectory = new File("./extClassic/");
+        File externalResourcesDirectory = new File("." + File.separator + "extClassic" + File.separator);
         externalResourcesDirectory.deleteOnExit();
         externalResourcesDirectory.mkdirs();
         RDF2Vec light = new RDF2Vec(graphFilePath);
@@ -152,31 +152,31 @@ class RDF2VecTest {
      * Deleting test files.
      */
     static void cleanUp(){
+        Gensim.shutDown();
         try {
-            FileUtils.deleteDirectory(new File("./walks"));
+            FileUtils.deleteDirectory(new File("." + File.separator + "walks"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./walks/).");
             e.printStackTrace();
         }
         try {
-            FileUtils.deleteDirectory(new File("./python-server"));
+            FileUtils.deleteDirectory(new File("." + File.separator + "python-server"));
         } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./python-server).");
+            LOGGER.info("Cleanup failed (directory ." + File.separator + "python-server).");
             e.printStackTrace();
         }
         try {
-            FileUtils.deleteDirectory(new File("./extClassic"));
+            FileUtils.deleteDirectory(new File("." + File.separator + "extClassic"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./extClassic/).");
             e.printStackTrace();
         }
         try {
-            FileUtils.deleteDirectory(new File("./ontModelTest"));
+            FileUtils.deleteDirectory(new File("." + File.separator + "ontModelTest"));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./ontModelTest/).");
             e.printStackTrace();
         }
-        Gensim.shutDown();
     }
 
     /**

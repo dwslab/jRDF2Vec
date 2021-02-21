@@ -984,6 +984,7 @@ class MainTest {
 
     @AfterAll
     static void cleanUp() {
+        Gensim.shutDown();
         try {
             FileUtils.deleteDirectory(new File("./mainWalksOwlText/"));
         } catch (IOException e) {
@@ -1062,7 +1063,6 @@ class MainTest {
             LOGGER.info("Cleanup failed (directory ./mainWalksNq/).");
             e.printStackTrace();
         }
-        Gensim.shutDown();
     }
 
     /**

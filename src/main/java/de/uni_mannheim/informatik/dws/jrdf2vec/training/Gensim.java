@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  */
 public class Gensim {
 
+
     /**
      * Default logger
      */
@@ -106,7 +107,6 @@ public class Gensim {
         }
     }
 
-
     /**
      * Method to query a vector space model (which has to be trained with trainVectorSpaceModel).
      * @param modelPath identifier for the model (used for querying a specific model
@@ -133,7 +133,6 @@ public class Gensim {
             }
         }
     }
-
 
     /************************************
      * Word2vec model
@@ -505,7 +504,7 @@ public class Gensim {
      * @param resourceName ie.: "/SmartLibrary.dll"
      */
     private void exportResource(File baseDirectory, String resourceName) {
-        try (InputStream stream = this.getClass().getResourceAsStream("/" + resourceName)){
+        try (InputStream stream = this.getClass().getResourceAsStream(File.separator + resourceName)){
             if(stream == null) {
                 throw new Exception("Cannot get resource \"" + resourceName + "\" from Jar file.");
             }
@@ -636,7 +635,7 @@ public class Gensim {
     protected void updateEnvironmentPath(Map<String,String> environment, String pythonCommand){
         String path = environment.getOrDefault("PATH", "");
         String additionalPaths = getPythonAdditionalPath(pythonCommand);
-        if(additionalPaths.isEmpty() == false){
+        if(!additionalPaths.isEmpty()){
             if(path.endsWith(File.pathSeparator) == false)
                 path += File.pathSeparator;
             path += additionalPaths;
@@ -656,10 +655,9 @@ public class Gensim {
             return "";
         }
         try {
-            String s = Files.find(f.toPath(), 6, (path, attributes) -> attributes.isDirectory() && path.getFileName().toString().equals("bin"))
+            return Files.find(f.toPath(), 6, (path, attributes) -> attributes.isDirectory() && path.getFileName().toString().equals("bin"))
                     .map(path->path.toAbsolutePath().toString())
                     .collect(Collectors.joining(File.pathSeparator));
-            return s;
         } catch (IOException ex) {
             LOGGER.info("Could not add more directories in path", ex);
             return "";
@@ -738,7 +736,7 @@ public class Gensim {
             return this.resourcesDirectory.getCanonicalPath();
         } catch (IOException ioe){
             LOGGER.error("Could not determine canonical path for resources directory. Returning default.");
-            return "./melt-resources/";
+            return "." + File.separator + "melt-resources" + File.separator;
         }
     }
 

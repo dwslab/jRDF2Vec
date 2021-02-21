@@ -99,6 +99,7 @@ class RDF2VecLightTest {
 
     @AfterAll
     static void cleanUp(){
+        Gensim.shutDown();
         try {
             FileUtils.deleteDirectory(new File("./walks"));
         } catch (IOException e) {
@@ -117,7 +118,6 @@ class RDF2VecLightTest {
             LOGGER.info("Cleanup failed (directory ./extLight/).");
             e.printStackTrace();
         }
-        Gensim.shutDown();
     }
 
 }
