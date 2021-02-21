@@ -11,6 +11,6 @@ class WalkGenerationModeTest {
         assertNotNull(result);
         assertFalse(result.endsWith(" "));
         assertFalse(result.endsWith("|"));
-        System.out.println(result);
+        //System.out.println(result);
     }
 }

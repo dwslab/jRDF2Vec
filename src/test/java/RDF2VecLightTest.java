@@ -1,4 +1,5 @@
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.net.URISyntaxException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RDF2VecLightTest {
+
 
     /**
      * Logger
@@ -115,6 +117,7 @@ class RDF2VecLightTest {
             LOGGER.info("Cleanup failed (directory ./extLight/).");
             e.printStackTrace();
         }
+        Gensim.shutDown();
     }
 
 }

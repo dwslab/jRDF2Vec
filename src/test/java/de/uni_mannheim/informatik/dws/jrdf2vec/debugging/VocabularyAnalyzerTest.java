@@ -1,6 +1,8 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.debugging;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import org.javatuples.Triplet;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class VocabularyAnalyzerTest {
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VocabularyAnalyzerTest.class);
 
@@ -66,5 +69,10 @@ class VocabularyAnalyzerTest {
             LOGGER.info("Cannot create path of resource", ex);
             return null;
         }
+    }
+
+    @AfterAll
+    public static void tearDown(){
+        Gensim.shutDown();
     }
 }

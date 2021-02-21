@@ -2,6 +2,7 @@ import com.google.common.collect.Sets;
 import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
+import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -1051,6 +1052,7 @@ class MainTest {
             LOGGER.info("Cleanup failed (directory ./mainWalksNq/).");
             e.printStackTrace();
         }
+        Gensim.shutDown();
     }
 
     /**

@@ -33,7 +33,6 @@ class RDF2VecTest {
         assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks" + File.separator) || rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
     }
 
-
     @Test
     void train() {
         RDF2Vec classic = new RDF2Vec(loadFile("dummyGraph.nt"));
@@ -177,6 +176,7 @@ class RDF2VecTest {
             LOGGER.info("Cleanup failed (directory ./ontModelTest/).");
             e.printStackTrace();
         }
+        Gensim.shutDown();
     }
 
     /**

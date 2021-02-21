@@ -134,9 +134,9 @@ public class Util {
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOGGER.error("File not found (exception).", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IOException", e);
         }
         return result;
     }
