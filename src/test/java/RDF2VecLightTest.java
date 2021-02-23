@@ -29,7 +29,7 @@ class RDF2VecLightTest {
         File entityFilePath =loadFile("emptyFile.nt");
         File graphFilePath = loadFile("emptyFile.txt");
         RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
-        assertEquals("./walks/walk_file.gz", light.getWalkFilePath());
+        assertEquals("." + File.separator + "walks" + File.separator + "walk_file.gz", light.getWalkFilePath());
         assertTrue(light.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + light.getWalkFileDirectoryPath());
     }
 

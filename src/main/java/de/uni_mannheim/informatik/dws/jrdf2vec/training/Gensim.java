@@ -501,10 +501,11 @@ public class Gensim {
      * Export a resource embedded into a Jar file to the local file path.
      *
      * @param baseDirectory The base directory.
-     * @param resourceName ie.: "/SmartLibrary.dll"
+     * @param resourceName ie.: "SmartLibrary.dll" (a leading slash will be added)
      */
     private void exportResource(File baseDirectory, String resourceName) {
-        try (InputStream stream = this.getClass().getResourceAsStream(File.separator + resourceName)){
+        // there must not be a backslash for getResourceAsStream()
+        try (InputStream stream = this.getClass().getResourceAsStream("/" + resourceName)){
             if(stream == null) {
                 throw new Exception("Cannot get resource \"" + resourceName + "\" from Jar file.");
             }
