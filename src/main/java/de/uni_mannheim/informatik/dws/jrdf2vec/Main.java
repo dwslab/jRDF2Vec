@@ -19,6 +19,7 @@ import java.util.HashSet;
  */
 public class Main {
 
+
     /**
      * word2vec configuration (not just CBOW/SG but contains also all other parameters)
      */
@@ -133,6 +134,11 @@ public class Main {
     private static boolean isEmbedText = false;
 
     /**
+     * The port that is to be used
+     */
+    private static int port = Gensim.DEFAULT_PORT;
+
+    /**
      * The main method that is executed when running the JAR.
      * @param args All the options for walk generation and training. Run with -help in order to get an overview.
      */
@@ -195,7 +201,19 @@ public class Main {
         }
 
         String knowledgeGraphFilePath = getValue("-graph", args);
-        if(knowledgeGraphFilePath == null) knowledgeGraphFilePath = getValue("-g", args);;
+        if(knowledgeGraphFilePath == null) knowledgeGraphFilePath = getValue("-g", args);
+
+        String portString = getValue("-port", args);
+        if(portString != null){
+            try {
+                int intPort = Integer.parseInt(portString);
+                Gensim.setPort(intPort);
+                port = intPort;
+            } catch (NumberFormatException nfe){
+                System.out.println("A problem occurred while trying to parse the following port number: " + portString + "\nUsing default port: " + Gensim.DEFAULT_PORT);
+            }
+        }
+        System.out.println("Using server port: " + port);
 
         isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
         // allowing a bit more...
@@ -678,7 +696,6 @@ public class Main {
         return;
     }
 
-
     /**
      * Get the help text on how to use the CLI.
      * Developer note: Also add new commands to the README.
@@ -761,6 +778,9 @@ public class Main {
                 "    -epochs <number> (default: 5)\n" +
                 "    The epochs for the training.\n\n" +
 
+                "    -port <port_number> (default: 1808)\n" +
+                "    The port that shall be used for the server.\n\n" +
+
                 "\n" +
 
                 "Additional Services\n" +
@@ -805,6 +825,7 @@ public class Main {
         walkGenerationMode = null;
         isVectorTextFileGeneration = true;
         isOnlyTraining = false;
+        Gensim.shutDown();
     }
 
 }

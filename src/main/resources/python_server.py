@@ -4,6 +4,7 @@ import csv
 import numpy as np
 import logging
 import os
+import sys
 import gzip
 
 
@@ -443,4 +444,18 @@ def hello_demo():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=1808)
+    # determine the port
+    try:
+        if len(sys.argv) == 2:
+            logging.info("Received argument: " + sys.argv[1])
+            int_port = int(sys.argv[1])
+            if int_port > 0:
+                port = int_port
+        else:
+            port = 1808
+    except Exception as e:
+        logging.info("Exception occurred. Using default port: 1808")
+        port=1808
+        logging.error(e)
+    logging.info(f"Starting server using port {port}")
+    app.run(debug=False, port=port)

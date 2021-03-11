@@ -7,6 +7,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +35,10 @@ class GensimTest {
 
     @AfterAll
     public static void tearDown(){
-        gensim.shutDown();
+        Gensim.shutDown();
     }
 
-    private static Logger LOGGER = LoggerFactory.getLogger(GensimTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GensimTest.class);
 
     @Test
     /**
@@ -159,6 +162,35 @@ class GensimTest {
      */
     @Test
     void getVectorNoCaching() {
+        gensim.setVectorCaching(false);
+        // test case 1: vector file
+        String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
+        Double[] europeVector = gensim.getVector("Europe", pathToVectorFile);
+        assertEquals(100, europeVector.length);
+
+        Double[] unitedVector = gensim.getVector("united", pathToVectorFile);
+
+        double similarityJava = (gensim.cosineSimilarity(europeVector, unitedVector));
+        double similarityPython = (gensim.getSimilarity("Europe", "united", pathToVectorFile));
+        assertEquals(similarityJava, similarityPython, 0.0001);
+
+        // test case 2: model file
+        String pathToModel = getPathOfResource("test_model");
+        europeVector = gensim.getVector("Europe", pathToModel);
+        assertEquals(100, europeVector.length);
+    }
+
+    /**
+     * Check whether vectors can be read using two different ports.
+     * Test without cache.
+     */
+    @ParameterizedTest
+    @ValueSource(ints = {41193, 41194})
+    void getVectorNoCachingDifferentPorts(int port) {
+        Gensim.shutDown();
+        Gensim.setPort(port);
+        assertEquals(port, Gensim.getPort());
+        gensim = Gensim.getInstance();
         gensim.setVectorCaching(false);
         // test case 1: vector file
         String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
@@ -302,10 +334,10 @@ class GensimTest {
         }
 
         // shut down again to keep using default resources directory
-        gensim.shutDown();
+        Gensim.shutDown();
 
         // we need to restart for subsequent tests
-        gensim = gensim.getInstance();
+        gensim = Gensim.getInstance();
 
         try {
             FileUtils.deleteDirectory(externalResourcesDirectory);
@@ -320,6 +352,18 @@ class GensimTest {
         HashSet<String> result = gensim.getVocabularyTerms(pathToVectorFile);
         assertTrue(result.size() > 0);
         assertTrue(result.contains("Europe"));
+    }
+
+    @Test
+    void setGetPort(){
+        int testPort = 41194;
+        Gensim.setPort(testPort);
+        assertFalse(Gensim.getPort() == testPort);
+        Gensim.shutDown();
+        Gensim.setPort(testPort);
+        gensim = Gensim.getInstance();
+        assertEquals(testPort, Gensim.getPort());
+        assertTrue(Gensim.getServerUrl().contains("41194"));
     }
 
     /**

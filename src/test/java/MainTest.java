@@ -563,7 +563,8 @@ class MainTest {
         lightWalks.deleteOnExit();
         String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/", "-noVectorTextFileGeneration"};
+        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/",
+                "-noVectorTextFileGeneration", "-port", "11121"};
         Main.main(args);
 
         assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class));

@@ -47,13 +47,24 @@ public class Gensim {
      */
     private Gensim() {
         // do nothing; do not start the server (yet)
+        serverUrl = "http://127.0.0.1:" + port;
     }
 
     /**
      * The URL that shall be used to perform the requests.
      * Important: If you change the port here, you also have to change the port in the python server code.
      */
-    private String serverUrl = "http://127.0.0.1:1808";
+    private static String serverUrl;
+
+    /**
+     * The default port number to be used for the server.
+     */
+    public static final int DEFAULT_PORT = 1808;
+
+    /**
+     * The port that shall be used.
+     */
+    private static int port = DEFAULT_PORT;
 
     /**
      * Indicator whether vectors shall be cached. This means that vectors are cached locally and similarities are
@@ -92,10 +103,11 @@ public class Gensim {
     /**
      * Method to train a vector space model. The file for the training (i.e., csv file where first column is id and second column text) has to
      * exist already.
-     * @param modelPath identifier for the model (used for querying a specific model
+     *
+     * @param modelPath        identifier for the model (used for querying a specific model
      * @param trainingFilePath The file path to the file that shall be used for training.
      */
-    public void trainVectorSpaceModel(String modelPath, String trainingFilePath){
+    public void trainVectorSpaceModel(String modelPath, String trainingFilePath) {
         HttpGet request = new HttpGet(serverUrl + "/train-vector-space-model");
         request.addHeader("input_file_path", getCanonicalPath(trainingFilePath));
         request.addHeader("model_path", modelPath);
@@ -109,13 +121,14 @@ public class Gensim {
 
     /**
      * Method to query a vector space model (which has to be trained with trainVectorSpaceModel).
-     * @param modelPath identifier for the model (used for querying a specific model
+     *
+     * @param modelPath     identifier for the model (used for querying a specific model
      * @param documentIdOne Document id for the first document
      * @param documentIdTwo Document id for the second document
      * @return The cosine similarity in the vector space between the two documents.
      * @throws Exception Thrown if there are server problems.
      */
-    public double queryVectorSpaceModel(String modelPath, String documentIdOne, String documentIdTwo) throws Exception{
+    public double queryVectorSpaceModel(String modelPath, String documentIdOne, String documentIdTwo) throws Exception {
         HttpGet request = new HttpGet(serverUrl + "/query-vector-space-model");
         request.addHeader("model_path", modelPath);
         request.addHeader("document_id_one", documentIdOne);
@@ -141,12 +154,13 @@ public class Gensim {
     /**
      * Method to train a word2vec model. The file for the training (i.e., file with sentences, paths etc.) has to
      * exist already.
+     *
      * @param modelOrVectorPath If a vector file is desired, the file ending '.kv' is required.
-     * @param trainingFilePath The file path to the file that shall be used for training. The path can be a directory of walk files or a single walk file.
-     * @param configuration The configuration for the training operation.
+     * @param trainingFilePath  The file path to the file that shall be used for training. The path can be a directory of walk files or a single walk file.
+     * @param configuration     The configuration for the training operation.
      * @return True if training succeeded, else false.
      */
-    public boolean trainWord2VecModel(String modelOrVectorPath, String trainingFilePath, Word2VecConfiguration configuration){
+    public boolean trainWord2VecModel(String modelOrVectorPath, String trainingFilePath, Word2VecConfiguration configuration) {
         HttpGet request = new HttpGet(serverUrl + "/train-word2vec");
         if (modelOrVectorPath.endsWith(".kv")) {
             request.addHeader("vector_path", modelOrVectorPath);
@@ -229,16 +243,16 @@ public class Gensim {
     /**
      * Returns the full vocabulary of the specified model as HashSet (e.g. for fast indexing).
      * Be aware that this operation can be very memory-consuming for very large models.
-     *
+     * <p>
      * Note: If you want to just check whether a concept exists in the vocabulary, it is better to call
      * {@link Gensim#isInVocabulary(String, String)}.Note further that you do not need to build your own
      * cache if the PythonServer has enabled vector caching (you can check this with {@link Gensim#isVectorCaching()}.
      *
      * @param modelOrVectorPath The path to the model or vector file. Note that the vector file MUST end with .kv in
-     *      *                   order to be recognized as vector file.
+     *                          *                   order to be recognized as vector file.
      * @return Returns all vocabulary entries without vectors in a String HashSet.
      */
-    public HashSet<String> getVocabularyTerms(String modelOrVectorPath){
+    public HashSet<String> getVocabularyTerms(String modelOrVectorPath) {
         HashSet<String> result = new HashSet<>();
         HttpGet request = new HttpGet(serverUrl + "/get-vocabulary-terms");
         addModelToRequest(request, modelOrVectorPath);
@@ -265,7 +279,7 @@ public class Gensim {
     /**
      * Returns the vector of a concept.
      *
-     * @param concept The concept for which the vector shall be obtained.
+     * @param concept           The concept for which the vector shall be obtained.
      * @param modelOrVectorPath The model path or vector file path leading to the file to be used.
      * @return The vector for the specified concept.
      */
@@ -300,13 +314,13 @@ public class Gensim {
                         } catch (NumberFormatException nfe) {
                             LOGGER.error("Number format exception occured on token: " + tokenizedResult[i], nfe);
                             // cannot return vector
-                            if(isVectorCaching) {
+                            if (isVectorCaching) {
                                 vectorCache.put(v1key, null);
                             }
                             return null;
                         }
                     }
-                    if(isVectorCaching) {
+                    if (isVectorCaching) {
                         vectorCache.put(v1key, result);
                     }
                     return result;
@@ -315,7 +329,7 @@ public class Gensim {
         } catch (IOException ioe) {
             LOGGER.error("Problem with http request.", ioe);
         }
-        if(isVectorCaching) {
+        if (isVectorCaching) {
             vectorCache.put(v1key, null);
         }
         return null;
@@ -357,11 +371,12 @@ public class Gensim {
 
     /**
      * Returns the size of the vocabulary of the stated model/vector set.
+     *
      * @param modelOrVectorPath The path to the model or vector file. Note that the vector file MUST end with .kv in
      *                          order to be recognized as vector file.
      * @return -1 in case of an error else the size of the vocabulary.
      */
-    public int getVocabularySize(String modelOrVectorPath){
+    public int getVocabularySize(String modelOrVectorPath) {
         HttpGet request = new HttpGet(serverUrl + "/get-vocabulary-size");
         addModelToRequest(request, modelOrVectorPath);
 
@@ -401,7 +416,7 @@ public class Gensim {
      * @return The canonical model path as String.
      */
     private String getCanonicalPath(String filePath) {
-        if(filePath == null){
+        if (filePath == null) {
             LOGGER.error("The provided file path is null.");
             return null;
         }
@@ -459,10 +474,11 @@ public class Gensim {
 
     /**
      * Get the instance (singleton pattern).
+     *
      * @param resourcesDirectory Directory where the files shall be copied to.
      * @return Gensim Instance
      */
-    public static Gensim getInstance(File resourcesDirectory){
+    public static Gensim getInstance(File resourcesDirectory) {
         if (instance == null) instance = new Gensim();
         instance.setResourcesDirectory(resourcesDirectory);
         if (isShutDown) instance.startServer();
@@ -501,17 +517,17 @@ public class Gensim {
      * Export a resource embedded into a Jar file to the local file path.
      *
      * @param baseDirectory The base directory.
-     * @param resourceName ie.: "SmartLibrary.dll" (a leading slash will be added)
+     * @param resourceName  ie.: "SmartLibrary.dll" (a leading slash will be added)
      */
     private void exportResource(File baseDirectory, String resourceName) {
         // there must not be a backslash for getResourceAsStream()
-        try (InputStream stream = this.getClass().getResourceAsStream("/" + resourceName)){
-            if(stream == null) {
+        try (InputStream stream = this.getClass().getResourceAsStream("/" + resourceName)) {
+            if (stream == null) {
                 throw new Exception("Cannot get resource \"" + resourceName + "\" from Jar file.");
             }
             int readBytes;
             byte[] buffer = new byte[4096];
-            try (OutputStream resStreamOut = new FileOutputStream(new File(baseDirectory,resourceName))){
+            try (OutputStream resStreamOut = new FileOutputStream(new File(baseDirectory, resourceName))) {
                 while ((readBytes = stream.read(buffer)) > 0) {
                     resStreamOut.write(buffer, 0, readBytes);
                 }
@@ -553,7 +569,8 @@ public class Gensim {
         }
         String pythonCommand = getPythonCommand();
 
-        List<String> command = Arrays.asList(pythonCommand, canonicalPath);
+        List<String> command = new ArrayList<>(Arrays.asList(pythonCommand, canonicalPath));
+        command.add("" + Gensim.getPort());
         ProcessBuilder pb = new ProcessBuilder(command);
         updateEnvironmentPath(pb.environment(), pythonCommand);
         //List<String> command = Arrays.asList("python", "--version");
@@ -579,7 +596,7 @@ public class Gensim {
                     LOGGER.error("Problem with http request.", ioe);
                 }
                 httpClient.close();
-                if (i == maxTrials -1){
+                if (i == maxTrials - 1) {
                     LOGGER.error("Failed to start the gensim server after " + maxTrials + " trials.");
                     isHookStarted = false;
                     isShutDown = true;
@@ -594,7 +611,7 @@ public class Gensim {
         vectorCache = new HashMap<>();
 
         // now: add shutdown hook in case the JVM is terminating
-        if(!isHookStarted) {
+        if (!isHookStarted) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 LOGGER.info("JVM shutdown detected - close python server if still open.");
                 shutDown();
@@ -607,12 +624,13 @@ public class Gensim {
 
     /**
      * Returns the python command which is extracted from {@code file melt-resources/python_command.txt}.
+     *
      * @return The python executable path.
      */
-    protected String getPythonCommand(){
+    protected String getPythonCommand() {
         String pythonCommand = "python";
         Path filePath = Paths.get(this.getResourcesDirectoryPath(), "python_command.txt");
-        if(Files.exists(filePath)){
+        if (Files.exists(filePath)) {
             LOGGER.info("Python command file detected.");
             try {
                 String fileContent = new String(Files.readAllBytes(filePath), StandardCharsets.UTF_8);
@@ -630,34 +648,36 @@ public class Gensim {
 
     /**
      * Updates the environment variable PATH with additional python needed directories like env/lib/bin
-     * @param environment The environment to be changed.
+     *
+     * @param environment   The environment to be changed.
      * @param pythonCommand The python executable path.
      */
-    protected void updateEnvironmentPath(Map<String,String> environment, String pythonCommand){
+    protected void updateEnvironmentPath(Map<String, String> environment, String pythonCommand) {
         String path = environment.getOrDefault("PATH", "");
         String additionalPaths = getPythonAdditionalPath(pythonCommand);
-        if(!additionalPaths.isEmpty()){
-            if(path.endsWith(File.pathSeparator) == false)
+        if (!additionalPaths.isEmpty()) {
+            if (path.endsWith(File.pathSeparator) == false)
                 path += File.pathSeparator;
             path += additionalPaths;
         }
-        environment.put("PATH",  path);
+        environment.put("PATH", path);
     }
 
     /**
      * Returns a concatenated path of directories which can be used in the PATH variable.
      * It searches based on a python executable path, all bin directories within the python dir.
+     *
      * @param pythonCommand the python executable path
      * @return a concatenated path of directories which can be used in the PATH variable
      */
-    protected String getPythonAdditionalPath(String pythonCommand){
+    protected String getPythonAdditionalPath(String pythonCommand) {
         File f = new File(pythonCommand).getParentFile();
-        if(f == null){
+        if (f == null) {
             return "";
         }
         try {
             return Files.find(f.toPath(), 6, (path, attributes) -> attributes.isDirectory() && path.getFileName().toString().equals("bin"))
-                    .map(path->path.toAbsolutePath().toString())
+                    .map(path -> path.toAbsolutePath().toString())
                     .collect(Collectors.joining(File.pathSeparator));
         } catch (IOException ex) {
             LOGGER.info("Could not add more directories in path", ex);
@@ -686,26 +706,28 @@ public class Gensim {
 
     /**
      * Writes the vectors to a human-readable text file.
+     *
      * @param modelOrVectorPath The path to the model or vector file. Note that the vector file MUST end with .kv in
-     *      *                          order to be recognized as vector file.
-     * @param fileToWrite The file that will be written.
+     *                          *                          order to be recognized as vector file.
+     * @param fileToWrite       The file that will be written.
      */
-    public void writeModelAsTextFile(String modelOrVectorPath, String fileToWrite){
+    public void writeModelAsTextFile(String modelOrVectorPath, String fileToWrite) {
         writeModelAsTextFile(modelOrVectorPath, fileToWrite, null);
     }
 
     /**
      * Writes the vectors to a human-readable text file.
+     *
      * @param modelOrVectorPath The path to the model or vector file. Note that the vector file MUST end with .kv in
-     *      *                          order to be recognized as vector file.
-     * @param fileToWrite The file that will be written.
-     * @param entityFile The vocabulary that shall appear in the text file (can be null if all words shall be written).
-     *                   The file must contain one word per line. The contents must be a subset of the vocabulary.
+     *                          *                          order to be recognized as vector file.
+     * @param fileToWrite       The file that will be written.
+     * @param entityFile        The vocabulary that shall appear in the text file (can be null if all words shall be written).
+     *                          The file must contain one word per line. The contents must be a subset of the vocabulary.
      */
-    public void writeModelAsTextFile(String modelOrVectorPath, String fileToWrite, String entityFile){
+    public void writeModelAsTextFile(String modelOrVectorPath, String fileToWrite, String entityFile) {
         HttpGet request = new HttpGet(serverUrl + "/write-model-as-text-file");
         addModelToRequest(request, modelOrVectorPath);
-        if(entityFile != null) {
+        if (entityFile != null) {
             request.addHeader("entity_file", entityFile);
         }
         request.addHeader("file_to_write", fileToWrite);
@@ -730,12 +752,13 @@ public class Gensim {
 
     /**
      * Get the resource directory as String.
+     *
      * @return Directory as String.
      */
     public String getResourcesDirectoryPath() {
         try {
             return this.resourcesDirectory.getCanonicalPath();
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             LOGGER.error("Could not determine canonical path for resources directory. Returning default.");
             return "." + File.separator + "melt-resources" + File.separator;
         }
@@ -743,18 +766,19 @@ public class Gensim {
 
     /**
      * Set the directory where the python files will be copied to.
+     *
      * @param resourcesDirectory Must be a directory.
      */
     public void setResourcesDirectory(File resourcesDirectory) {
-        if(!resourcesDirectory.exists()) resourcesDirectory.mkdir();
-        if(!resourcesDirectory.isDirectory()){
+        if (!resourcesDirectory.exists()) resourcesDirectory.mkdir();
+        if (!resourcesDirectory.isDirectory()) {
             LOGGER.error("The specified directory is no directory. Using default: '" + DEFAULT_RESOURCES_DIRECTORY + "'");
             resourcesDirectory = new File(DEFAULT_RESOURCES_DIRECTORY);
         }
 
         // check if python command file exists in default resources directory
         Path pythonCommandFilePath = Paths.get(DEFAULT_RESOURCES_DIRECTORY, "python_command.txt");
-        if(Files.exists(pythonCommandFilePath)){
+        if (Files.exists(pythonCommandFilePath)) {
             LOGGER.info("Python command file detected. Trying to copy file to external resources directory.");
             try {
                 FileUtils.copyFile(pythonCommandFilePath.toFile(), new File(resourcesDirectory, "python_command.txt"));
@@ -768,6 +792,7 @@ public class Gensim {
 
     /**
      * If true: enabled. Else: false.
+     *
      * @return True if enabled, else false.
      */
     public boolean isVectorCaching() {
@@ -778,9 +803,32 @@ public class Gensim {
      * If vector caching is turned on, similarities will be calculated on Java site (rather than in Python) and
      * vectors are held in memories. Turn this function on, if you plan to do many computations with the same set
      * of vectors. This will increase the performance at the cost of memory.
+     *
      * @param vectorCaching True if caching shall be enabled, else false.
      */
     public void setVectorCaching(boolean vectorCaching) {
         isVectorCaching = vectorCaching;
+    }
+
+    public static int getPort() {
+        return port;
+    }
+
+    public static void setPort(int port) {
+        if (instance != null) {
+            LOGGER.error("Server is already running. The port cannot be changed.");
+            return;
+        }
+        if (port > 0) {
+            Gensim.port = port;
+        } else {
+            LOGGER.error("You tried to set the port to a negative number. Using default: " + DEFAULT_PORT);
+            Gensim.port = DEFAULT_PORT;
+        }
+        Gensim.serverUrl = "http://127.0.0.1:" + port;
+    }
+
+    public static String getServerUrl() {
+        return serverUrl;
     }
 }
