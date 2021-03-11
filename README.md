@@ -76,7 +76,7 @@ The threshold for configuring which higher-frequency words are randomly downsamp
 The size of the window in the training process.
 - `-epochs <number_of_epochs>` (default: `5`)<br/>
 The number of epochs to use in training.
-- `port <port_number>` (default: `1808`)<br/>
+- `-port <port_number>` (default: `1808`)<br/>
 The port that shall be used for the server.
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services

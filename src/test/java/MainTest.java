@@ -21,7 +21,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
@@ -342,9 +341,9 @@ class MainTest {
     }
 
     /**
-     * Write the
-     * @param toBeTransformed
-     * @return
+     * Transform the toBeTransformed list to a single string.
+     * @param toBeTransformed List that shall be converted into a single String.
+     * @return Single String.
      */
     private String transformToString(List<String> toBeTransformed){
         StringBuffer buffer = new StringBuffer();
