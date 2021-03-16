@@ -168,3 +168,7 @@ to call Python 3 in the first line of the file.
 **The program starts and immediately shuts down. Nothing seems to happen.**<br/>
 Make sure your system is set-up correctly, in particular whether you have installed Python 3 and the required 
 dependencies.
+
+**Can I run the command multiple times in parallel on the same machine?**<br/>
+Yes, you can. You need to make sure that for each command, you use (1) a different `-port` and (2) a different 
+`-walkDirectory`.
