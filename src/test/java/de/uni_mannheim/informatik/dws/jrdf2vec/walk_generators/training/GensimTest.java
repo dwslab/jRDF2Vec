@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Set;
 
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
 import static org.junit.jupiter.api.Assertions.*;
@@ -349,9 +351,29 @@ class GensimTest {
     @Test
     void getVocabularyTerms(){
         String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
-        HashSet<String> result = gensim.getVocabularyTerms(pathToVectorFile);
+        Set<String> result = gensim.getVocabularyTerms(pathToVectorFile);
         assertTrue(result.size() > 0);
         assertTrue(result.contains("Europe"));
+    }
+
+    @Test
+    void writeVocabularyToFile() {
+        File vocabFile = new File("./gensim_vocab.txt");
+        vocabFile.deleteOnExit();
+        gensim.writeVocabularyToFile(getPathOfResource("test_model_vectors.kv"), vocabFile);
+        assertTrue(vocabFile.exists());
+
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(vocabFile), StandardCharsets.UTF_8));
+            Set<String> vocabulary = new HashSet<>();
+            String line;
+            while((line = reader.readLine()) != null){
+                vocabulary.add(line);
+            }
+            assertTrue(vocabulary.contains("Europe"));
+        } catch (IOException  e) {
+            fail(e);
+        }
     }
 
     @Test

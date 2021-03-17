@@ -21,9 +21,11 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 
@@ -598,6 +600,26 @@ class MainTest {
         Main.main(new String[]{"-graph", graphFilePath, "-numberOfWalks", "100", "-minCount", "2"});
         assertEquals(100, ((RDF2Vec) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
         assertEquals(2, ((RDF2Vec) Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
+    }
+
+    @Test
+    void writeVocabularyToFile() {
+        File modelFile = new File(getPathOfResource("test_model_vectors.kv"));
+        Main.main(new String[]{"-generateVocabularyFile", modelFile.getAbsolutePath()});
+        File vocabFile = new File(modelFile.getParentFile().getAbsolutePath(), "vocabulary.txt");
+        vocabFile.deleteOnExit();
+        assertTrue(vocabFile.exists());
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(vocabFile), StandardCharsets.UTF_8));
+            Set<String> vocabulary = new HashSet<>();
+            String line;
+            while((line = reader.readLine()) != null){
+                vocabulary.add(line);
+            }
+            assertTrue(vocabulary.contains("Europe"));
+        } catch (IOException  e) {
+            fail(e);
+        }
     }
 
     @Test

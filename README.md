@@ -82,13 +82,26 @@ The port that shall be used for the server.
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.
 
-#### Generating a Text Vector File
-jRDF is compatible with the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation framework for KG embeddings (GEval)</a>. 
+#### Generating a Vector Text File
+jRDF2vec is compatible with the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation 
+framework for KG embeddings (GEval)</a>. 
 This framework requires the vectors to be present in a text file. If you have a gensim model or vector file, you can
 use the following command to generate this file:
 
 ```
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
+```
+You can find the file (named `vectors.txt`) in the directory where the model/vector file is located,
+
+#### Generating a Vocabulary Text File
+jRDF2vec provides functionality to print all concepts for which a vector has been trained.
+One word of the vocabulary will be printed per line to a file named `vocabulary.txt`.
+The model or vector file needs to be specified. If you have a gensim model or vector file, you can
+use the following command to generate this file:
+
+
+```
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateVocabularyFile ./path-to-your-model-or-vector-file
 ```
 
 #### Analyzing the Embedding Vocabulary

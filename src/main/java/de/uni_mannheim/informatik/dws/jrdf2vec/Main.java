@@ -178,6 +178,19 @@ public class Main {
             }
         }
 
+        if(args.length == 2){
+            String modelFilePath = getValue("-generateVocabFile", args);
+            if(modelFilePath == null){
+                // check for alternative spelling
+                modelFilePath = getValue("-generateVocabularyFile", args);
+            }
+            if(modelFilePath != null){
+                printIfIgnoredOptionsExist();
+                generateVocabFile(modelFilePath);
+                return;
+            }
+        }
+
         if(containsIgnoreCase("-embedText", args) ||
                 containsIgnoreCase("-text", args) ||
                 containsIgnoreCase("--text", args) ||
@@ -548,6 +561,24 @@ public class Main {
     }
 
     /**
+     * Write a UTF-8 encoded file containing the specified model's vocabulary.
+     * @param modelFilePath The model of which the vocabulary shall be written.
+     */
+    private static void generateVocabFile(String modelFilePath){
+        File modelFile = new File(modelFilePath);
+        if(!modelFile.exists()){
+            System.out.println("The given file does not exist. Cannot generate vocabulary file.");
+            return;
+        }
+        if(modelFile.isDirectory()){
+            System.out.println("The specified file is a directory. Cannot generate vocabulary file.");
+            return;
+        }
+        File fileToGenerate = new File(modelFile.getParentFile().getAbsolutePath(), "vocabulary.txt");
+        Gensim.getInstance().writeVocabularyToFile(modelFilePath, fileToGenerate.getAbsolutePath());
+    }
+
+    /**
      * Given a model or vector file, a text file is generated containing all the vectors.
      * @param transformationSource File path to the model or vector file.
      */
@@ -786,15 +817,21 @@ public class Main {
                 "Additional Services\n" +
                 "-------------------\n\n" +
 
-                "A) Generation of Text Vector File\n" +
-                "   jRDF is compatible with the evaluation framework for KG embeddings (GEval). This framework requires\n" +
-                "   the vectors to be present in a text file. If you have a gensim model or vector file, you can use the\n" +
-                "   following parameter to generate this file:\n\n" +
+                "A) Generation of Vector Text File\n" +
+                "   jRDF2vec is compatible with the evaluation framework for KG embeddings (GEval). This framework\n" +
+                "   requires the vectors to be present in a text file. If you have a gensim model or vector file,\n" +
+                "   you can use the following parameter to generate this file:\n\n" +
                 "       -generateTextVectorFile <model_or_vector_file>\n" +
-                "        The file path to the model or vector file that shall be used to write the vectors in a text\n" +
-                "        file needs to be specified.\n\n" +
-                "B) Analysis of the Vocabulary\n" +
-                "   For RDF2Vec, it is not always guaranteed that all concepts in the graph appear in the embedding space.\n" +
+                "       The file path to the model or vector file that shall be used to write the vectors in a text\n" +
+                "       file needs to be specified.\n\n" +
+                "B) Generation of Vocabulary Text File\n" +
+                "   jRDF2vec provides functionality to print all concepts for which a vector has been trained:\n\n" +
+                "       -generateVocabularyFile <model_or_vector_file>\n" +
+                "       One word of the vocabulary will be printed per line to a file named vocabulary.txt.\n" +
+                "       The model or vector file needs to be specified.\n\n" +
+                "C) Analysis of the Vocabulary\n" +
+                "   For RDF2vec, it is not always guaranteed that all concepts in the graph appear in the embedding\n" +
+                "   space.\n" +
                 "   For example, some concepts may only appear in the object position of statements and may never be\n" +
                 "   reached by random walks. In addition, the word2vec configuration parameters may filter out infrequent\n" +
                 "   words depending on the configuration (see -minCount above, for example). To analyze such rather \n" +

@@ -252,8 +252,8 @@ public class Gensim {
      *                          *                   order to be recognized as vector file.
      * @return Returns all vocabulary entries without vectors in a String HashSet.
      */
-    public HashSet<String> getVocabularyTerms(String modelOrVectorPath) {
-        HashSet<String> result = new HashSet<>();
+    public Set<String> getVocabularyTerms(String modelOrVectorPath) {
+        Set<String> result = new HashSet<>();
         HttpGet request = new HttpGet(serverUrl + "/get-vocabulary-terms");
         addModelToRequest(request, modelOrVectorPath);
 
@@ -275,6 +275,62 @@ public class Gensim {
             return result;
         }
     }
+
+    /**
+     * Writes the vocabulary of the given gensim model to a text file (UTF-8 encoded).
+     * @param modelOrVectorPath The model of which the vocabulary shall be obtained.
+     * @param fileToWritePath The file path of the file that shall be written.
+     */
+    public void writeVocabularyToFile(String modelOrVectorPath, String fileToWritePath){
+        Set<String> vocab = getVocabularyTerms(modelOrVectorPath);
+        writeSetToFile(new File(fileToWritePath), vocab);
+    }
+
+    /**
+     * Writes the vocabulary of the given gensim model to a text file (UTF-8 encoded).
+     * @param modelOrVectorPath The model of which the vocabulary shall be obtained.
+     * @param fileToWrite The file that shall be written.
+     */
+    public void writeVocabularyToFile(String modelOrVectorPath, File fileToWrite){
+        Set<String> vocab = getVocabularyTerms(modelOrVectorPath);
+        writeSetToFile(fileToWrite, vocab);
+    }
+
+    /**
+     * This method writes the content of a {@code Set<String>} to a file. The file will be UTF-8 encoded.
+     *
+     * @param fileToWrite File which will be created and in which the data will
+     *                    be written.
+     * @param setToWrite Set whose content will be written into fileToWrite.
+     * @param <T> Type of the Set.
+     */
+    private static <T> void writeSetToFile(File fileToWrite, Set<T> setToWrite) {
+        LOGGER.info("Start writing Set to file '" + fileToWrite.getName() + "'");
+        Iterator<T> iterator = setToWrite.iterator();
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite), StandardCharsets.UTF_8));
+            String line;
+            boolean firstLine = true;
+            while (iterator.hasNext()) {
+                line = iterator.next().toString();
+                if (!(line.equals("") || line.equals("\n"))) { // do not write empty lines or just line breaks
+                    if (firstLine) {
+                        writer.write(line);
+                        firstLine = false;
+                    } else {
+                        writer.write("\n");
+                        writer.write(line);
+                    }
+                }
+            } // end while
+            writer.flush();
+            writer.close();
+            LOGGER.info("Finished writing file '" + fileToWrite.getName() + "'");
+        } catch (IOException e) {
+            LOGGER.error("Could not write file.", e);
+        }
+    }
+
 
     /**
      * Returns the vector of a concept.
