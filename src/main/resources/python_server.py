@@ -60,8 +60,9 @@ def check_requirements() -> str:
             try:
                 pkg_resources.require(requirement)
                 ok_requirements.append(requirement)
-            except DistributionNotFound as error:
+            except Exception as error:
                 missing = str(error)
+                missing_requirements.append(requirement)
         message = "Dependency Check"
         if len(ok_requirements) > 0:
             message += "\nInstalled Requirements:"

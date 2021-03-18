@@ -149,7 +149,6 @@ public class HdtParser implements IParser {
      * @return One walk as list where each element is a walk component.
      */
     public List<String> generateMidWalkForEntity(String entity, int depth) {
-
         LinkedList<String> result = new LinkedList<>();
 
         String nextElementPredecessor = entity;
