@@ -7,6 +7,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.slf4j.Logger;
@@ -143,19 +145,36 @@ class MainTest {
 
     /**
      * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
+     * The test is performed on the default port as well as on a custom port.
      */
-    @Test
-    public void trainClassicNoTextVectorFile(){
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void trainClassicNoTextVectorFile(boolean isRunOnDefaultPort){
         LOGGER.info("Running test: trainClassicNoTextVectorFile()");
         String walkPath = "./mainWalks/";
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
+
+        String[] args;
+        if(isRunOnDefaultPort){
+            args = new String[]{"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
+        } else {
+            // run on other port
+            args = new String[7];
+            args[0] = "-graph";
+            args[1] = graphFilePath;
+            args[2] = "-walkDir";
+            args[3] = walkPath;
+            args[4] = "-noVectorTextFileGeneration";
+            args[5] = "-port";
+            args[6] = "1820";
+        }
+
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertEquals(RDF2Vec.class, Main.getRdf2VecInstance().getClass(), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
 
@@ -174,6 +193,7 @@ class MainTest {
             LOGGER.error("Failed to clean up after test.", ioe);
             fail();
         }
+        Main.reset();
     }
 
     /**
@@ -429,7 +449,7 @@ class MainTest {
         walkDirectory.mkdir();
         walkDirectory.deleteOnExit();
 
-        String[] mainArgs = {"-graph", pizzaOntology.getAbsolutePath(), "-onlyWalks", "-walkDir", directoryName};
+        String[] mainArgs = new String[]{"-graph", pizzaOntology.getAbsolutePath(), "-onlyWalks", "-walkDir", directoryName};
         Main.main(mainArgs);
 
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
@@ -734,7 +754,6 @@ class MainTest {
         // clean up
         walkDirectory.delete();
     }
-
 
     /**
      * Weighted mid walk generation.
