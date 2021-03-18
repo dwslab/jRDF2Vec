@@ -331,7 +331,6 @@ public class Gensim {
         }
     }
 
-
     /**
      * Returns the vector of a concept.
      *
@@ -538,7 +537,32 @@ public class Gensim {
         if (instance == null) instance = new Gensim();
         instance.setResourcesDirectory(resourcesDirectory);
         if (isShutDown) instance.startServer();
+        checkRequirements();
         return instance;
+    }
+
+    public static boolean checkRequirements(){
+        Gensim gensim = Gensim.getInstance();
+        HttpGet request = new HttpGet(serverUrl + "/check-requirements");
+        File requirementsFile = new File(DEFAULT_RESOURCES_DIRECTORY + "requirements.txt");
+        if(!requirementsFile.exists()){
+            LOGGER.error("Could not find requirements file.");
+            return false;
+        }
+        request.addHeader("requirements_file", requirementsFile.getAbsolutePath());
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            HttpEntity entity = response.getEntity();
+            String resultMessage = EntityUtils.toString(entity);
+            System.out.println(resultMessage);
+            if(resultMessage.contains("good to go")) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException ioe) {
+            LOGGER.error("Problem with http request.", ioe);
+            return false;
+        }
     }
 
     /**
@@ -712,7 +736,7 @@ public class Gensim {
         String path = environment.getOrDefault("PATH", "");
         String additionalPaths = getPythonAdditionalPath(pythonCommand);
         if (!additionalPaths.isEmpty()) {
-            if (path.endsWith(File.pathSeparator) == false)
+            if (!path.endsWith(File.pathSeparator))
                 path += File.pathSeparator;
             path += additionalPaths;
         }

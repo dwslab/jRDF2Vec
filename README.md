@@ -24,6 +24,13 @@ Alternatively, you can download the packaged JAR of the latest successful: commi
 - Java 8 or later.
 - Python 3 with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.
 
+You can check if you set up the environment (Python 3 + dependencies) correctly by running:
+```
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -checkInstallation
+```
+The command line output will list missing requirements or print `Installation is ok ✔`.
+
+
 ### Command-Line Interface (jRDF2Vec CLI) for Training and Walk Generation
 Use the resulting jar from the `target` directory.
 

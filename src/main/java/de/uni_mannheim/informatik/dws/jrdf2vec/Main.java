@@ -158,6 +158,19 @@ public class Main {
             return;
         }
 
+        // check install
+        if(containsIgnoreCase("-checkInstall", args) || containsIgnoreCase("-check", args) || containsIgnoreCase(
+                "-checkRequirements",args) || containsIgnoreCase("-checkInstallation", args)){
+            boolean isOk = Gensim.checkRequirements();
+            if(isOk) {
+               System.out.println("Installation is ok ✔︎");
+            } else {
+                System.out.println("Installation is not ok ❌\nIs Python 3 installed? Please check the log for missing" +
+                        " dependencies.");
+            }
+            return;
+        }
+
         // check for analysis request
         if (args[0].equalsIgnoreCase("-analyzevocab") || args[0].equalsIgnoreCase("-analyzevocabulary") ||
                 args[0].equalsIgnoreCase("--analyzevocabulary") || args[0].equalsIgnoreCase("--analyzevocab")){

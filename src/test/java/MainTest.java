@@ -603,6 +603,11 @@ class MainTest {
     }
 
     @Test
+    void checkRequirements(){
+        Main.main(new String[]{"-checkInstallation"});
+    }
+
+    @Test
     void writeVocabularyToFile() {
         File modelFile = new File(getPathOfResource("test_model_vectors.kv"));
         Main.main(new String[]{"-generateVocabularyFile", modelFile.getAbsolutePath()});

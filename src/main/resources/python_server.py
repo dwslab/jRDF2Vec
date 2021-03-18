@@ -6,6 +6,10 @@ import logging
 import os
 import sys
 import gzip
+import pkg_resources
+from pkg_resources import DistributionNotFound
+import pathlib
+
 
 
 logging.basicConfig(handlers=[logging.FileHandler(__file__ + '.log', 'w', 'utf-8')], format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
@@ -31,6 +35,36 @@ def display_server_status():
     """
     return "MELT ML Server running. Ready to accept requests."
 
+@app.route('/check-requirements', methods=['GET'])
+def check_requirements() -> str:
+    requirements_file = request.headers.get('requirements_file')
+    logging.info(f"received requirements file path: {requirements_file}")
+    with pathlib.Path(requirements_file).open() as requirements_txt:
+        requirements = pkg_resources.parse_requirements(requirements_txt)
+        ok_requirements = []
+        missing_requirements = []
+        for requirement in requirements:
+            requirement = str(requirement)
+            print(f"Checking {requirement}")
+            try:
+                pkg_resources.require(requirement)
+                ok_requirements.append(requirement)
+            except DistributionNotFound as error:
+                missing = str(error)
+        message = "Dependency Check"
+        if len(ok_requirements) > 0:
+            message += "\nInstalled Requirements:"
+            for r in ok_requirements:
+                message += "\n\t" + r
+        if len(missing_requirements) > 0:
+            message += "\nMissing Requirements:"
+            for r in missing_requirements:
+                message += "\n\t" + r
+        else:
+            message += "\n=> Everything is installed. You are good to go!"
+        print(message)
+        logging.info(message)
+        return message
 
 class MySentences(object):
     """Data structure to iterate over the lines of a file in a memory-friendly way. The files can be gzipped.
@@ -131,7 +165,6 @@ def train_word_2_vec():
     except Exception as exception:
         logging.exception("An exception occurred.")
         return "False"
-
 
 
 @app.route('/is-in-vocabulary', methods=['GET'])
