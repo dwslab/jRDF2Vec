@@ -537,10 +537,13 @@ public class Gensim {
         if (instance == null) instance = new Gensim();
         instance.setResourcesDirectory(resourcesDirectory);
         if (isShutDown) instance.startServer();
-        checkRequirements();
         return instance;
     }
 
+    /**
+     * Checks whether all Python requirements are installed and whether the server is functional.
+     * @return True if the server is fully functional, else false.
+     */
     public static boolean checkRequirements(){
         Gensim gensim = Gensim.getInstance();
         HttpGet request = new HttpGet(serverUrl + "/check-requirements");

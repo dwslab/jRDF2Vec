@@ -163,9 +163,10 @@ public class Main {
                 "-checkRequirements",args) || containsIgnoreCase("-checkInstallation", args)){
             boolean isOk = Gensim.checkRequirements();
             if(isOk) {
-               System.out.println("Installation is ok ✔︎");
+               System.out.println("Installation is ok! [✔︎]");
             } else {
-                System.out.println("Installation is not ok ❌\nIs Python 3 installed? Please check the log for missing" +
+                System.out.println("Installation is not ok! [❌]\nIs Python 3 installed? Please check the log for " +
+                        "missing" +
                         " dependencies.");
             }
             return;

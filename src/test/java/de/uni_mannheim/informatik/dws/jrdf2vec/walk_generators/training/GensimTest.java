@@ -43,7 +43,7 @@ class GensimTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(GensimTest.class);
 
     @Test
-    void checkDependencies(){
+    void checkRequirements(){
         assertTrue(Gensim.checkRequirements());
     }
 
@@ -66,7 +66,6 @@ class GensimTest {
         assertTrue(gensim.isInVocabulary("united", pathToVectorFile));
         assertFalse(gensim.isInVocabulary("China", pathToVectorFile));
     }
-
 
     /**
      * Default test without cache.
