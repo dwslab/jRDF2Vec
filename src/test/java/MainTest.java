@@ -368,7 +368,7 @@ class MainTest {
      * @return Single String.
      */
     private String transformToString(List<String> toBeTransformed){
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for(String s : toBeTransformed){
             buffer.append(s).append("\n");
         }
@@ -609,9 +609,10 @@ class MainTest {
     public void parameterCheck() {
         String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
-        Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100", "-minCount", "3"});
-        assertEquals(100, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-        assertEquals(3, ((RDF2VecLight) Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
+        Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "100", "-minCount", "3", "-walkMode", "random_walks_duplicate_free"});
+        assertEquals(100, (Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+        assertEquals(3, (Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
+        assertEquals(WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE, Main.getRdf2VecInstance().getWalkGenerationMode());
 
         // important: reset
         Main.reset();

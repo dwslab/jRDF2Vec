@@ -1,7 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.debugging;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.EntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.HdtParser;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.IParser;

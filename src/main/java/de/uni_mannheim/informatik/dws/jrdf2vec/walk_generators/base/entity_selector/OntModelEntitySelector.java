@@ -1,4 +1,4 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;

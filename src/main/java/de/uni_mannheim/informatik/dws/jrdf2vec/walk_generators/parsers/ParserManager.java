@@ -1,9 +1,9 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.EntitySelector;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.HdtEntitySelector;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.MemoryEntitySelector;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.OntModelEntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.HdtEntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.MemoryEntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.OntModelEntitySelector;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.riot.Lang;
 import org.javatuples.Pair;

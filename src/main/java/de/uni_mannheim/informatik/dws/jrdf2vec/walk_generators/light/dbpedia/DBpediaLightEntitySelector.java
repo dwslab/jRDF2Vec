@@ -9,8 +9,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Set;
 
 public class DBpediaLightEntitySelector extends LightEntitySelector {
+
 
     /**
      * Default logger.
@@ -51,14 +53,11 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
                     result.add(alternativeUri);
                 }
             }
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Failed to read file.", e);
         } catch (IOException e) {
             LOGGER.error("Failed to read file.", e);
         }
         return result;
     }
-
 
     /**
      * Obtain potential redirection target URL.
@@ -84,9 +83,8 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
         }
     }
 
-
     @Override
-    public HashSet<String> getEntities() {
+    public Set<String> getEntities() {
         if(entitiesToProcess != null) return this.entitiesToProcess;
         else {
             entitiesToProcess = readEntitiesFromFile(this.entityFile);

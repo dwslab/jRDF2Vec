@@ -466,10 +466,10 @@ public class Main {
             // now distinguish light/non-light
             if (lightEntityFile != null) {
                 // light walk generation:
-                WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile, isEmbedText);
+                WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile,
+                        isEmbedText);
                 walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
-
             } else {
                 // classic walk generation
                 WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile, isEmbedText);

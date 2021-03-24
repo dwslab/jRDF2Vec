@@ -2,11 +2,12 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.EntitySelector;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Selector which determines for which entities walks shall be generated.
@@ -17,7 +18,7 @@ public class LightEntitySelector implements EntitySelector {
     /**
      * The entities for which walks will be generated.
      */
-    public HashSet<String> entitiesToProcess;
+    public Set<String> entitiesToProcess;
 
     /**
      * The file from which the entities will be read.
@@ -54,7 +55,7 @@ public class LightEntitySelector implements EntitySelector {
      * @param pathToEntityFile The file to be read from. The file must be UTF-8 encoded.
      * @return A HashSet of entities.
      */
-    public static HashSet<String> readEntitiesFromFile(String pathToEntityFile) {
+    public static Set<String> readEntitiesFromFile(String pathToEntityFile) {
         return readEntitiesFromFile(new File(pathToEntityFile));
     }
 
@@ -64,7 +65,7 @@ public class LightEntitySelector implements EntitySelector {
      * @param entityFile The file to be read from. The file must be UTF-8 encoded.
      * @return A HashSet of entities.
      */
-    public static HashSet<String> readEntitiesFromFile(File entityFile) {
+    public static Set<String> readEntitiesFromFile(File entityFile) {
         HashSet<String> result = new HashSet<>();
         if(!entityFile.exists()){
             LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
@@ -92,7 +93,7 @@ public class LightEntitySelector implements EntitySelector {
     }
 
     @Override
-    public HashSet<String> getEntities() {
+    public Set<String> getEntities() {
         if(this.entitiesToProcess == null) {
             this.entitiesToProcess = readEntitiesFromFile(this.entityFile);
         }

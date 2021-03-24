@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,7 +14,7 @@ class LightEntitySelectorTest {
 
     @Test
     void readEntitiesFromFile() {
-        HashSet<String> result = LightEntitySelector.readEntitiesFromFile(loadFile("entityFileForTest.txt"));
+        Set<String> result = LightEntitySelector.readEntitiesFromFile(loadFile("entityFileForTest.txt"));
         assertTrue(result.contains("http://dbpedia.org/resource/Amp"));
         assertTrue(result.contains("http://dbpedia.org/resource/SQM"));
         assertTrue(result.contains("http://dbpedia.org/resource/Grupa_Lotos"));

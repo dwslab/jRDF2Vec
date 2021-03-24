@@ -1,5 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.MemoryEntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.*;
 import org.apache.jena.ontology.OntModel;
 import org.javatuples.Pair;
@@ -144,7 +146,6 @@ public class WalkGeneratorDefault extends WalkGenerator {
         if(isGenerateTextWalks()){
             this.generateTextWalks(numberOfThreads, textWalkLength);
         }
-
         this.close();
     }
 

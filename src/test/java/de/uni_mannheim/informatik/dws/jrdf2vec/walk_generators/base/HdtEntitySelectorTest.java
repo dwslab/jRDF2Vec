@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.HdtEntitySelector;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 

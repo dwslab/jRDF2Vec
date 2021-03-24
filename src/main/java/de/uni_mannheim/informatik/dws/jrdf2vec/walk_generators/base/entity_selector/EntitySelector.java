@@ -1,9 +1,9 @@
-package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base;
+package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector;
 
 import java.util.Set;
 
 /**
- * Select the entities for which walks shall be generated.
+ * An EntitySelector determines the entities for which walks shall be generated.
  */
 public interface EntitySelector {
 
