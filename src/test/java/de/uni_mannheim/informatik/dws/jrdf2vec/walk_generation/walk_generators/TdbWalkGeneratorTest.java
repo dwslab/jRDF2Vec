@@ -33,13 +33,25 @@ class TdbWalkGeneratorTest {
     void getBackwardTriple() {
         Set<Triple> result = walkGenerator.getBackwardTriples("http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping");
         assertTrue(result.size() > 0);
-
         Triple triple1 = new Triple(
                 "http://www.co-ode.org/ontologies/pizza/pizza.owl#PetitPoisTopping",
                 "http://www.w3.org/2000/01/rdf-schema#subClassOf",
                 "http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping");
-
         assertTrue(result.contains(triple1));
+
+        assertNotNull(walkGenerator.getBackwardTriples("ERROR_URL"));
+    }
+
+    @Test
+    void generateDuplicateFreeRandomWalksForEntity(){
+        String entity = "http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping";
+        List<String> result = walkGenerator.generateDuplicateFreeRandomWalksForEntity(entity, 100, 4);
+        assertTrue(result.size() > 0);
+        assertTrue(result.size() <= 100);
+        for(String walk : result){
+            assertTrue(walk.split(" ")[0].equals(entity));
+            assertTrue(walk.split(" ").length <= 4 * 2 + 1);
+        }
     }
 
     @Test
@@ -77,6 +89,9 @@ class TdbWalkGeneratorTest {
 
         // manually tested for bnodes and (not existing!) datatype properties
         assertTrue(result.contains(triple1));
+
+        // test error case
+        assertNotNull(walkGenerator.getForwardTriples("ERROR_URL"));
     }
 
     /**

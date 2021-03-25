@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -274,6 +275,43 @@ public class Util {
             uniqueSet.add(walk.toString());
         }
         return new ArrayList<>(uniqueSet);
+    }
+
+    public static List<String> convertToStringWalks(List<List<Triple>> walks,
+                                                    String entity,
+                                                    boolean isUnifyAnonymousNodes){
+        List<String> result = new ArrayList<>();
+        for (List<Triple> walk : walks) {
+            String finalSentence = entity;
+            if (isUnifyAnonymousNodes) {
+                for (Triple po : walk) {
+                    String object = po.object;
+                    if (isAnonymousNode(object)) {
+                        object = "ANode";
+                    }
+                    finalSentence += " " + po.predicate + " " + object;
+                }
+            } else {
+                for (Triple po : walk) {
+                    finalSentence += " " + po.predicate + " " + po.object;
+                }
+            }
+            result.add(finalSentence);
+        }
+        return result;
+    }
+
+    /**
+     * Returns true if the given parameter follows the schema of an anonymous node
+     *
+     * @param uriString The URI string to be checked.
+     * @return True if anonymous node.
+     */
+    public static boolean isAnonymousNode(String uriString) {
+        uriString = uriString.trim();
+        if (uriString.startsWith("_:")) {
+            return true;
+        } else return false;
     }
 
     /**

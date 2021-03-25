@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMidWalkDuplicateFreeCapability {
+public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMidWalkDuplicateFreeCapability,
+        IRandomWalkDuplicateFreeCapability {
 
 
     /**
@@ -154,4 +155,52 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
         tdbDataset.close();
     }
 
+    @Override
+    public List<String> generateDuplicateFreeRandomWalksForEntity(String entity, int numberOfWalks, int depth) {
+        List<String> result = new ArrayList<>();
+        List<List<Triple>> walks = new ArrayList();
+        boolean isFirstIteration = true;
+        for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
+            // initialize with first node
+            if (isFirstIteration) {
+                Set<Triple> neighbours = getForwardTriples(entity);
+                if (neighbours == null || neighbours.size() == 0) {
+                    return result;
+                }
+                for (Triple neighbour : neighbours) {
+                    ArrayList<Triple> individualWalk = new ArrayList<>();
+                    individualWalk.add(neighbour);
+                    walks.add(individualWalk);
+                }
+                isFirstIteration = false;
+            } else {
+                // create a copy
+                List<List<Triple>> walks_tmp = new ArrayList<>();
+                walks_tmp.addAll(walks);
+
+                // loop over current walks
+                for (List<Triple> walk : walks_tmp) {
+                    // get last entity
+                    Triple lastTriple = walk.get(walk.size() - 1);
+                    Set<Triple> nextIteration = getForwardTriples(lastTriple.object);
+                    if (nextIteration != null) {
+                        walks.remove(walk); // check whether this works
+                        for (Triple nextStep : nextIteration) {
+                            List<Triple> newWalk = new ArrayList<>(walk);
+                            newWalk.add(nextStep);
+                            walks.add(newWalk);
+                        }
+                    }
+                } // loop over walks
+            }
+            // trim the list
+            while (walks.size() > numberOfWalks) {
+                int randomNumber = ThreadLocalRandom.current().nextInt(walks.size());
+                walks.remove(randomNumber);
+            }
+        } // depth loop
+
+        return Util.convertToStringWalks(walks, entity, false);
+
+    }
 }

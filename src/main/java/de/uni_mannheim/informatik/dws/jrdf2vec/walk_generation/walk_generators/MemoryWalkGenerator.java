@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.TripleDataSetMemory;
 import org.slf4j.Logger;
@@ -13,7 +14,8 @@ import java.util.function.UnaryOperator;
  * Memory based walk generator using the {@link TripleDataSetMemory} data structure.
  * These kind of walk generators load the complete model into memory.
  */
-public abstract class MemoryWalkGenerator implements IWalkGenerator {
+public abstract class MemoryWalkGenerator implements IWalkGenerator,
+        IMidWalkCapability, IMidWalkDuplicateFreeCapability, IRandomWalkDuplicateFreeCapability {
 
 
     /**
@@ -57,7 +59,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator {
      * @return List of walks.
      */
     public List<String> generateWeightedMidWalksForEntity(String entity, int depth, int numberOfWalks) {
-        return convertToStringWalks(generateWeightedMidWalkForEntityAsArray(entity, depth, numberOfWalks));
+        return Util.convertToStringWalks(generateWeightedMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
     /**
@@ -155,26 +157,9 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator {
      * @param numberOfWalks The number of walks to be generated.
      * @return List where every item is a walk separated by spaces.
      */
+    @Override
     public List<String> generateMidWalksForEntity(String entity, int depth, int numberOfWalks) {
-        return convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
-    }
-
-    public List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
-        List<String> result = new ArrayList<>();
-        for (List<String> individualWalk : dataStructureToConvert) {
-            StringBuilder walk = new StringBuilder();
-            boolean isFirst = true;
-            for (String walkComponent : individualWalk) {
-                if (isFirst) {
-                    isFirst = false;
-                    walk.append(walkComponent);
-                } else {
-                    walk.append(" ").append(walkComponent);
-                }
-            }
-            result.add(walk.toString());
-        }
-        return result;
+        return Util.convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
     /**
@@ -205,33 +190,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator {
      * @return List where every item is a walk separated by spaces.
      */
     public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth) {
-        return convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
-    }
-
-    /**
-     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
-     * into a list of strings where a walk is one string (and the elements are separated by spaces).
-     * The lists are duplicate free.
-     *
-     * @param dataStructureToConvert The data structure that shall be converted.
-     * @return Data structure converted to string list.
-     */
-    public List<String> convertToStringWalksDuplicateFree(List<List<String>> dataStructureToConvert) {
-        HashSet<String> uniqueSet = new HashSet<>();
-        for (List<String> individualWalk : dataStructureToConvert) {
-            StringBuilder walk = new StringBuilder();
-            boolean isFirst = true;
-            for (String walkComponent : individualWalk) {
-                if (isFirst) {
-                    isFirst = false;
-                    walk.append(walkComponent);
-                } else {
-                    walk.append(" ").append(walkComponent);
-                }
-            }
-            uniqueSet.add(walk.toString());
-        }
-        return new ArrayList<>(uniqueSet);
+        return Util.convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
     /**
@@ -374,7 +333,6 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator {
      * spaces.
      */
     public List<String> generateDuplicateFreeRandomWalksForEntity(String entity, int numberOfWalks, int depth) {
-        List<String> result = new ArrayList<>();
         List<List<Triple>> walks = new ArrayList();
         boolean isFirstIteration = true;
         for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
@@ -382,7 +340,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator {
             if (isFirstIteration) {
                 List<Triple> neighbours = data.getObjectTriplesInvolvingSubject(entity);
                 if (neighbours == null || neighbours.size() == 0) {
-                    return result;
+                    return new ArrayList<>();
                 }
                 for (Triple neighbour : neighbours) {
                     ArrayList<Triple> individualWalk = new ArrayList<>();
@@ -419,37 +377,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator {
         } // depth loop
 
         // now we need to translate our walks into strings
-        for (List<Triple> walk : walks) {
-            String finalSentence = entity;
-            if (this.isUnifyAnonymousNodes()) {
-                for (Triple po : walk) {
-                    String object = po.object;
-                    if (isAnonymousNode(object)) {
-                        object = "ANode";
-                    }
-                    finalSentence += " " + po.predicate + " " + object;
-                }
-            } else {
-                for (Triple po : walk) {
-                    finalSentence += " " + po.predicate + " " + po.object;
-                }
-            }
-            result.add(finalSentence);
-        }
-        return result;
-    }
-
-    /**
-     * Returns true if the given parameter follows the schema of an anonymous node
-     *
-     * @param uriString The URI string to be checked.
-     * @return True if anonymous node.
-     */
-    public boolean isAnonymousNode(String uriString) {
-        uriString = uriString.trim();
-        if (uriString.startsWith("_:genid")) {
-            return true;
-        } else return false;
+        return Util.convertToStringWalks(walks, entity, isUnifyAnonymousNodes());
     }
 
     /**

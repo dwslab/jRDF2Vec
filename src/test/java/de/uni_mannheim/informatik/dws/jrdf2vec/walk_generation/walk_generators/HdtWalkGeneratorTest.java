@@ -67,7 +67,6 @@ class HdtWalkGeneratorTest {
         }
     }
 
-
     @Test
     public void generateMidWalkForEntity() {
         try {
@@ -153,7 +152,6 @@ class HdtWalkGeneratorTest {
             fail("Init should not fail.");
         }
     }
-
 
     @Test
     public void generateMidWalksForEntity() {
