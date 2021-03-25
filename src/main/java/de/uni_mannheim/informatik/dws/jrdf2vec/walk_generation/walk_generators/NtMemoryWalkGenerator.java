@@ -175,7 +175,6 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
                 readNTriples(file, false);
             } else {
                 LOGGER.info("Skipping file: " + file.getName());
-                continue;
             }
         }
     }
@@ -233,7 +232,6 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
                 allThreads.add(zThread);
             } else {
                 LOGGER.info("Skipping file: " + fileOriginal.getName());
-                continue;
             }
         }
 
@@ -252,7 +250,8 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
      * Thread that allows concurrent file parsing (used for data sets that consist of multiple, potentially zipped
      * files).
      */
-    class FileReaderThread extends Thread {
+    static class FileReaderThread extends Thread {
+
 
         public FileReaderThread(NtMemoryWalkGenerator parser, File fileToRead, boolean gzipped, boolean optimized) {
             this.fileToRead = fileToRead;
@@ -472,20 +471,18 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
         if(includeDatatypeProperties) {
             skipCondition = input -> {
                 if (input.trim().startsWith("#")) return true; // just a comment line
-                if (input.trim().equals("")) return true; // empty line
-                return false;
+                return input.trim().equals(""); // empty line
             };
         } else {
             skipCondition = new IsearchCondition() {
-                Pattern pattern = Pattern.compile("\".*\"");
+                final Pattern pattern = Pattern.compile("\".*\"");
 
                 @Override
                 public boolean isHit(String input) {
                     if (input.trim().startsWith("#")) return true; // just a comment line
                     if (input.trim().equals("")) return true; // empty line
                     Matcher matcher = pattern.matcher(input);
-                    if (matcher.find()) return true;
-                    return false;
+                    return matcher.find();
                 }
             };
         }

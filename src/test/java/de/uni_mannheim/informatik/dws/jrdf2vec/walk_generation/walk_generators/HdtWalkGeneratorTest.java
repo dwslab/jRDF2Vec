@@ -34,7 +34,7 @@ class HdtWalkGeneratorTest {
         int cCount = 0;
 
         for (int i = 0; i < 1000; i++) {
-            String drawValue = HdtWalkGenerator.<String>randomDrawFromSet(hashSet);
+            String drawValue = HdtWalkGenerator.randomDrawFromSet(hashSet);
             switch (drawValue) {
                 case "A":
                     aCount++;

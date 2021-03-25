@@ -110,17 +110,17 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
     public List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
         List<String> result = new ArrayList<>();
         for (List<String> individualWalk : dataStructureToConvert){
-            String walk = "";
+            StringBuilder walk = new StringBuilder();
             boolean isFirst = true;
             for(String walkComponent : individualWalk){
                 if(isFirst){
                     isFirst = false;
-                    walk = walkComponent;
+                    walk.append(walkComponent);
                 } else {
-                    walk += " " + walkComponent;
+                    walk.append(" ").append(walkComponent);
                 }
             }
-            result.add(walk);
+            result.add(walk.toString());
         }
         return result;
     }
@@ -170,7 +170,8 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
             if (randomPickZeroOne == 0) {
                 // predecessor
                 try {
-                    IteratorTripleString iterator = hdtDataSet.search("", "", nextElementPredecessor);
+                    IteratorTripleString iterator = hdtDataSet.search("", "",
+                            nextElementPredecessor);
                     HashSet<TripleString> candidates = new HashSet<>();
 
                     TripleString ts;

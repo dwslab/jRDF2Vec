@@ -13,7 +13,7 @@ import java.util.function.UnaryOperator;
  * Memory based walk generator using the {@link TripleDataSetMemory} data structure.
  * These kind of walk generators load the complete model into memory.
  */
-public abstract class MemoryWalkGenerator implements IWalkGenerator{
+public abstract class MemoryWalkGenerator implements IWalkGenerator {
 
 
     /**
@@ -50,8 +50,9 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
 
     /**
      * Weighted mid walk: If there are more options to go forward, it is more likely to go forward.
-     * @param entity The entity for which walks shall be generated.
-     * @param depth The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
+     *
+     * @param entity        The entity for which walks shall be generated.
+     * @param depth         The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
      * @param numberOfWalks Number of walks to be performed per entity.
      * @return List of walks.
      */
@@ -61,8 +62,9 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
 
     /**
      * Walks of length 1, i.e., walks that contain only one node, are ignored.
-     * @param entity The entity for which walks shall be generated.
-     * @param depth The depth of each walk (where the depth is the number of hops).
+     *
+     * @param entity        The entity for which walks shall be generated.
+     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @param numberOfWalks The number of walks to be performed.
      * @return A data structure describing the walks.
      */
@@ -70,7 +72,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < numberOfWalks; i++) {
             List<String> walk = generateWeightedMidWalkForEntity(entity, depth);
-            if(walk.size() > 1) {
+            if (walk.size() > 1) {
                 result.add(walk);
             }
         }
@@ -81,7 +83,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
      * Generates a single walk for the given entity with the given depth.
      *
      * @param entity The entity for which a walk shall be generated.
-     * @param depth The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
+     * @param depth  The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
      * @return One walk as list where each element is a walk component.
      */
     public List<String> generateWeightedMidWalkForEntity(String entity, int depth) {
@@ -111,11 +113,11 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
             double numberOfPredecessors = 0.0;
             double numberOfSuccessors = 0.0;
 
-            if(candidatesPredecessor != null) numberOfPredecessors = candidatesPredecessor.size();
-            if(candidatesSuccessor != null) numberOfSuccessors = candidatesSuccessor.size();
+            if (candidatesPredecessor != null) numberOfPredecessors = candidatesPredecessor.size();
+            if (candidatesSuccessor != null) numberOfSuccessors = candidatesSuccessor.size();
 
             // if there are no successors and predecessors: return current walk
-            if(numberOfPredecessors == 0 && numberOfSuccessors == 0) return result;
+            if (numberOfPredecessors == 0 && numberOfSuccessors == 0) return result;
 
             // determine cut-off point
             double cutOffPoint = numberOfPredecessors / (numberOfPredecessors + numberOfSuccessors);
@@ -160,25 +162,26 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
     public List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
         List<String> result = new ArrayList<>();
         for (List<String> individualWalk : dataStructureToConvert) {
-            String walk = "";
+            StringBuilder walk = new StringBuilder();
             boolean isFirst = true;
             for (String walkComponent : individualWalk) {
                 if (isFirst) {
                     isFirst = false;
-                    walk = walkComponent;
+                    walk.append(walkComponent);
                 } else {
-                    walk += " " + walkComponent;
+                    walk.append(" ").append(walkComponent);
                 }
             }
-            result.add(walk);
+            result.add(walk.toString());
         }
         return result;
     }
 
     /**
      * Walks of length 1, i.e., walks that contain only one node, are ignored.
-     * @param entity The entity for which walks shall be generated.
-     * @param depth The depth of each walk (where the depth is the number of hops).
+     *
+     * @param entity        The entity for which walks shall be generated.
+     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @param numberOfWalks The number of walks to be performed.
      * @return A data structure describing the walks.
      */
@@ -186,7 +189,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < numberOfWalks; i++) {
             List<String> walk = generateMidWalkForEntity(entity, depth);
-            if(walk.size() > 1) {
+            if (walk.size() > 1) {
                 result.add(walk);
             }
         }
@@ -195,12 +198,13 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     *
      * @param numberOfWalks The number of walks to be generated.
-     * @param entity The entity for which a walk shall be generated.
-     * @param depth The depth of each walk.
+     * @param entity        The entity for which a walk shall be generated.
+     * @param depth         The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
-    public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
+    public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth) {
         return convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
@@ -208,23 +212,24 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
      * Given a list of walks where a walk is represented as a List of strings, this method will convert that
      * into a list of strings where a walk is one string (and the elements are separated by spaces).
      * The lists are duplicate free.
+     *
      * @param dataStructureToConvert The data structure that shall be converted.
      * @return Data structure converted to string list.
      */
     public List<String> convertToStringWalksDuplicateFree(List<List<String>> dataStructureToConvert) {
         HashSet<String> uniqueSet = new HashSet<>();
-        for (List<String> individualWalk : dataStructureToConvert){
-            String walk = "";
+        for (List<String> individualWalk : dataStructureToConvert) {
+            StringBuilder walk = new StringBuilder();
             boolean isFirst = true;
-            for(String walkComponent : individualWalk){
-                if(isFirst){
+            for (String walkComponent : individualWalk) {
+                if (isFirst) {
                     isFirst = false;
-                    walk = walkComponent;
+                    walk.append(walkComponent);
                 } else {
-                    walk += " " + walkComponent;
+                    walk.append(" ").append(walkComponent);
                 }
             }
-            uniqueSet.add(walk);
+            uniqueSet.add(walk.toString());
         }
         return new ArrayList<>(uniqueSet);
     }
@@ -315,34 +320,35 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
 
     /**
      * Generate text walks. This only works if datatype triples/properties were parsed previously.
+     *
      * @param entity The entity for which walks shall be generated.
-     * @param depth Must be &gt; 2.
+     * @param depth  Must be &gt; 2.
      * @return List of walks.
      */
-    public List<String> generateTextWalksForEntity(String entity, int depth){
+    public List<String> generateTextWalksForEntity(String entity, int depth) {
         List<String> result = new ArrayList<>();
         Set<String> datatypeSubjects = this.data.getUniqueDatatypeTripleSubjects();
-        if(!datatypeSubjects.contains(entity)){
+        if (!datatypeSubjects.contains(entity)) {
             return result;
         }
         Map<String, Set<String>> tuples = this.data.getDatatypeTuplesForSubject(entity);
 
-        for(Map.Entry<String, Set<String>> entry : tuples.entrySet()){
+        for (Map.Entry<String, Set<String>> entry : tuples.entrySet()) {
             String predicate = entry.getKey();
             Set<String> texts = entry.getValue();
             StringBuffer walk = getNewBufferWalk(entity, predicate);
             int currentWalkLength = 2;
-            for(String text : texts){
-                for(String token : text.split(" ")){
+            for (String text : texts) {
+                for (String token : text.split(" ")) {
                     walk.append(" " + this.textProcessingFunction.apply(token));
                     currentWalkLength++;
-                    if(currentWalkLength == depth){
+                    if (currentWalkLength == depth) {
                         result.add(walk.toString());
                         walk = getNewBufferWalk(entity, predicate);
                         currentWalkLength = 2;
                     }
                 }
-                if(walk.length() > entity.length() + predicate.length() + 1){
+                if (walk.length() > entity.length() + predicate.length() + 1) {
                     result.add(walk.toString());
                     walk = getNewBufferWalk(entity, predicate);
                     currentWalkLength = 2;
@@ -352,10 +358,9 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
         return result;
     }
 
-    private StringBuffer getNewBufferWalk(String subject, String predicate){
+    private StringBuffer getNewBufferWalk(String subject, String predicate) {
         StringBuffer walk = new StringBuffer();
-        walk.append(subject);
-        walk.append(" " + predicate);
+        walk.append(subject).append(" ").append(predicate);
         return walk;
     }
 
@@ -502,7 +507,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator{
         isParseDatatypeProperties = parseDatatypeProperties;
     }
 
-    public long getDataSize(){
+    public long getDataSize() {
         if (data == null) {
             return 0L;
         } else return data.getObjectTripleSize();
