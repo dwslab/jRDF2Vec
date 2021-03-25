@@ -6,18 +6,19 @@ import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGeneratorLight;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
 
 import java.io.File;
 import java.time.Instant;
 
-import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
  * This class allows to generate walks and train embeddings for RDF2Vec Light.
  */
 public class RDF2VecLight implements IRDF2Vec {
+
 
     /**
      * File containing the entities for which an embedding shall be trained.
@@ -135,7 +136,7 @@ public class RDF2VecLight implements IRDF2Vec {
         }
 
         Instant before = Instant.now();
-        WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, entitiesFile, isEmbedText());
+        WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, entitiesFile, isEmbedText());
         generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), this.getWalkFilePath());
 
         Instant after = Instant.now();

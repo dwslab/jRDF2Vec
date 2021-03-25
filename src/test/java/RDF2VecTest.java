@@ -14,16 +14,36 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RDF2VecTest {
 
+
     /**
      * Logger
      */
     private static Logger LOGGER = LoggerFactory.getLogger(RDF2Vec.class);
+
+    /**
+     * A working internet connection is required.
+     */
+    @Test
+    void isUriOk(){
+        assertTrue(RDF2Vec.isUriOk(loadFile("emptyFile.txt").toURI()));
+        assertFalse(RDF2Vec.isUriOk(new File("./does_not_exist.txt").toURI()));
+        assertFalse(RDF2Vec.isUriOk(null));
+
+        // Web endpoint
+        try {
+            assertTrue(RDF2Vec.isUriOk(new URI("https://query.wikidata.org/bigdata/namespace/wdq/sparql/")));
+            assertFalse(RDF2Vec.isUriOk(new URI("https://www.jan-portisch.eu/")));
+        } catch (URISyntaxException e) {
+            fail(e);
+        }
+    }
 
     @Test
     void getWalkFilePath() {

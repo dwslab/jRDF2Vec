@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -93,6 +94,16 @@ class UtilTest {
     void getDimensionalityFromVectorTextFileFail(){
         assertEquals(-1, Util.getDimensionalityFromVectorTextFile(""));
         assertEquals(-1, Util.getDimensionalityFromVectorTextFile(new File("")));
+    }
+
+    @Test
+    void uriIsFile(){
+        try {
+            assertTrue(Util.uriIsFile(new File("./myfile.txt").toURI()));
+            assertFalse(Util.uriIsFile(new URI("http://www.jan-portisch.eu")));
+        } catch (Exception e){
+            fail(e);
+        }
     }
 
     /**

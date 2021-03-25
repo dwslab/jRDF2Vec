@@ -1,7 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
 
 /**
  * Interface for RDF2Vec orchestration classes.

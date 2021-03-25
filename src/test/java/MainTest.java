@@ -14,8 +14,8 @@ import org.rdfhdt.hdt.hdt.HDTManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.HdtParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.HdtWalkGenerator;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 
 
@@ -771,7 +771,7 @@ class MainTest {
             e.printStackTrace();
             fail("Could not load HDT file.");
         }
-        HdtParser.serializeDataSetAsNtFile(dataSet, graphFileToUse);
+        HdtWalkGenerator.serializeDataSetAsNtFile(dataSet, graphFileToUse);
 
         // prepare directory
         String directoryName = "./walksOnlyMidWeighted/";
@@ -867,7 +867,7 @@ class MainTest {
             e.printStackTrace();
             fail("Could not load HDT file.");
         }
-        HdtParser.serializeDataSetAsNtFile(dataSet, graphFileToUse);
+        HdtWalkGenerator.serializeDataSetAsNtFile(dataSet, graphFileToUse);
 
         // prepare directory
         File walkDirectory = new File("./walksOnly/");
@@ -944,7 +944,7 @@ class MainTest {
             e.printStackTrace();
             fail("Could not load HDT file.");
         }
-        HdtParser.serializeDataSetAsNtFile(dataSet, graphFileToUse);
+        HdtWalkGenerator.serializeDataSetAsNtFile(dataSet, graphFileToUse);
 
         // prepare directory
         String walkDirectoryName = "./walksOnly2/";

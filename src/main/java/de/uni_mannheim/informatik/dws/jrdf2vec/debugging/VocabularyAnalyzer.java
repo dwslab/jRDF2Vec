@@ -1,12 +1,12 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.debugging;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.entity_selector.EntitySelector;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures.TripleDataSetMemory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.HdtParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.IParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.MemoryParser;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers.ParserManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.TripleDataSetMemory;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.HdtWalkGenerator;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IWalkGenerator;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.MemoryWalkGenerator;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.WalkGeneratorManager;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
@@ -99,9 +99,9 @@ public class VocabularyAnalyzer {
     public static VocabularyAnalyzerResult analyze(String filePathToModel, String filePathToTripleFile){
         VocabularyAnalyzerResult result = new VocabularyAnalyzerResult();
 
-        Pair<IParser, EntitySelector> parserPair = ParserManager.parseSingleFile(filePathToTripleFile);
+        Pair<IWalkGenerator, EntitySelector> parserPair = WalkGeneratorManager.parseSingleFile(filePathToTripleFile);
 
-        if(parserPair.getValue0().getClass() == HdtParser.class){
+        if(parserPair.getValue0().getClass() == HdtWalkGenerator.class){
             LOGGER.error("Analysis is not implemented for HDT parser!");
             return result;
         }
@@ -110,7 +110,7 @@ public class VocabularyAnalyzer {
         result.setDimensionConsistent(readInfo.getValue2());
 
         Set<String> conceptsInModel = readInfo.getValue0();
-        MemoryParser parser = (MemoryParser) parserPair.getValue0();
+        MemoryWalkGenerator parser = (MemoryWalkGenerator) parserPair.getValue0();
         TripleDataSetMemory triples = parser.getData();
 
         Set<String> subjectsNotFound = new HashSet<>(triples.getUniqueObjectTripleSubjects());

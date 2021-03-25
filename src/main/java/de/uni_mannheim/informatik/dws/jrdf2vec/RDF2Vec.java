@@ -2,17 +2,19 @@ package de.uni_mannheim.informatik.dws.jrdf2vec;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault;
 
 import java.io.File;
+import java.net.URI;
 import java.time.Instant;
 
-import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
  * This class allows to generate walks and train embeddings for RDF2Vec Classic.
@@ -23,7 +25,7 @@ public class RDF2Vec implements IRDF2Vec {
     /**
      * File with KG triples.
      */
-    private File knowledgeGraphFile;
+    private URI knowledgeGraphUri;
 
     /**
      * Ont model reference in case that is already loaded. (not important for CLI but for API usage)
@@ -108,29 +110,42 @@ public class RDF2Vec implements IRDF2Vec {
      * @param walkDirectory      Directory to which the walks shall be written to.
      */
     public RDF2Vec(File knowledgeGraphFile, File walkDirectory) {
-        this.knowledgeGraphFile = knowledgeGraphFile;
-        setWalkDirectory(walkDirectory);
+        this(knowledgeGraphFile.toURI(), walkDirectory);
     }
 
     /**
      * Constructor
      *
-     * @param ontModel OntModel reference.
+     * @param ontModel      OntModel reference.
      * @param walkDirectory Directory to which the walks and models shall be written to.
      */
     public RDF2Vec(OntModel ontModel, File walkDirectory) {
-       setWalkDirectory(walkDirectory);
-       this.ontModel = ontModel;
+        setWalkDirectory(walkDirectory);
+        this.ontModel = ontModel;
+    }
+
+    /**
+     * Main constructor
+     * @param knowledgeGraphUri The URI to the knowledge graph.
+     * @param walkDirectory The walk directory that shall be generated.
+     */
+    public RDF2Vec(URI knowledgeGraphUri, File walkDirectory) {
+        this.knowledgeGraphUri = knowledgeGraphUri;
+        if(!isUriOk(knowledgeGraphUri)){
+            LOGGER.error("There is a problem with the provided knowledge graph. RDF2Vec is not functional.");
+        }
+        setWalkDirectory(walkDirectory);
     }
 
 
     /**
      * Train a new model with the existing parameters.
-     * @param ontModel Model
+     *
+     * @param ontModel      Model
      * @param walkDirectory Directory where walks shall be generated.
      * @return Path to model.
      */
-    public String trainNew(OntModel ontModel, File walkDirectory){
+    public String trainNew(OntModel ontModel, File walkDirectory) {
         setWalkDirectory(walkDirectory);
         this.ontModel = ontModel;
         return train();
@@ -138,12 +153,13 @@ public class RDF2Vec implements IRDF2Vec {
 
     /**
      * Train a new model with the existing parameters.
+     *
      * @param knowledgeGraphFile KG file (for which embedding shall be trained).
-     * @param walkDirectory Directory where walks shall be generated.
+     * @param walkDirectory      Directory where walks shall be generated.
      * @return Path to model.
      */
-    public String trainNew(File knowledgeGraphFile, File walkDirectory){
-        this.knowledgeGraphFile = knowledgeGraphFile;
+    public String trainNew(File knowledgeGraphFile, File walkDirectory) {
+        this.knowledgeGraphUri = knowledgeGraphFile.toURI();
         setWalkDirectory(walkDirectory);
         return train();
     }
@@ -159,12 +175,12 @@ public class RDF2Vec implements IRDF2Vec {
         if (ontModel == null) {
 
             // sanity checks
-            if (knowledgeGraphFile == null) {
+            if (knowledgeGraphUri == null) {
                 LOGGER.error("Knowledge Graph File not set. ABORT.");
                 return null;
             }
-            if (!knowledgeGraphFile.exists()) {
-                LOGGER.error("File " + knowledgeGraphFile.getAbsolutePath() + " does not exist. ABORT.");
+            if (!getFile(knowledgeGraphUri).exists()) {
+                LOGGER.error("File " + getFile(knowledgeGraphUri).getAbsolutePath() + " does not exist. ABORT.");
                 return null;
             }
         } else {
@@ -173,11 +189,11 @@ public class RDF2Vec implements IRDF2Vec {
 
         Instant before = Instant.now();
 
-        WalkGeneratorDefault classicGenerator;
-        if(useFile) {
-            classicGenerator = new WalkGeneratorDefault(this.knowledgeGraphFile, isEmbedText());
+        WalkGenerationManagerDefault classicGenerator;
+        if (useFile) {
+            classicGenerator = new WalkGenerationManagerDefault(getFile(this.knowledgeGraphUri), isEmbedText());
         } else {
-            classicGenerator = new WalkGeneratorDefault(this.ontModel, isEmbedText());
+            classicGenerator = new WalkGenerationManagerDefault(this.ontModel, isEmbedText());
         }
 
         classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), getWalkFilePath());
@@ -187,13 +203,13 @@ public class RDF2Vec implements IRDF2Vec {
 
         before = Instant.now();
         Gensim gensim;
-        if(this.pythonServerResourceDirectory != null) {
+        if (this.pythonServerResourceDirectory != null) {
             gensim = Gensim.getInstance(this.pythonServerResourceDirectory);
         } else gensim = Gensim.getInstance();
 
         String fileToWrite = this.getWalkFileDirectoryPath() + File.separator + "model.kv";
         gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
-        if(isVectorTextFileGeneration) {
+        if (isVectorTextFileGeneration) {
             gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + File.separator + "vectors.txt");
         }
         Gensim.shutDown();
@@ -203,12 +219,20 @@ public class RDF2Vec implements IRDF2Vec {
         return fileToWrite;
     }
 
-    public File getKnowledgeGraphFile() {
-        return knowledgeGraphFile;
+    public URI getKnowledgeGraphUri() {
+        return knowledgeGraphUri;
     }
 
-    public void setKnowledgeGraphFile(File knowledgeGraphFile) {
-        this.knowledgeGraphFile = knowledgeGraphFile;
+    public File getKnowledgeGraphFile() {
+        return getFile(this.knowledgeGraphUri);
+    }
+
+    public void setKnowledgeGraphUri(File knowledgeGraphFile) {
+        this.knowledgeGraphUri = knowledgeGraphFile.toURI();
+    }
+
+    public void setKnowledgeGraphUri(URI knowledgeGraphUri) {
+        this.knowledgeGraphUri = knowledgeGraphUri;
     }
 
     public int getNumberOfThreads() {
@@ -237,6 +261,7 @@ public class RDF2Vec implements IRDF2Vec {
 
     /**
      * Returns the path to the walk directory.
+     *
      * @return Path as String.
      */
     public String getWalkFileDirectoryPath() {
@@ -295,6 +320,7 @@ public class RDF2Vec implements IRDF2Vec {
 
     /**
      * This method returns the time it took to generate walks for the last run as String.
+     *
      * @return The time it took to generate walks for the last run as String. Will never be null.
      */
     public String getRequiredTimeForLastWalkGenerationString() {
@@ -304,21 +330,23 @@ public class RDF2Vec implements IRDF2Vec {
 
     /**
      * This method returns he time it took to train the model for the last run as String.
+     *
      * @return The time it took to train the model for the last run as String. Will never be null.
      */
     public String getRequiredTimeForLastTrainingString() {
-        if(this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
+        if (this.requiredTimeForLastTrainingString == null) return "<training time not yet set>";
         else return requiredTimeForLastTrainingString;
     }
 
     /**
      * Set the walk file path given the directory.
+     *
      * @param walkDirectory Directory where walks shall be generated.
      */
-    private void setWalkDirectory(File walkDirectory){
+    private void setWalkDirectory(File walkDirectory) {
         if (walkDirectory == null || !walkDirectory.isDirectory()) {
             LOGGER.warn("walkDirectory is not a directory. Using default.");
-            walkFilePath = WalkGeneratorDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+            walkFilePath = WalkGenerationManagerDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
         } else {
             this.walkFilePath = walkDirectory.getAbsolutePath() + File.separator + "walk_file.gz";
         }
@@ -351,4 +379,36 @@ public class RDF2Vec implements IRDF2Vec {
     public void setEmbedText(boolean embedText) {
         isEmbedText = embedText;
     }
+
+    static File getFile(URI fileUri) {
+        return new File(fileUri);
+    }
+
+    /**
+     * Check if the URI is ok.
+     * @param uriToCheck The URI that shall be checked.
+     * @return True if the URI is ok, else false.
+     */
+    public static boolean isUriOk(URI uriToCheck) {
+        if (uriToCheck == null) {
+            LOGGER.error("The provided URI/File for the knowledge graph is null.");
+            return false;
+        }
+        try {
+            if (getFile(uriToCheck).exists()) {
+                return true;
+            }
+        } catch (IllegalArgumentException iae) {
+            // we do nothing but continue with the next check
+        }
+        try {
+            String queryString = "ASK { ?s ?p ?o . }";
+            Query query = QueryFactory.create(queryString);
+            QueryExecution queryExecution = QueryExecutionFactory.sparqlService(uriToCheck.toString(), query);
+            return queryExecution.execAsk();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

@@ -5,9 +5,9 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGenerationMode;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base.WalkGeneratorDefault;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.WalkGeneratorLight;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
 
 import java.io.File;
 import java.time.Instant;
@@ -466,13 +466,13 @@ public class Main {
             // now distinguish light/non-light
             if (lightEntityFile != null) {
                 // light walk generation:
-                WalkGeneratorLight generatorLight = new WalkGeneratorLight(knowledgeGraphFile, lightEntityFile,
+                WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, lightEntityFile,
                         isEmbedText);
                 walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
             } else {
                 // classic walk generation
-                WalkGeneratorDefault classicGenerator = new WalkGeneratorDefault(knowledgeGraphFile, isEmbedText);
+                WalkGenerationManagerDefault classicGenerator = new WalkGenerationManagerDefault(knowledgeGraphFile, isEmbedText);
                 walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE : walkGenerationMode;
                 classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
             }

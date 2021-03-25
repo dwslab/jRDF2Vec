@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -69,6 +70,9 @@ public class Util {
      * @return Number of lines in the file.
      */
     public static int getNumberOfLines(File file){
+        if (file == null){
+            return 0;
+        }
         int linesRead = 0;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -76,10 +80,8 @@ public class Util {
                 linesRead++;
             }
             br.close();
-        } catch (FileNotFoundException fnfe){
-            fnfe.printStackTrace();
-        } catch (IOException ioe){
-            ioe.printStackTrace();
+        } catch (IOException fnfe){
+            LOGGER.error("Could not get number of lines for file " + file.getAbsolutePath(), fnfe);
         }
         return linesRead;
     }
@@ -213,5 +215,39 @@ public class Util {
             LOGGER.error("A problem occurred while trying to close the file reader.", e);
         }
         return result;
+    }
+
+    /**
+     * Checks whether the provided URI points to a file.
+     * @param uriToCheck The URI that shall be checked.
+     * @return True if the URI is a file, else false.
+     */
+    public static boolean uriIsFile(URI uriToCheck){
+        if(uriToCheck == null){
+            return false;
+        } else {
+            return uriToCheck.getScheme().equals("file");
+        }
+    }
+
+    /**
+     * Returns true if the provided directory is a TDB directory, else false.
+     * @param directoryToCheck The directory that shall be checked.
+     * @return True if TDB directory, else false.
+     */
+    public static boolean isTdbDirectory(File directoryToCheck){
+        if(directoryToCheck == null || !directoryToCheck.exists() || !directoryToCheck.isDirectory()){
+            return false;
+        }
+        boolean isDatFileAvailable = false;
+        // note: we already checked that directoryToCheck is a directory
+        for(File file : directoryToCheck.listFiles()){
+            // we accept the directory as tdb directory if it contains a dat file.
+            if(file.getAbsolutePath().endsWith(".dat")){
+                isDatFileAvailable = true;
+                break;
+            }
+        }
+        return isDatFileAvailable;
     }
 }
