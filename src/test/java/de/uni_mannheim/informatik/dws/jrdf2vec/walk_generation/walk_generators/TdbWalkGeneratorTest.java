@@ -77,10 +77,9 @@ class TdbWalkGeneratorTest {
     }
 
     @Test
-    void getForwardTriple() {
+    void getForwardTriples() {
         Set<Triple> result = walkGenerator.getForwardTriples("http://www.co-ode.org/ontologies/pizza/pizza" +
                 ".owl#Siciliana");
-        assertTrue(result.size() > 0);
 
         Triple triple1 = new Triple(
                 "http://www.co-ode.org/ontologies/pizza/pizza.owl#Siciliana",
