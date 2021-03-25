@@ -2,9 +2,10 @@ de.uni_mannheim.informatik.dws.jrdf2vec
 de.uni_mannheim.informatik.dws.jrdf2vec.debugging
 de.uni_mannheim.informatik.dws.jrdf2vec.training
 de.uni_mannheim.informatik.dws.jrdf2vec.util
-de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.base
-de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.data_structures
-de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light
-de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.light.dbpedia
-de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.parsers
-de.uni_mannheim.informatik.dws.jrdf2vec.walk_generators.runnables
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.dbpedia
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables
+de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators
