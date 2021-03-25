@@ -1,4 +1,5 @@
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.HdtWalkGenerator;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -10,6 +11,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,6 +98,35 @@ class UtilTest {
     void getDimensionalityFromVectorTextFileFail(){
         assertEquals(-1, Util.getDimensionalityFromVectorTextFile(""));
         assertEquals(-1, Util.getDimensionalityFromVectorTextFile(new File("")));
+    }
+
+    @Test
+    public void randomDrawFromHashSet() {
+        Set<String> hashSet = new HashSet<>(Arrays.asList("A", "B", "C"));
+        int aCount = 0;
+        int bCount = 0;
+        int cCount = 0;
+
+        for (int i = 0; i < 1000; i++) {
+            String drawValue = Util.randomDrawFromSet(hashSet);
+            switch (drawValue) {
+                case "A":
+                    aCount++;
+                    break;
+                case "B":
+                    bCount++;
+                    break;
+                case "C":
+                    cCount++;
+                    break;
+                default:
+                    fail("Invalid value: " + drawValue);
+            }
+        }
+        assertTrue(aCount > 0, "A was never drawn.");
+        assertTrue(bCount > 0, "B was never drawn.");
+        assertTrue(cCount > 0, "C was never drawn.");
+        LOGGER.info("A : B : C  :   " + aCount + " : " + bCount + " : " + cCount);
     }
 
     @Test

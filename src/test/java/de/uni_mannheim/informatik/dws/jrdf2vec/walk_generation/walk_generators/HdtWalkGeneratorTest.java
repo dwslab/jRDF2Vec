@@ -26,35 +26,6 @@ class HdtWalkGeneratorTest {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(HdtWalkGenerator.class);
 
-    @Test
-    public void randomDrawFromHashSet() {
-        Set<String> hashSet = new HashSet<>(Arrays.asList("A", "B", "C"));
-        int aCount = 0;
-        int bCount = 0;
-        int cCount = 0;
-
-        for (int i = 0; i < 1000; i++) {
-            String drawValue = HdtWalkGenerator.randomDrawFromSet(hashSet);
-            switch (drawValue) {
-                case "A":
-                    aCount++;
-                    break;
-                case "B":
-                    bCount++;
-                    break;
-                case "C":
-                    cCount++;
-                    break;
-                default:
-                    fail("Invalid value: " + drawValue);
-            }
-        }
-        assertTrue(aCount > 0, "A was never drawn.");
-        assertTrue(bCount > 0, "B was never drawn.");
-        assertTrue(cCount > 0, "C was never drawn.");
-        LOGGER.info("A : B : C  :   " + aCount + " : " + bCount + " : " + cCount);
-    }
-
     /**
      * Just making sure that the method behaves as assumed.
      */
@@ -123,9 +94,7 @@ class HdtWalkGeneratorTest {
                                 + walkArray[i - 2] + " " + walkArray[i - 1] + " " + walkArray[i]
                                 + "\nSentence:\n" + walk1);
                     }
-                } catch (NotFoundException e) {
-                    fail("Exception", e);
-                } catch (IOException e) {
+                } catch (NotFoundException | IOException e) {
                     fail("Exception", e);
                 }
             }
@@ -134,7 +103,6 @@ class HdtWalkGeneratorTest {
             fail("Init should not fail.");
         }
     }
-
 
     @Test
     public void generateMidWalksForEntityDuplicateFree(){
@@ -177,9 +145,7 @@ class HdtWalkGeneratorTest {
                                 + "\nSentence:\n" + walk);
                     }
                 }
-            } catch (IOException e) {
-                fail("No exception should occur.", e);
-            } catch (NotFoundException e) {
+            } catch (IOException | NotFoundException e) {
                 fail("No exception should occur.", e);
             }
         } catch (IOException ioe) {
@@ -230,9 +196,7 @@ class HdtWalkGeneratorTest {
                                 + "\nSentence:\n" + walk);
                     }
                 }
-            } catch (IOException e) {
-                fail("No exception should occur.", e);
-            } catch (NotFoundException e) {
+            } catch (IOException | NotFoundException e) {
                 fail("No exception should occur.", e);
             }
         } catch (IOException ioe) {

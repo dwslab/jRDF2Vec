@@ -1,5 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
@@ -16,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * A parser for HDT files.
  */
-public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCapability {
+public class HdtWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMidWalkDuplicateFreeCapability {
 
 
     /**
@@ -61,33 +62,9 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
      * @param depth The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
+    @Override
     public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
-        return convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
-    }
-
-    /**
-     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
-     * into a list of strings where a walk is one string (and the elements are separated by spaces).
-     * The lists are duplicate free.
-     * @param dataStructureToConvert The data structure that shall be converted.
-     * @return Data structure converted to string list.
-     */
-    public List<String> convertToStringWalksDuplicateFree(List<List<String>> dataStructureToConvert) {
-        Set<String> uniqueSet = new HashSet<>();
-        for (List<String> individualWalk : dataStructureToConvert){
-            StringBuilder walk = new StringBuilder();
-            boolean isFirst = true;
-            for(String walkComponent : individualWalk){
-                if(isFirst){
-                    isFirst = false;
-                    walk.append(walkComponent);
-                } else {
-                    walk.append(" ").append(walkComponent);
-                }
-            }
-            uniqueSet.add(walk.toString());
-        }
-        return new ArrayList<>(uniqueSet);
+        return Util.convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
     /**
@@ -97,32 +74,9 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
      * @param depth The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
-    public List<String> generateMidWalksForEntity(String entity, int numberOfWalks, int depth){
-        return convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
-    }
-
-    /**
-     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
-     * into a list of strings where a walk is one string (and the elements are separated by spaces).
-     * @param dataStructureToConvert The data structure that shall be converted.
-     * @return Data structure converted to string list.
-     */
-    public List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
-        List<String> result = new ArrayList<>();
-        for (List<String> individualWalk : dataStructureToConvert){
-            StringBuilder walk = new StringBuilder();
-            boolean isFirst = true;
-            for(String walkComponent : individualWalk){
-                if(isFirst){
-                    isFirst = false;
-                    walk.append(walkComponent);
-                } else {
-                    walk.append(" ").append(walkComponent);
-                }
-            }
-            result.add(walk.toString());
-        }
-        return result;
+    @Override
+    public List<String> generateMidWalksForEntity(java.lang.String entity, int numberOfWalks, int depth){
+        return Util.convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
     /**
@@ -181,7 +135,7 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
                     }
 
                     if (candidates.size() > 0) {
-                        TripleString drawnTriple = randomDrawFromSet(candidates);
+                        TripleString drawnTriple = Util.randomDrawFromSet(candidates);
 
                         // add walks from the front (walk started before entity)
                         result.addFirst(drawnTriple.getPredicate().toString());
@@ -209,7 +163,7 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
                         candidates.add(ts);
                     }
                     if (candidates.size() > 0) {
-                        TripleString stringToAdd = randomDrawFromSet(candidates);
+                        TripleString stringToAdd = Util.randomDrawFromSet(candidates);
 
                         // add next walk iteration
                         result.addLast(stringToAdd.getPredicate().toString());
@@ -222,21 +176,6 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
             }
         }
         return result;
-    }
-
-    /**
-     * Draw a random value from a HashSet. This method is thread-safe.
-     * @param setToDrawFrom The set from which shall be drawn.
-     * @param <T> Type
-     * @return Drawn value of type T.
-     */
-    public static <T> T randomDrawFromSet(Set<T> setToDrawFrom) {
-        int randomNumber = ThreadLocalRandom.current().nextInt(setToDrawFrom.size());
-        Iterator<T> iterator = setToDrawFrom.iterator();
-        for (int i = 0; i < randomNumber; i++) {
-            iterator.next();
-        }
-        return iterator.next();
     }
 
     /**

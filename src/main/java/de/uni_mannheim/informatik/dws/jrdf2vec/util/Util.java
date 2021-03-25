@@ -15,8 +15,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
@@ -249,5 +249,69 @@ public class Util {
             }
         }
         return isDatFileAvailable;
+    }
+
+    /**
+     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
+     * into a list of strings where a walk is one string (and the elements are separated by spaces).
+     * The lists are duplicate free.
+     * @param dataStructureToConvert The data structure that shall be converted.
+     * @return Data structure converted to string list.
+     */
+    public static List<String> convertToStringWalksDuplicateFree(List<List<String>> dataStructureToConvert) {
+        Set<String> uniqueSet = new HashSet<>();
+        for (List<String> individualWalk : dataStructureToConvert) {
+            StringBuilder walk = new StringBuilder();
+            boolean isFirst = true;
+            for(String walkComponent : individualWalk){
+                if(isFirst){
+                    isFirst = false;
+                    walk.append(walkComponent);
+                } else {
+                    walk.append(" ").append(walkComponent);
+                }
+            }
+            uniqueSet.add(walk.toString());
+        }
+        return new ArrayList<>(uniqueSet);
+    }
+
+    /**
+     * Given a list of walks where a walk is represented as a List of strings, this method will convert that
+     * into a list of strings where a walk is one string (and the elements are separated by spaces).
+     * @param dataStructureToConvert The data structure that shall be converted.
+     * @return Data structure converted to string list.
+     */
+    public static List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
+        List<String> result = new ArrayList<>();
+        for (List<String> individualWalk : dataStructureToConvert){
+            StringBuilder walk = new StringBuilder();
+            boolean isFirst = true;
+            for(String walkComponent : individualWalk){
+                if(isFirst){
+                    isFirst = false;
+                    walk.append(walkComponent);
+                } else {
+                    walk.append(" ").append(walkComponent);
+                }
+            }
+            result.add(walk.toString());
+        }
+        return result;
+    }
+
+    /**
+     * Draw a random value from a HashSet. This method is thread-safe.
+     * @param setToDrawFrom The set from which shall be drawn.
+     * @param <T> Type
+     * @return Drawn value of type T.
+     */
+    public static <T> T randomDrawFromSet(Set<T> setToDrawFrom) {
+        int randomNumber = ThreadLocalRandom.current().nextInt(setToDrawFrom.size());
+        Iterator<T> iterator = setToDrawFrom.iterator();
+        for (int i = 0; i < randomNumber; i++) {
+            iterator.next();
+        }
+        return iterator.next();
     }
 }

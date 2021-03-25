@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +40,28 @@ class TdbWalkGeneratorTest {
                 "http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping");
 
         assertTrue(result.contains(triple1));
+    }
+
+    @Test
+    void generateMidWalksForEntity(){
+        String entity = "http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping";
+        List<String> walks = walkGenerator.generateMidWalksForEntity(entity, 100, 3);
+        assertEquals(100, walks.size());
+        for(String walk : walks){
+            assertTrue(walk.contains(entity));
+            assertTrue(walk.split(" ").length <= 3 * 2 + 1);
+        }
+    }
+
+    @Test
+    void generateMidWalksForEntityDuplicateFree(){
+        String entity = "http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping";
+        List<String> walks = walkGenerator.generateMidWalksForEntityDuplicateFree(entity, 100, 3);
+        assertTrue(walks.size() <= 100);
+        for(String walk : walks){
+            assertTrue(walk.contains(entity));
+            assertTrue(walk.split(" ").length <= 3 * 2 + 1);
+        }
     }
 
     @Test
