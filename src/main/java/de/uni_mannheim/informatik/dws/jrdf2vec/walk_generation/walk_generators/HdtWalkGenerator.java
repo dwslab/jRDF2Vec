@@ -133,7 +133,7 @@ public class HdtWalkGenerator implements IWalkGenerator, IMidWalkDuplicateFreeCa
      * @return A data structure describing the walks.
      */
     public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks){
-        List<List<String>>  result = new ArrayList<>();
+        List<List<String>> result = new ArrayList<>();
         for(int i = 0; i < numberOfWalks; i++){
             List<String> walk = generateMidWalkForEntity(entity, depth);
             if(walk.size() > 1) {
