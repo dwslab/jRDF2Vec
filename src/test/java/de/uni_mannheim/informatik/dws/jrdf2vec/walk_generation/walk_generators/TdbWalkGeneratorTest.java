@@ -77,6 +77,17 @@ class TdbWalkGeneratorTest {
     }
 
     @Test
+    void generateWeightedMidWalksForEntity(){
+        String entity = "http://www.co-ode.org/ontologies/pizza/pizza.owl#VegetableTopping";
+        List<String> walks = walkGenerator.generateWeightedMidWalksForEntity(entity, 100, 3);
+        assertTrue(walks.size() <= 100);
+        for(String walk : walks){
+            assertTrue(walk.contains(entity));
+            assertTrue(walk.split(" ").length <= 3 * 2 + 1);
+        }
+    }
+
+    @Test
     void getForwardTriples() {
         Set<Triple> result = walkGenerator.getForwardTriples("http://www.co-ode.org/ontologies/pizza/pizza" +
                 ".owl#Siciliana");

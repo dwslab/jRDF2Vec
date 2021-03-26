@@ -10,8 +10,8 @@ public interface IMidWalkDuplicateFreeCapability extends IWalkGenerator {
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
-     * @param numberOfWalks The number of walks to be generated.
      * @param entity The entity for which a walk shall be generated.
+     * @param numberOfWalks The number of walks to be generated.
      * @param depth The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */

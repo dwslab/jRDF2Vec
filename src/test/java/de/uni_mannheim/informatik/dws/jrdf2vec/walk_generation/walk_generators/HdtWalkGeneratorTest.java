@@ -68,6 +68,24 @@ class HdtWalkGeneratorTest {
     }
 
     @Test
+    void generateWeightedMidWalksForEntity() {
+        try {
+            HdtWalkGenerator parser = new HdtWalkGenerator(loadFile("swdf-2012-11-28.hdt"));
+            String concept = "http://data.semanticweb.org/workshop/semwiki/2010/programme-committee-member";
+
+            List<String> walks = parser.generateWeightedMidWalksForEntity(concept, 100, 3);
+            assertTrue(walks.size() <= 100);
+            for(String walk : walks){
+                assertTrue(walk.contains(concept));
+                assertTrue(walk.split(" ").length <= 3 * 2 + 1, "Wrong walk length for walk:\n" + walk);
+            }
+        } catch (IOException ioe) {
+            LOGGER.error("HDT Init error.");
+            fail("Init should not fail.");
+        }
+    }
+
+    @Test
     public void generateMidWalkForEntity() {
         try {
             HdtWalkGenerator parser = new HdtWalkGenerator(loadFile("swdf-2012-11-28.hdt"));
@@ -104,7 +122,7 @@ class HdtWalkGeneratorTest {
     }
 
     @Test
-    public void generateMidWalksForEntityDuplicateFree(){
+    public void generateMidWalksForEntityDuplicateFree() {
         try {
             HdtWalkGenerator parser = new HdtWalkGenerator(loadFile("swdf-2012-11-28.hdt").getAbsolutePath());
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
@@ -224,15 +242,16 @@ class HdtWalkGeneratorTest {
 
     /**
      * Helper function to load files in class path that contain spaces.
+     *
      * @param fileName Name of the file.
      * @return File in case of success, else null.
      */
-    private File loadFile(String fileName){
+    private File loadFile(String fileName) {
         try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            File result = FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
             assertTrue(result.exists(), "Required resource not available.");
             return result;
-        } catch (URISyntaxException | MalformedURLException exception){
+        } catch (URISyntaxException | MalformedURLException exception) {
             exception.printStackTrace();
             fail("Could not load file.");
             return null;

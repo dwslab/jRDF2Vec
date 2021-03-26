@@ -10,9 +10,9 @@ public interface IMidWalkWeightedCapability {
      * The walks are duplicate free.
      *
      * @param entity        The entity for which walks shall be generated.
-     * @param depth         The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
      * @param numberOfWalks Number of walks to be performed per entity.
+     * @param depth         The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
      * @return List of walks.
      */
-    List<String> generateWeightedMidWalksForEntity(String entity, int depth, int numberOfWalks);
+    List<String> generateWeightedMidWalksForEntity(String entity,  int numberOfWalks, int depth);
 }

@@ -62,18 +62,19 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      */
     @Override
     public List<String> generateWeightedMidWalksForEntity(String entity, int depth, int numberOfWalks) {
-        return Util.convertToStringWalks(generateWeightedMidWalkForEntityAsArray(entity, depth, numberOfWalks));
+        return Util.convertToStringWalksDuplicateFree(generateWeightedMidWalkForEntityAsArray(entity, numberOfWalks,
+                depth));
     }
 
     /**
      * Walks of length 1, i.e., walks that contain only one node, are ignored.
      *
      * @param entity        The entity for which walks shall be generated.
-     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @param numberOfWalks The number of walks to be performed.
+     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @return A data structure describing the walks.
      */
-    public List<List<String>> generateWeightedMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks) {
+    public List<List<String>> generateWeightedMidWalkForEntityAsArray(String entity, int numberOfWalks, int depth) {
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < numberOfWalks; i++) {
             List<String> walk = generateWeightedMidWalkForEntity(entity, depth);
