@@ -1,5 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IWalkGenerator;
+
 /**
  * Interface for all walk generation managers.
  */
@@ -122,4 +124,6 @@ public interface IWalkGenerationManager {
      * @param filePathOfFileToBeWritten The path to the file that shall be written.
      */
     void generateTextWalks(int numberOfThreads, int walkLength, String filePathOfFileToBeWritten);
+
+    IWalkGenerator getWalkGenerator();
 }

@@ -4,10 +4,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector.EntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector.MemoryEntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables.RandomWalkEntityProcessingRunnable;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.NtMemoryWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.JenaOntModelMemoryWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.WalkGeneratorManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.*;
 import org.apache.jena.ontology.OntModel;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -240,6 +237,11 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
         if(!isParserOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateTextWalksForEntities(entitySelector.getEntities(), numberOfThreads, walkLength);
+    }
+
+    @Override
+    public IWalkGenerator getWalkGenerator() {
+        return this.walkGenerator;
     }
 
     /**

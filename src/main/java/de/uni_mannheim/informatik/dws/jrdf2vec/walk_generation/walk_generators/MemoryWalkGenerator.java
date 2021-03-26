@@ -56,12 +56,12 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * The walks are duplicate free.
      *
      * @param entity        The entity for which walks shall be generated.
-     * @param depth         The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
      * @param numberOfWalks Number of walks to be performed per entity.
+     * @param depth         The depth of the walk. Depth is defined as hop to the next node. A walk of depth 1 will have three walk components.
      * @return List of walks.
      */
     @Override
-    public List<String> generateWeightedMidWalksForEntity(String entity, int depth, int numberOfWalks) {
+    public List<String> generateWeightedMidWalksForEntity(String entity, int numberOfWalks, int depth) {
         return Util.convertToStringWalksDuplicateFree(generateWeightedMidWalkForEntityAsArray(entity, numberOfWalks,
                 depth));
     }
@@ -162,8 +162,8 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * @return List where every item is a walk separated by spaces.
      */
     @Override
-    public List<String> generateMidWalksForEntity(String entity, int depth, int numberOfWalks) {
-        return Util.convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
+    public List<String> generateMidWalksForEntity(String entity, int numberOfWalks, int depth) {
+        return Util.convertToStringWalks(generateMidWalkForEntityAsArray(entity, numberOfWalks, depth));
     }
 
     /**
@@ -174,7 +174,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * @param numberOfWalks The number of walks to be performed.
      * @return A data structure describing the walks.
      */
-    public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks) {
+    public List<List<String>> generateMidWalkForEntityAsArray(String entity, int numberOfWalks, int depth) {
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < numberOfWalks; i++) {
             List<String> walk = generateMidWalkForEntity(entity, depth);

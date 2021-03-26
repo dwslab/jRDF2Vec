@@ -1,10 +1,8 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidWalkDuplicateFreeCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.HdtWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.NtMemoryWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.NxMemoryWalkGenerator;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
 
@@ -32,14 +30,14 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
     int numberOfWalks;
 
     /**
-     * The walk generator for which this parser works.
+     * The walk generation manager.
      */
-    WalkGenerationManager walkGenerator;
+    WalkGenerationManager walkGenerationManager;
 
     /**
      * Constructor.
      *
-     * @param generator     Generator to be used.
+     * @param generator     Walk generation manager to be used.
      * @param entity        The entity this particular thread shall handle.
      * @param numberOfWalks The number of walks to be performed per entity.
      * @param depth    Desired length of the walk. Defines how many entity steps are allowed. Note that
@@ -49,20 +47,15 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;
-        this.walkGenerator = generator;
+        this.walkGenerationManager = generator;
     }
 
     /**
      * Actual thread execution.
      */
     public void run() {
-        if (walkGenerator.walkGenerator.getClass() == HdtWalkGenerator.class) {
-            walkGenerator.writeToFile(((HdtWalkGenerator) walkGenerator.walkGenerator).generateMidWalksForEntityDuplicateFree(walkGenerator.shortenUri(entity), this.numberOfWalks, this.depth));
-        } else if (walkGenerator.walkGenerator.getClass() == NtMemoryWalkGenerator.class) {
-            // yes, the depth and # of walks parameters are this way
-            walkGenerator.writeToFile(((NtMemoryWalkGenerator) walkGenerator.walkGenerator).generateMidWalksForEntityDuplicateFree(walkGenerator.shortenUri(entity), this.numberOfWalks, depth));
-        } else if (walkGenerator.walkGenerator.getClass() == NxMemoryWalkGenerator.class) {
-            walkGenerator.writeToFile(((NxMemoryWalkGenerator) walkGenerator.walkGenerator).generateMidWalksForEntityDuplicateFree(walkGenerator.shortenUri(entity), this.numberOfWalks, depth));
-        } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT PARSER!");
+        if(walkGenerationManager.getWalkGenerator() instanceof IMidWalkDuplicateFreeCapability){
+            walkGenerationManager.writeToFile(((IMidWalkDuplicateFreeCapability) walkGenerationManager.walkGenerator).generateMidWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
+        } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT WALK GENERATOR " + walkGenerationManager.walkGenerator.getClass().toString() + "!");
     }
 }

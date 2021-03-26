@@ -62,7 +62,7 @@ class NxMemoryWalkGeneratorTest {
 
             NxMemoryWalkGenerator parser = new NxMemoryWalkGenerator(fileToUse);
             String concept = "http://data.semanticweb.org/person/amelie-cordier";
-            List<String> walks1 = parser.generateMidWalksForEntity(concept, 10, 12);
+            List<String> walks1 = parser.generateMidWalksForEntity(concept, 12, 10);
             assertNotNull(walks1);
 
             // check number of generated walks
