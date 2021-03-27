@@ -6,7 +6,8 @@
 
 jRDF2Vec is a Java implementation of <a href="http://rdf2vec.org/">RDF2Vec</a>. 
 It supports multi-threaded, in-memory (or disk-access-based) walk generation and training.
-You can generate embeddings for any `NT`, `NQ`, `OWL/XML`, [`RDF HDT`](http://www.rdfhdt.org/), or `TTL` file.
+You can generate embeddings for any `NT`, `NQ`, `OWL/XML`, [`RDF HDT`](http://www.rdfhdt.org/), 
+[`TDB 1`](https://jena.apache.org/documentation/tdb/), or `TTL` file.
 
 Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issues">open an issue</a>.
 
@@ -18,7 +19,8 @@ An open-access version of the paper is available [here](https://arxiv.org/pdf/20
 
 ## How to use the jRDF2Vec Command-Line Interface?
 Download this project, execute `mvn clean install`.
-Alternatively, you can download the packaged JAR of the latest successful: commit <a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
+Alternatively, you can download the packaged JAR of the latest successful: commit 
+<a href="https://github.com/dwslab/jRDF2Vec/tree/jars/jars">here</a>. 
 
 ### System Requirements
 - Java 8 or later.
