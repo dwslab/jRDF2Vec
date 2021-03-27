@@ -92,10 +92,12 @@ public class RDF2Vec implements IRDF2Vec {
      */
     private String requiredTimeForLastTrainingString = null;
 
+    private static final WalkGenerationMode defaultWalkGenerationMode = WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
+
     /**
      * Walk generation mode for the walk generation part.
      */
-    private WalkGenerationMode walkGenerationMode = WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
+    private WalkGenerationMode walkGenerationMode = defaultWalkGenerationMode;
 
     /**
      * Indicator whether a text file with all the vectors shall be generated.
@@ -191,7 +193,7 @@ public class RDF2Vec implements IRDF2Vec {
 
         WalkGenerationManagerDefault classicGenerator;
         if (useFile) {
-            classicGenerator = new WalkGenerationManagerDefault(getFile(this.knowledgeGraphUri), isEmbedText());
+            classicGenerator = new WalkGenerationManagerDefault(getFile(this.knowledgeGraphUri), isEmbedText(), true);
         } else {
             classicGenerator = new WalkGenerationManagerDefault(this.ontModel, isEmbedText());
         }

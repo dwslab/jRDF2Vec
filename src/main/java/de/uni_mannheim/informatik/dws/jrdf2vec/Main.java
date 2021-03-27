@@ -46,7 +46,7 @@ public class Main {
     private static int dimensions = -1;
 
     /**
-     * Word2vec mincount parameter.
+     * Word2vec minCount parameter.
      */
     private static int minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
 
@@ -426,6 +426,13 @@ public class Main {
             walkGenerationMode = WalkGenerationMode.getModeFromString(walkGenerationModeText);
         }
 
+        // setting the default walk generation mode
+        if(lightEntityFile != null) {
+            walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
+        } else {
+            walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE : walkGenerationMode;
+        }
+
         Instant before, after;
 
         // -------------------
@@ -468,12 +475,11 @@ public class Main {
                 // light walk generation:
                 WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, lightEntityFile,
                         isEmbedText);
-                walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
             } else {
                 // classic walk generation
-                WalkGenerationManagerDefault classicGenerator = new WalkGenerationManagerDefault(knowledgeGraphFile, isEmbedText);
-                walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE : walkGenerationMode;
+                WalkGenerationManagerDefault classicGenerator = new WalkGenerationManagerDefault(knowledgeGraphFile,
+                        isEmbedText, true);
                 classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
             }
 
@@ -513,9 +519,6 @@ public class Main {
 
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
-
-            // setting the walk generation mode
-            rdf2vec.setWalkGenerationMode(walkGenerationMode);
 
             // set vector text file
             rdf2vec.setVectorTextFileGeneration(isVectorTextFileGeneration);
@@ -738,7 +741,6 @@ public class Main {
         } else {
             System.out.println(VocabularyAnalyzer.analyze(args[1], args[2]));
         }
-        return;
     }
 
     /**
@@ -748,7 +750,6 @@ public class Main {
      * @return Help text as String.
      */
     public static String getHelp() {
-
         return  "*****************\n" +
                 "* jRDF2Vec Help *\n" +
                 "*****************\n\n" +
@@ -876,6 +877,7 @@ public class Main {
         walkGenerationMode = null;
         isVectorTextFileGeneration = true;
         isOnlyTraining = false;
+        isEmbedText = false;
         Gensim.shutDown();
     }
 

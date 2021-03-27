@@ -3,17 +3,18 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.tdb.TDBFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMidWalkDuplicateFreeCapability,
-        IRandomWalkDuplicateFreeCapability, IMidWalkWeightedCapability {
+        IRandomWalkDuplicateFreeCapability, IMidWalkWeightedCapability, ICloseableWalkGenerator {
 
 
     /**
@@ -24,17 +25,31 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
     private Dataset tdbDataset;
     private Model tdbModel;
 
-    public TdbWalkGenerator(String pathToTdbDataset){
-         tdbDataset = TDBFactory.createDataset(pathToTdbDataset);
-         tdbDataset.begin(ReadWrite.READ);
-         tdbModel = tdbDataset.getDefaultModel();
+    /**
+     * Main Constructor
+     *
+     * @param pathToTdbDataset File path to the TDB dataset.
+     */
+    public TdbWalkGenerator(String pathToTdbDataset) {
+        tdbDataset = TDBFactory.createDataset(pathToTdbDataset);
+        //tdbDataset.begin(ReadWrite.READ);
+        tdbModel = tdbDataset.getDefaultModel();
+    }
+
+    /**
+     * Constructor
+     * @param uriToTdbDataset URI to the TDB dataset. Must be a file URI.
+     */
+    public TdbWalkGenerator(URI uriToTdbDataset) {
+        this(new File(uriToTdbDataset).getAbsolutePath());
     }
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     *
      * @param numberOfWalks The number of walks to be generated.
-     * @param entity The entity for which a walk shall be generated.
-     * @param depth The depth of each walk.
+     * @param entity        The entity for which a walk shall be generated.
+     * @param depth         The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
     @Override
@@ -44,35 +59,37 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     *
      * @param numberOfWalks The number of walks to be generated.
-     * @param entity The entity for which a walk shall be generated.
-     * @param depth The depth of each walk.
+     * @param entity        The entity for which a walk shall be generated.
+     * @param depth         The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
     @Override
-    public List<String> generateMidWalksForEntity(java.lang.String entity, int numberOfWalks, int depth){
+    public List<String> generateMidWalksForEntity(java.lang.String entity, int numberOfWalks, int depth) {
         return Util.convertToStringWalks(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
     }
 
     /**
      * Walks of length 1, i.e., walks that contain only one node, are ignored.
-     * @param entity The entity for which walks shall be generated.
-     * @param depth The depth of each walk (where the depth is the number of hops).
+     *
+     * @param entity        The entity for which walks shall be generated.
+     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @param numberOfWalks The number of walks to be performed.
      * @return A data structure describing the walks.
      */
-    public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks){
+    public List<List<String>> generateMidWalkForEntityAsArray(String entity, int depth, int numberOfWalks) {
         List<List<String>> result = new ArrayList<>();
-        for(int i = 0; i < numberOfWalks; i++){
+        for (int i = 0; i < numberOfWalks; i++) {
             List<String> walk = generateMidWalkForEntity(entity, depth);
-            if(walk.size() > 1) {
+            if (walk.size() > 1) {
                 result.add(walk);
             }
         }
         return result;
     }
 
-    public List<String> generateMidWalkForEntity(String entity, int depth){
+    public List<String> generateMidWalkForEntity(String entity, int depth) {
         LinkedList<String> result = new LinkedList<>();
 
         String nextElementPredecessor = entity;
@@ -84,7 +101,7 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
         // variable to store the number of iterations performed so far
         int currentDepth = 0;
 
-        while(currentDepth < depth) {
+        while (currentDepth < depth) {
             currentDepth++;
 
             // randomly decide whether to use predecessors or successors
@@ -115,12 +132,19 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
         return result;
     }
 
-    public Set<Triple> getBackwardTriples(String object){
+    /**
+     * Answers a (?, ?, o) query.
+     * @param object The object in the query.
+     * @return Result triples.
+     */
+    public Set<Triple> getBackwardTriples(String object) {
         Set<Triple> result = new HashSet<>();
-        for (Statement statement : tdbModel.listStatements(null, null, tdbModel.createResource(object)).toSet()){
+        Set<Statement> tdbStatements =  tdbModel.listStatements(null, null, tdbModel.createResource(object)).toSet();
+
+        for (Statement statement : tdbStatements) {
             String subjectUri;
             RDFNode subject = statement.getSubject();
-            if (subject.isAnon()){
+            if (subject.isAnon()) {
                 subjectUri = subject.asResource().getId().getLabelString();
             } else {
                 subjectUri = subject.asResource().getURI();
@@ -131,16 +155,22 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
         return result;
     }
 
-    public Set<Triple> getForwardTriples(String subject){
+    /**
+     * Answers a (s, ?, ?) query.
+     * @param subject The subject in the query.
+     * @return Result triples.
+     */
+    public Set<Triple> getForwardTriples(String subject) {
         Set<Triple> result = new HashSet<>();
-        for (Statement statement :
-                tdbModel.createResource(subject)
-                        .listProperties()
-                        .filterKeep(x -> x.getObject().isResource())
-                        .toSet()){
+        Set<Statement> tdbStatements =  tdbModel.createResource(subject)
+                .listProperties()
+                .filterKeep(x -> x.getObject().isResource())
+                .toSet();
+
+        for (Statement statement : tdbStatements) {
             String objectUri;
             RDFNode object = statement.getObject();
-            if (object.isAnon()){
+            if (object.isAnon()) {
                 objectUri = object.asResource().getId().getLabelString();
             } else {
                 objectUri = object.asResource().getURI();
@@ -151,7 +181,7 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
         return result;
     }
 
-    public void close(){
+    public void close() {
         tdbDataset.close();
     }
 
@@ -205,7 +235,7 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
     }
 
     @Override
-    public List<String> generateWeightedMidWalksForEntity(String entity,  int numberOfWalks, int depth) {
+    public List<String> generateWeightedMidWalksForEntity(String entity, int numberOfWalks, int depth) {
         return Util.convertToStringWalksDuplicateFree(generateWeightedMidWalkForEntityAsArray(entity, numberOfWalks, depth));
     }
 
@@ -296,5 +326,7 @@ public class TdbWalkGenerator implements IWalkGenerator, IMidWalkCapability, IMi
         return result;
     }
 
-
+    public Model getTdbModel() {
+        return tdbModel;
+    }
 }

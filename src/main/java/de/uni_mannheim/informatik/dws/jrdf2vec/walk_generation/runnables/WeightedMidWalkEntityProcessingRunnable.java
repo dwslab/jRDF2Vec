@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
-public class WeightedMidWalkEntityProcessingRunnable implements Runnable{
+public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
 
 
     /**

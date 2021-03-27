@@ -53,7 +53,7 @@ public class WalkGenerationManagerLight extends WalkGenerationManagerDefault {
      * @param isGenerateTextWalks True if datatype properties shall be parsed and text walks shall be generated.
      */
     public WalkGenerationManagerLight(File tripleFile, File entitiesFile, boolean isGenerateTextWalks){
-        super(tripleFile, isGenerateTextWalks);
+        super(tripleFile, isGenerateTextWalks, false);
         if(!tripleFile.exists()){
             LOGGER.error("The data file does not exist: " + tripleFile.getName() + "\nProgram will fail.");
         }

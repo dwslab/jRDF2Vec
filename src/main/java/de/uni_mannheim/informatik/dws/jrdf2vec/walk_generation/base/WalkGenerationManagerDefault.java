@@ -1,8 +1,9 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector.EntitySelector;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector.MemoryEntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.MemoryEntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.TdbEntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables.RandomWalkEntityProcessingRunnable;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.*;
 import org.apache.jena.ontology.OntModel;
@@ -49,7 +50,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
      * Can be set to false if there are problems with the parser to make sure that generation functions do not
      * start.
      */
-    private boolean parserIsOk = true;
+    private boolean isWalkGeneratorOk = true;
 
     /**
      * Indicator whether text walks (based on datatype properties) shall be generated.
@@ -83,7 +84,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
     public WalkGenerationManagerDefault(File tripleFile){
-        this(tripleFile, false);
+        this(tripleFile, false, true);
     }
 
     /**
@@ -91,17 +92,19 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
      *
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
+     * @param isSetEntitySelector If true, an entity selector will be chosen automatically.
      */
-    public WalkGenerationManagerDefault(File tripleFile, boolean isGenerateTextWalks){
-        this(tripleFile.toURI(), isGenerateTextWalks);
+    public WalkGenerationManagerDefault(File tripleFile, boolean isGenerateTextWalks, boolean isSetEntitySelector){
+        this(tripleFile.toURI(), isGenerateTextWalks, isSetEntitySelector);
     }
 
     /**
      * Main Constructor
      * @param knowledgeGraphResource A URI representing the graph for which an embedding shall be trained.
      * @param isGenerateTextWalks True if text shall also appear in the embedding space.
+     * @param isSetEntitySelector If true, an entity selector will be chosen automatically.
      */
-    public WalkGenerationManagerDefault(URI knowledgeGraphResource, boolean isGenerateTextWalks) {
+    public WalkGenerationManagerDefault(URI knowledgeGraphResource, boolean isGenerateTextWalks, boolean isSetEntitySelector) {
         if(Util.uriIsFile(knowledgeGraphResource)) {
             File knowledgeGraphFile = new File(knowledgeGraphResource);
             if (!knowledgeGraphFile.exists()) {
@@ -109,22 +112,33 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
                 return;
             }
             if (knowledgeGraphFile.isDirectory()) {
-
+                // DIRECTORY OPTIONS
+                // (1) TDB
+                // (2) Directory with multiple NT files
                 if(Util.isTdbDirectory(knowledgeGraphFile)){
-                    // TODO TDB handler
+                    LOGGER.info("TDB directory recognized. Using disk-based TDB walk generator.");
+                    this.walkGenerator = new TdbWalkGenerator(knowledgeGraphResource);
+                    if(isSetEntitySelector) {
+                        LOGGER.info("Setting TDB entity selector...");
+                        this.entitySelector = new TdbEntitySelector(((TdbWalkGenerator) walkGenerator).getTdbModel());
+                    }
                 } else {
                     LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                             "if you use an entity selector that requires one ontology.");
                     this.walkGenerator = new NtMemoryWalkGenerator(isGenerateTextWalks);
                     ((NtMemoryWalkGenerator) this.walkGenerator).readNtTriplesFromDirectoryMultiThreaded(knowledgeGraphFile, false);
-                    this.entitySelector = new MemoryEntitySelector(((NtMemoryWalkGenerator) this.walkGenerator).getData());
+                    if(isSetEntitySelector) {
+                        this.entitySelector = new MemoryEntitySelector(((NtMemoryWalkGenerator) this.walkGenerator).getData());
+                    }
                 }
             } else {
                 // knowledge graph resource is a file
                 // decide on parser depending on file ending
                 Pair<IWalkGenerator, EntitySelector> parserSelectorPair = WalkGeneratorManager.parseSingleFile(knowledgeGraphFile, isGenerateTextWalks);
                 this.walkGenerator = parserSelectorPair.getValue0();
-                this.entitySelector = parserSelectorPair.getValue1();
+                if(isSetEntitySelector) {
+                    this.entitySelector = parserSelectorPair.getValue1();
+                }
             }
             this.setGenerateTextWalks(isGenerateTextWalks);
         }
@@ -198,7 +212,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
 
     @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if(!isParserOk()) return;
+        if(!isWalkGeneratorOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateRandomMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
@@ -210,7 +224,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
 
     @Override
     public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if(!isParserOk()) return;
+        if(!isWalkGeneratorOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateWeightedMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
@@ -222,7 +236,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
 
     @Override
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        if(!isParserOk()) return;
+        if(!isWalkGeneratorOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateRandomMidWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
@@ -234,7 +248,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
 
     @Override
     public void generateTextWalks(int numberOfThreads, int walkLength, String filePathOfFileToBeWritten) {
-        if(!isParserOk()) return;
+        if(!isWalkGeneratorOk()) return;
         this.filePath = filePathOfFileToBeWritten;
         generateTextWalksForEntities(entitySelector.getEntities(), numberOfThreads, walkLength);
     }
@@ -248,12 +262,12 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
      * Helper method to check parser and manage log output.
      * @return True if parser is ok, false if parser is not ok.
      */
-    private boolean isParserOk(){
+    private boolean isWalkGeneratorOk(){
         if (this.walkGenerator == null) {
             LOGGER.error("Parser not initialized. Aborting program.");
             return false;
         }
-        if (!parserIsOk) {
+        if (!isWalkGeneratorOk) {
             LOGGER.error("Will not execute walk generation due to parser initialization error.");
             return false;
         }

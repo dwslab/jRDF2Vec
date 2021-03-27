@@ -61,10 +61,10 @@ class GensimTest {
         assertFalse(gensim.isInVocabulary("China", pathToModel));
 
         // test case 2: vector file
-        String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
-        assertTrue(gensim.isInVocabulary("Europe", pathToVectorFile));
-        assertTrue(gensim.isInVocabulary("united", pathToVectorFile));
-        assertFalse(gensim.isInVocabulary("China", pathToVectorFile));
+        File vectorFile = new File(getPathOfResource("test_model_vectors.kv"));
+        assertTrue(gensim.isInVocabulary("Europe", vectorFile));
+        assertTrue(gensim.isInVocabulary("united", vectorFile));
+        assertFalse(gensim.isInVocabulary("China", vectorFile));
     }
 
     /**

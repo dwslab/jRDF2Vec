@@ -56,7 +56,7 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
      */
     public void run() {
         if(walkGenerationManager.getWalkGenerator()  instanceof IRandomWalkDuplicateFreeCapability){
-            walkGenerationManager.writeToFile(((IRandomWalkDuplicateFreeCapability) walkGenerationManager.walkGenerator).generateDuplicateFreeRandomWalksForEntity(walkGenerationManager.shortenUri(entity), numberOfWalks, this.depth));
+            walkGenerationManager.writeToFile(((IRandomWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator()).generateDuplicateFreeRandomWalksForEntity(walkGenerationManager.shortenUri(entity), numberOfWalks, this.depth));
         } else {
             LOGGER.error("NOT YET IMPLEMENTED FOR THIS WALK GENERATOR (" + walkGenerationManager.walkGenerator.getClass() + ")! Make sure" +
                     " it implements IRandomWalkDuplicateFreeCapability.");

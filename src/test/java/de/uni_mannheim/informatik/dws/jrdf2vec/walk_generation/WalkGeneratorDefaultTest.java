@@ -99,7 +99,7 @@ class WalkGeneratorDefaultTest {
         File pizzaOntology = loadFile("pizza.ttl");
 
         String generatedFilePath = "./test_walks3.gz";
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerDefault(pizzaOntology, true);
+        WalkGenerationManagerDefault generator = new WalkGenerationManagerDefault(pizzaOntology, true, true);
         generator.generateTextWalks(8,  5, generatedFilePath);
         generator.close();
 

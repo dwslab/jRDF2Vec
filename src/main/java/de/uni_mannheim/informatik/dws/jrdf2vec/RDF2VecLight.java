@@ -77,9 +77,14 @@ public class RDF2VecLight implements IRDF2Vec {
     private String requiredTimeForLastTrainingString = null;
 
     /**
+     * Default walk generation mode.
+     */
+    public static final WalkGenerationMode DEFAULT_WALK_GENERATION_MODE = WalkGenerationMode.MID_WALKS;
+
+    /**
      * Walk generation mode.
      */
-    private WalkGenerationMode walkGenerationMode = WalkGenerationMode.MID_WALKS;
+    private WalkGenerationMode walkGenerationMode = DEFAULT_WALK_GENERATION_MODE;
 
     /**
      * Indicator whether a text file with all the vectors shall be generated.

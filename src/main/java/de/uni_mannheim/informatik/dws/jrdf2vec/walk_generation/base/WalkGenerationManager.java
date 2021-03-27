@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables.*;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.ICloseableWalkGenerator;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IWalkGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -361,6 +362,9 @@ public abstract class WalkGenerationManager implements IWalkGenerationManager {
             writer.close();
         } catch (IOException ioe) {
             LOGGER.error("There was an error when closing the writer.", ioe);
+        }
+        if(getWalkGenerator() instanceof ICloseableWalkGenerator){
+            ((ICloseableWalkGenerator) this.walkGenerator).close();
         }
     }
 }

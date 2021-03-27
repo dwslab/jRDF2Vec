@@ -554,7 +554,7 @@ class MainTest {
         lightWalks.deleteOnExit();
         String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", "./mainLightWalks/"};
+        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", lightWalks.getAbsolutePath()};
         Main.main(args);
 
         assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class));
@@ -574,6 +574,43 @@ class MainTest {
         }
     }
 
+    @Test
+    public void trainLightTdb() {
+        LOGGER.info("Starting TDB test.");
+        Main.reset();
+        File lightWalks = new File("./mainLightWalksTdb/");
+        lightWalks.mkdir();
+        lightWalks.deleteOnExit();
+        String entityFilePath = loadFile("tdbEntitySubset.txt").getAbsolutePath();
+        String graphFilePath = loadFile("pizza_tdb").getAbsolutePath();
+        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", lightWalks.getAbsolutePath()};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class));
+
+        // the default strategy for light:
+        assertEquals(RDF2VecLight.DEFAULT_WALK_GENERATION_MODE, Main.getWalkGenerationMode());
+        assertTrue(lightWalks.listFiles().length > 0);
+        HashSet<String> files = Sets.newHashSet(lightWalks.list());
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("vectors.txt"));
+
+        // make sure that there is a vector for http://www.co-ode.org/ontologies/pizza/pizza.owl#Siciliana
+        Gensim.getInstance().isInVocabulary("http://www.co-ode.org/ontologies/pizza/pizza.owl#Siciliana",
+                new File(lightWalks, "model.kv"));
+
+        try {
+            FileUtils.forceDelete(lightWalks);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+        }
+        Main.reset();
+    }
+
     /**
      * Test light run with explicit statement that no vector text file shall be written.
      */
@@ -588,8 +625,9 @@ class MainTest {
                 "-noVectorTextFileGeneration", "-port", "11121"};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class));
+        assertEquals(RDF2VecLight.class, Main.getRdf2VecInstance().getClass());
         assertTrue(lightWalks.listFiles().length > 0);
+        assertEquals(RDF2VecLight.DEFAULT_WALK_GENERATION_MODE, Main.getWalkGenerationMode());
         HashSet<String> files = Sets.newHashSet(lightWalks.list());
 
         // assert that all files are there
@@ -712,6 +750,9 @@ class MainTest {
         // check ignored arguments
         assertEquals(0, Main.getIgnoredArguments().size());
 
+        // check default walk generation mode
+        assertEquals(RDF2VecLight.DEFAULT_WALK_GENERATION_MODE, Main.getWalkGenerationMode());
+
         // make sure that there is only a walk file
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
         assertFalse(files.contains("model.kv"));
@@ -744,11 +785,8 @@ class MainTest {
             assertTrue(100 <= pcmCount);
 
             reader.close();
-        } catch (FileNotFoundException fnfe) {
+        } catch (IOException fnfe) {
             fnfe.printStackTrace();
-            fail("Could not read from walk file.");
-        } catch (IOException e) {
-            e.printStackTrace();
             fail("Could not read from walk file.");
         }
 
@@ -1032,83 +1070,26 @@ class MainTest {
     @AfterAll
     static void cleanUp() {
         Gensim.shutDown();
+        deleteDirectory("./mainWalksNq/");
+        deleteDirectory("./mainWalksOwlText/");
+        deleteDirectory("./mainWalksNtText_light/");
+        deleteDirectory("./mainWalksNtText/");
+        deleteDirectory("./walks");
+        deleteDirectory("./python-server");
+        deleteDirectory("./extClassic");
+        deleteDirectory("./extLight");
+        deleteDirectory("./walksOnly");
+        deleteDirectory("./walksOnly2");
+        deleteDirectory("./classicWalks/");
+        deleteDirectory("./mainWalks/");
+        deleteDirectory("./walksOnlyMidWeighted/");
+    }
+
+    private static void deleteDirectory(String directoryPath){
         try {
-            FileUtils.deleteDirectory(new File("./mainWalksOwlText/"));
+            FileUtils.deleteDirectory(new File(directoryPath));
         } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./mainWalksOwlText/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./mainWalksNtText_light/"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./mainWalksNtText_light/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./mainWalksNtText/"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./mainWalksNtText/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./walks"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./walks/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./python-server"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./python-server).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./extClassic"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./extClassic/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./extLight"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./extLight/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./walksOnly"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./walksOnly/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./walksOnly2"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./walksOnly2/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./classicWalks/"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./classicWalks/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./walksOnlyMidWeighted/"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./walksOnlyMidWeighted/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./mainWalks/"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./mainWalks/).");
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(new File("./mainWalksNq/"));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory ./mainWalksNq/).");
-            e.printStackTrace();
+            LOGGER.info("Cleanup failed (directory '" + directoryPath + "'.", e);
         }
     }
 

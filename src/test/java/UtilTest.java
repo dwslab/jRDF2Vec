@@ -144,9 +144,9 @@ class UtilTest {
      * @param fileName Name of the file.
      * @return File in case of success, else null.
      */
-    private File loadFile(String fileName){
+    public static File loadFile(String fileName){
         try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            File result =  FileUtils.toFile(UtilTest.class.getClassLoader().getResource(fileName).toURI().toURL());
             assertTrue(result.exists(), "Required resource not available.");
             return result;
         } catch (URISyntaxException | MalformedURLException exception){

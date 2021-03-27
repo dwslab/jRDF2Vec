@@ -2,7 +2,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.entity_selector.EntitySelector;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.EntitySelector;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
