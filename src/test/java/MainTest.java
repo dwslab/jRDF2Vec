@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
@@ -574,8 +575,9 @@ class MainTest {
         }
     }
 
-    @Test
-    public void trainLightTdb() {
+    @ParameterizedTest
+    @EnumSource(value = WalkGenerationMode.class, names = {"MID_WALKS", "MID_WALKS_DUPLICATE_FREE"})
+    public void trainLightTdb(WalkGenerationMode walkGenerationMode) {
         LOGGER.info("Starting TDB test.");
         Main.reset();
         File lightWalks = new File("./mainLightWalksTdb/");
@@ -583,13 +585,14 @@ class MainTest {
         lightWalks.deleteOnExit();
         String entityFilePath = loadFile("tdbEntitySubset.txt").getAbsolutePath();
         String graphFilePath = loadFile("pizza_tdb").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", lightWalks.getAbsolutePath()};
+        String[] args = {"-graph", graphFilePath, "-light", entityFilePath, "-walkDir", lightWalks.getAbsolutePath(),
+                "-walkGenerationMode", walkGenerationMode.toString()};
         Main.main(args);
 
         assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class));
 
         // the default strategy for light:
-        assertEquals(RDF2VecLight.DEFAULT_WALK_GENERATION_MODE, Main.getWalkGenerationMode());
+        assertEquals(walkGenerationMode, Main.getWalkGenerationMode());
         assertTrue(lightWalks.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(lightWalks.list());
 
