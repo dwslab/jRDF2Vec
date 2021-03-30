@@ -173,6 +173,7 @@ public class RDF2Vec implements IRDF2Vec {
      * @return Returns the path to the trained model.
      */
     public String train() {
+        // if true: file-based gneration
         boolean useFile = true;
         if (ontModel == null) {
 

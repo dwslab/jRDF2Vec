@@ -116,6 +116,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
                 // (1) TDB
                 // (2) Directory with multiple NT files
                 if(Util.isTdbDirectory(knowledgeGraphFile)){
+                    // (1) TDB
                     LOGGER.info("TDB directory recognized. Using disk-based TDB walk generator.");
                     this.walkGenerator = new TdbWalkGenerator(knowledgeGraphResource);
                     if(isSetEntitySelector) {
@@ -123,6 +124,7 @@ public class WalkGenerationManagerDefault extends WalkGenerationManager {
                         this.entitySelector = new TdbEntitySelector(((TdbWalkGenerator) walkGenerator).getTdbModel());
                     }
                 } else {
+                    // (2) NT Directory
                     LOGGER.warn("You specified a directory. Trying to parse files in the directory. The program will fail (later) " +
                             "if you use an entity selector that requires one ontology.");
                     this.walkGenerator = new NtMemoryWalkGenerator(isGenerateTextWalks);

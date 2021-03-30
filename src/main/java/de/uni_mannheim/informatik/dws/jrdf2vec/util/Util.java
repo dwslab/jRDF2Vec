@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -21,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -351,5 +354,22 @@ public class Util {
             iterator.next();
         }
         return iterator.next();
+    }
+
+    /**
+     * Helper function to load files in class path that contain spaces.
+     * @param fileName Name of the file.
+     * @return File in case of success, else null.
+     */
+    public static File loadFile(String fileName){
+        try {
+            File result =  FileUtils.toFile(Util.class.getClassLoader().getResource(fileName).toURI().toURL());
+            assertTrue(result.exists(), "Required resource not available.");
+            return result;
+        } catch (URISyntaxException | MalformedURLException exception){
+            exception.printStackTrace();
+            fail("Could not load file.");
+            return null;
+        }
     }
 }

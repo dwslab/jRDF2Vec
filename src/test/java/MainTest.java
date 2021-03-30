@@ -210,7 +210,7 @@ class MainTest {
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01"};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertEquals(RDF2Vec.class, Main.getRdf2VecInstance().getClass(), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
 
@@ -241,7 +241,7 @@ class MainTest {
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "5"};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertEquals(RDF2Vec.class, Main.getRdf2VecInstance().getClass(), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
         assertEquals(5, Main.getRdf2VecInstance().getWord2VecConfiguration().getWindowSize());
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
@@ -282,7 +282,7 @@ class MainTest {
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
+        assertEquals(RDF2Vec.class, Main.getRdf2VecInstance().getClass(), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
         assertEquals(8, Main.getRdf2VecInstance().getWord2VecConfiguration().getWindowSize());
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
@@ -328,7 +328,7 @@ class MainTest {
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-light", entityFilePath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
         Main.main(args);
 
-        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2VecLight.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2VecLight.class)");
+        assertEquals(RDF2VecLight.class, Main.getRdf2VecInstance().getClass(), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2VecLight.class)");
         assertEquals(8, Main.getRdf2VecInstance().getWord2VecConfiguration().getWindowSize());
         assertTrue(walkDirectory.listFiles().length > 0);
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
