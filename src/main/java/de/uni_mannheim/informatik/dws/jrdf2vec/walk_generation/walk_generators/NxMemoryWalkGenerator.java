@@ -98,6 +98,7 @@ public class NxMemoryWalkGenerator extends MemoryWalkGenerator {
      * Constructor
      *
      * @param nTripleFile File to be parsed.
+     * @param isParseDatatypeTriples True if datatype properties shall also be parsed.
      */
     public NxMemoryWalkGenerator(File nTripleFile, boolean isParseDatatypeTriples) {
         this();

@@ -2,7 +2,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
 import java.io.File;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.HashSet;
 /**
  * Default Walk Generator for RDF2Vec Light.
  */
-public class WalkGenerationManagerLight extends WalkGenerationManagerDefault {
+public class WalkGenerationManagerLight extends WalkGenerationManager {
 
 
     /**

@@ -72,7 +72,7 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertTrue(files.contains("vectors.txt"));
 
         // assert sample parameter
@@ -94,7 +94,7 @@ class MainTest {
 
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
         assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
-        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertTrue(new File("./walks/walk_file_0.txt.gz").exists(), "Walk file not written.");
         assertFalse(Main.getRdf2VecInstance().getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
         assertFalse(Main.getRdf2VecInstance().getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
@@ -182,7 +182,7 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertFalse(files.contains("vectors.txt"));
 
         // check sample parameter
@@ -217,7 +217,7 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertFalse(files.contains("vectors.txt"));
 
         // test sample parameter
@@ -249,11 +249,11 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertFalse(files.contains("vectors.txt"));
 
         // assert that a text walk has been written
-        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file.gz"));
+        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file_0.txt.gz"));
 
         // look for specific walk
         assertTrue(lines.contains("http://www.co-ode.org/ontologies/pizza/pizza.owl#Siciliana http://www.w3.org/2004/02/skos/core#altLabel siciliana"));
@@ -290,11 +290,11 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertFalse(files.contains("vectors.txt"));
 
         // assert that a text walk has been written
-        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file.gz"));
+        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file_0.txt.gz"));
 
         // make sure that we do not paste mass text
         for(String line : lines){
@@ -336,11 +336,11 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertFalse(files.contains("vectors.txt"));
 
         // assert that a text walk has been written
-        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file.gz"));
+        List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file_0.txt.gz"));
 
         // make sure that we do not paste mass text
         for(String line : lines){
@@ -459,11 +459,11 @@ class MainTest {
         assertFalse(files.contains("model.kv"));
         assertFalse(files.contains("model"));
         assertFalse(files.contains("model.txt"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
 
         GZIPInputStream gzip = null;
         try {
-            File walkFile = new File(walkDirectory, "walk_file.gz");
+            File walkFile = new File(walkDirectory, "walk_file_0.txt.gz");
             assertTrue(walkFile.exists());
             gzip = new GZIPInputStream(new FileInputStream(walkFile));
         } catch (IOException e) {
@@ -509,11 +509,11 @@ class MainTest {
         assertFalse(files.contains("model.kv"));
         assertFalse(files.contains("model"));
         assertFalse(files.contains("model.txt"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
 
         gzip = null;
         try {
-            File walkFile = new File(walkDirectory, "walk_file.gz");
+            File walkFile = new File(walkDirectory, "walk_file_0.txt.gz");
             assertTrue(walkFile.exists());
             gzip = new GZIPInputStream(new FileInputStream(walkFile));
         } catch (IOException e) {
@@ -565,7 +565,7 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertTrue(files.contains("vectors.txt"));
 
         try {
@@ -599,7 +599,7 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertTrue(files.contains("vectors.txt"));
 
         // make sure that there is a vector for http://www.co-ode.org/ontologies/pizza/pizza.owl#Siciliana
@@ -636,7 +636,7 @@ class MainTest {
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
         assertFalse(files.contains("vectors.txt"));
 
         try {
@@ -760,11 +760,11 @@ class MainTest {
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
         assertFalse(files.contains("model.kv"));
         assertFalse(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
 
         // now check out the walk file
         try {
-            File walkFile = new File(walkDirectory, "walk_file.gz");
+            File walkFile = new File(walkDirectory, "walk_file_0.txt.gz");
             assertTrue(walkFile.exists(), "The walk file does not exist.");
             assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
 
@@ -830,14 +830,14 @@ class MainTest {
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
         assertFalse(files.contains("model.kv"));
         assertFalse(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
 
         assertEquals(WalkGenerationMode.MID_WALKS_WEIGHTED, Main.getWalkGenerationMode());
         assertEquals(3, Main.getDepth());
 
         // now check out the walk file
         try {
-            File walkFile = new File(walkDirectory, "walk_file.gz");
+            File walkFile = new File(walkDirectory, "walk_file_0.txt.gz");
             assertTrue(walkFile.exists(), "The walk file does not exist.");
             assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
 
@@ -926,14 +926,14 @@ class MainTest {
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
         assertFalse(files.contains("model.kv"));
         assertFalse(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
 
         assertEquals(WalkGenerationMode.MID_WALKS_DUPLICATE_FREE, Main.getWalkGenerationMode());
         assertEquals(1, Main.getDepth());
 
         // now check out the walk file
         try {
-            File walkFile = new File(walkDirectory, "walk_file.gz");
+            File walkFile = new File(walkDirectory, "walk_file_0.txt.gz");
             assertTrue(walkFile.exists(), "The walk file does not exist.");
             assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
 
@@ -1003,11 +1003,11 @@ class MainTest {
         HashSet<String> files = Sets.newHashSet(walkDirectory.list());
         assertFalse(files.contains("model.kv"));
         assertFalse(files.contains("model"));
-        assertTrue(files.contains("walk_file.gz"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
 
         // now check out the walk file
         try {
-            File walkFile = new File(walkDirectory, "walk_file.gz");
+            File walkFile = new File(walkDirectory, "walk_file_0.txt.gz");
             assertTrue(walkFile.exists(), "The walk file does not exist.");
             assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
 

@@ -1,7 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.TripleDataSetMemory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IsearchCondition;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.ISearchCondition;
 import org.apache.jena.ontology.OntModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
     /**
      * returns true if a triple shall be excluded.
      */
-    private IsearchCondition skipCondition;
+    private ISearchCondition skipCondition;
 
 
     /**
@@ -86,6 +86,7 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
      * Constructor
      *
      * @param pathToTripleFile The nt file to be read (not zipped).
+     * @param isParseDatatypeTriples True if datatype properties shall also be parsed.
      */
     public NtMemoryWalkGenerator(String pathToTripleFile, boolean isParseDatatypeTriples) {
         this(isParseDatatypeTriples);
@@ -428,11 +429,11 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
         }
     }
 
-    public IsearchCondition getSkipCondition() {
+    public ISearchCondition getSkipCondition() {
         return skipCondition;
     }
 
-    public void setSkipCondition(IsearchCondition skipCondition) {
+    public void setSkipCondition(ISearchCondition skipCondition) {
         this.skipCondition = skipCondition;
     }
 
@@ -474,7 +475,7 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
                 return input.trim().equals(""); // empty line
             };
         } else {
-            skipCondition = new IsearchCondition() {
+            skipCondition = new ISearchCondition() {
                 final Pattern pattern = Pattern.compile("\".*\"");
 
                 @Override

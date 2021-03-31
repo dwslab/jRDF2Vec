@@ -6,7 +6,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
 
 import java.io.File;
@@ -459,13 +459,10 @@ public class Main {
         if (isOnlyWalks) {
             printIfIgnoredOptionsExist();
             System.out.println("Only walks are being generated, training is performed.");
-            String walkFile = "." + File.separator + "walks" + File.separator + "walk_file.gz";
 
             // handle the walk directory
             if (walkDirectory == null || !walkDirectory.isDirectory()) {
-                System.out.println("walkDirectory is not a directory. Using default: " + walkFile);
-            } else {
-                walkFile = walkDirectory.getAbsolutePath() + File.separator + "walk_file.gz";
+                walkDirectory = new File(WalkGenerationManager.DEFAULT_WALK_DIRECTORY);
             }
 
             before = Instant.now();
@@ -475,12 +472,12 @@ public class Main {
                 // light walk generation:
                 WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, lightEntityFile,
                         isEmbedText);
-                generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
+                generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkDirectory);
             } else {
                 // classic walk generation
-                WalkGenerationManagerDefault classicGenerator = new WalkGenerationManagerDefault(knowledgeGraphFile,
+                WalkGenerationManager classicGenerator = new WalkGenerationManager(knowledgeGraphFile,
                         isEmbedText, true);
-                classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkFile);
+                classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkDirectory);
             }
 
             after = Instant.now();

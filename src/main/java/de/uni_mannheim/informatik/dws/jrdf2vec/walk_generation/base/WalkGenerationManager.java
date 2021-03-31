@@ -28,13 +28,13 @@ import java.util.zip.GZIPOutputStream;
  * Default Walk Generator.
  * Intended to work on any data set.
  */
-public class WalkGenerationManagerDefault implements IWalkGenerationManager{
+public class WalkGenerationManager implements IWalkGenerationManager{
 
 
     /**
      * Default Logger.
      */
-    Logger LOGGER = LoggerFactory.getLogger(WalkGenerationManagerDefault.class);
+    Logger LOGGER = LoggerFactory.getLogger(WalkGenerationManager.class);
 
     /**
      * Inject default entity selector.
@@ -49,7 +49,8 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
     /**
      * If not specified differently, this file will be used to persists walks.
      */
-    public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = DEFAULT_WALK_DIRECTORY + File.separator + "walk_file.gz";
+    //public final static String DEFAULT_WALK_FILE_TO_BE_WRITTEN = DEFAULT_WALK_DIRECTORY + File.separator +
+    //        "walk_file.gz";
 
     /**
      * Can be set to false if there are problems with the parser to make sure that generation functions do not
@@ -90,7 +91,7 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
     /**
      * File path to the walk file to be written.
      */
-    public String filePath;
+    //public String filePath;
 
     File walkDirectory;
 
@@ -98,7 +99,7 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
      * Constructor
      * @param ontModel Model for which walks shall be generated.
      */
-    public WalkGenerationManagerDefault(OntModel ontModel){
+    public WalkGenerationManager(OntModel ontModel){
         this(ontModel, false);
     }
 
@@ -108,7 +109,7 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
      * @param ontModel Model for which walks shall be generated.
      * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
      */
-    public WalkGenerationManagerDefault(OntModel ontModel, boolean isGenerateTextWalks) {
+    public WalkGenerationManager(OntModel ontModel, boolean isGenerateTextWalks) {
         this.walkGenerator = new JenaOntModelMemoryWalkGenerator();
         ((JenaOntModelMemoryWalkGenerator) this.walkGenerator).setParseDatatypeProperties(isGenerateTextWalks);
         ((JenaOntModelMemoryWalkGenerator) this.walkGenerator).readDataFromOntModel(ontModel);
@@ -120,7 +121,7 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
      * Constructor
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
-    public WalkGenerationManagerDefault(File tripleFile){
+    public WalkGenerationManager(File tripleFile){
         this(tripleFile, false, true);
     }
 
@@ -131,7 +132,7 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
      * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
      * @param isSetEntitySelector If true, an entity selector will be chosen automatically.
      */
-    public WalkGenerationManagerDefault(File tripleFile, boolean isGenerateTextWalks, boolean isSetEntitySelector){
+    public WalkGenerationManager(File tripleFile, boolean isGenerateTextWalks, boolean isSetEntitySelector){
         this(tripleFile.toURI(), isGenerateTextWalks, isSetEntitySelector, null, null);
     }
 
@@ -141,9 +142,11 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
      * @param isGenerateTextWalks True if text shall also appear in the embedding space.
      * @param isSetEntitySelector If true, an entity selector will be chosen automatically.
      * @param existingWalks If existing walks shall be parsed, the existing walk directory can be specified here.
+     * @param newWalkDirectory The new walk directory that is to be written. If there are existing walks, those will
+     *                         be copied if the file is not corrupted.
      */
-    public WalkGenerationManagerDefault(URI knowledgeGraphResource, boolean isGenerateTextWalks,
-                                        boolean isSetEntitySelector, File existingWalks, File newWalkDirectory) {
+    public WalkGenerationManager(URI knowledgeGraphResource, boolean isGenerateTextWalks,
+                                 boolean isSetEntitySelector, File existingWalks, File newWalkDirectory) {
         if(Util.uriIsFile(knowledgeGraphResource)) {
             File knowledgeGraphFile = new File(knowledgeGraphResource);
             if (!knowledgeGraphFile.exists()) {
@@ -210,29 +213,31 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
      *
      * @param pathToTripleFile The path to the NT file.
      */
-    public WalkGenerationManagerDefault(String pathToTripleFile) {
+    public WalkGenerationManager(String pathToTripleFile) {
         this(new File(pathToTripleFile));
     }
 
-    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth, int textWalkLength, String walkFile) {
+    @Override
+    public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth,
+                              int textWalkLength, File walkDirectory) {
         if (generationMode == null) {
             System.out.println("walkGeneration mode is null... Using default: RANDOM_WALKS_DUPLICATE_FREE");
-            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else if (generationMode == WalkGenerationMode.MID_WALKS) {
             System.out.println("Generate random mid walks...");
-            this.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
+            this.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else if (generationMode == WalkGenerationMode.MID_WALKS_DUPLICATE_FREE) {
             System.out.println("Generate random mid walks duplicate free...");
-            this.generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+            this.generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else if (generationMode == WalkGenerationMode.RANDOM_WALKS) {
             System.out.println("Generate random walks...");
-            this.generateRandomWalks(numberOfThreads, numberOfWalks, depth, walkFile);
+            this.generateRandomWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else if (generationMode == WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE) {
             System.out.println("Generate random walks duplicate free...");
-            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkFile);
+            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else if (generationMode == WalkGenerationMode.MID_WALKS_WEIGHTED) {
             System.out.println("Generate weighted mid walks...");
-            this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkFile);
+            this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else {
             System.out.println("ERROR. Cannot identify the \"walkGenenerationMode\" chosen. Aborting program.");
         }
@@ -244,60 +249,61 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
     }
 
     public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomWalks(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+        generateRandomWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
     }
 
-    public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        this.filePath = filePathOfFileToBeWritten;
+    public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
+        this.walkDirectory = walkDirectory;
         generateRandomWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
-    public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
-        this.filePath = filePathOfFileToBeWritten;
+    public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
+        this.walkDirectory = walkDirectory;
         generateDuplicateFreeWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+        generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
     }
 
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+        generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
     }
 
-    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+    @Override
+    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
         if(!isWalkGeneratorOk()) return;
-        this.filePath = filePathOfFileToBeWritten;
+        this.walkDirectory = walkDirectory;
         generateRandomMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateWeightedMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+        generateWeightedMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
     }
 
-    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
         if(!isWalkGeneratorOk()) return;
-        this.filePath = filePathOfFileToBeWritten;
+        this.walkDirectory = walkDirectory;
         generateWeightedMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+        generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
     }
 
-    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, String filePathOfFileToBeWritten) {
+    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
         if(!isWalkGeneratorOk()) return;
-        this.filePath = filePathOfFileToBeWritten;
+        this.walkDirectory = walkDirectory;
         generateRandomMidWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     public void generateTextWalks(int numberOfThreads, int walkLength) {
-        generateTextWalks(numberOfThreads, walkLength, DEFAULT_WALK_FILE_TO_BE_WRITTEN);
+        generateTextWalks(numberOfThreads, walkLength, new File(DEFAULT_WALK_DIRECTORY));
     }
 
-    public void generateTextWalks(int numberOfThreads, int walkLength, String filePathOfFileToBeWritten) {
+    public void generateTextWalks(int numberOfThreads, int walkLength, File walkDirectory) {
         if(!isWalkGeneratorOk()) return;
-        this.filePath = filePathOfFileToBeWritten;
+        this.walkDirectory = walkDirectory;
         generateTextWalksForEntities(entitySelector.getEntities(), numberOfThreads, walkLength);
     }
 
@@ -568,12 +574,12 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
     }
 
     /**
-     * Initialize {@link WalkGenerationManagerDefault#writer}.
+     * Initialize {@link WalkGenerationManager#writer}.
      */
     void setOutputFileWriter(){
         // only act if the writer has not yet been initialized.
         if(this.writer == null) {
-            File outputFile = new File(filePath);
+            File outputFile = new File(this.walkDirectory, "walk_file_0.txt.gz");
             if(outputFile.getParentFile().mkdirs()){
                 LOGGER.info("Directory created.");
             }
@@ -618,10 +624,10 @@ public class WalkGenerationManagerDefault implements IWalkGenerationManager{
                 e.printStackTrace();
             }
             int tmpNM = (processedWalks / 3000000);
-            String tmpFilename = filePath.replace(".gz", tmpNM + ".gz");
+            File newFile = new File(this.walkDirectory, "walk_file_" + tmpNM + ".txt.gz");
             try {
                 writer = new OutputStreamWriter(new GZIPOutputStream(
-                        new FileOutputStream(tmpFilename, false)), StandardCharsets.UTF_8);
+                        new FileOutputStream(newFile, false)), StandardCharsets.UTF_8);
             } catch (Exception e) {
                 e.printStackTrace();
             }

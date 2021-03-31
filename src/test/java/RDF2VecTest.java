@@ -23,6 +23,21 @@ class RDF2VecTest {
 
 
     /**
+     * In rare cases when the test execution is aborted in the middle of processing, some intermediate test files
+     * may have been created. When restarting the tests, those may lead to errors. Therefore, the cleanup is also run
+     * before all tests.
+     */
+    @BeforeAll
+    static void beforeCleanUp(){
+        cleanUp();
+    }
+
+    @AfterAll
+    static void afterAll(){
+        cleanUp();
+    }
+
+    /**
      * Logger
      */
     private static Logger LOGGER = LoggerFactory.getLogger(RDF2Vec.class);
@@ -46,14 +61,6 @@ class RDF2VecTest {
     }
 
     @Test
-    void getWalkFilePath() {
-        RDF2Vec rdf2vec = new RDF2Vec(loadFile("emptyFile.txt"));
-        // also forward slash on windows
-        assertEquals("." + File.separator + "walks" + File.separator + "walk_file.gz", rdf2vec.getWalkFilePath());
-        assertTrue(rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks" + File.separator) || rdf2vec.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + rdf2vec.getWalkFileDirectoryPath());
-    }
-
-    @Test
     void train() {
         RDF2Vec classic = new RDF2Vec(loadFile("dummyGraph.nt"));
         Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.CBOW);
@@ -63,7 +70,7 @@ class RDF2VecTest {
 
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
         assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
-        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertTrue(new File("./walks/walk_file_0.txt.gz").exists(), "Walk file not written.");
         assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
         assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
@@ -118,7 +125,8 @@ class RDF2VecTest {
 
         assertTrue(new File("." + File.separator + "walks" + File.separator + "model").exists(), "Model file not written.");
         assertTrue(new File("." + File.separator + "walks" + File.separator + "model.kv").exists(), "Vector file not written.");
-        assertTrue(new File("." + File.separator + "walks" + File.separator + "walk_file.gz").exists(), "Walk file not written.");
+        assertTrue(new File("." + File.separator + "walks" + File.separator + "walk_file_0.txt.gz").exists(), "Walk " +
+                "file not written.");
         assertFalse(classic.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
         assertFalse(classic.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 
@@ -151,21 +159,6 @@ class RDF2VecTest {
             LOGGER.info("Cleanup failed.");
             e.printStackTrace();
         }
-    }
-
-    /**
-     * In rare cases when the test execution is aborted in the middle of processing, some intermediate test files
-     * may have been created. When restarting the tests, those may lead to errors. Therefore, the cleanup is also run
-     * before all tests.
-     */
-    @BeforeAll
-    static void beforeCleanUp(){
-        cleanUp();
-    }
-
-    @AfterAll
-    static void afterAll(){
-        cleanUp();
     }
 
     /**

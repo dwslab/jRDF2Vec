@@ -73,6 +73,7 @@ public interface IRDF2Vec {
 
     /**
      * Text embedding option setter.
+     * @param embedText Boolean
      */
     void setEmbedText(boolean embedText);
 }

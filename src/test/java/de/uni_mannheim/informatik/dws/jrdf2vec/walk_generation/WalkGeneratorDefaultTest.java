@@ -3,7 +3,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -22,12 +22,12 @@ class WalkGeneratorDefaultTest {
     void generateRandomWalksDuplicateFreeXml() {
         File pizzaOntology = loadFile("pizza.owl.xml");
 
-        String generatedFilePath = "./test_walks.gz";
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerDefault(pizzaOntology);
-        generator.generateRandomWalksDuplicateFree(8, 5, 5, generatedFilePath);
+        File walkDirectory = new File("./test_walks");
+        WalkGenerationManager generator = new WalkGenerationManager(pizzaOntology);
+        generator.generateRandomWalksDuplicateFree(8, 5, 5, walkDirectory);
         generator.close();
 
-        File generatedFile = new File(generatedFilePath);
+        File generatedFile = walkDirectory.listFiles()[0];
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
 
         GZIPInputStream gzip = null;
@@ -60,12 +60,12 @@ class WalkGeneratorDefaultTest {
     void generateRandomWalksDuplicateFreeTtl() {
         File pizzaOntology = loadFile("pizza.ttl");
 
-        String generatedFilePath = "./test_walks2.gz";
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerDefault(pizzaOntology);
+        File generatedFilePath = new File("./test_walks2");
+        WalkGenerationManager generator = new WalkGenerationManager(pizzaOntology);
         generator.generateRandomWalksDuplicateFree(8, 5, 5, generatedFilePath);
         generator.close();
 
-        File generatedFile = new File(generatedFilePath);
+        File generatedFile = generatedFilePath.listFiles()[0];
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
 
         GZIPInputStream gzip = null;
@@ -98,12 +98,14 @@ class WalkGeneratorDefaultTest {
     void generateTextWalks(){
         File pizzaOntology = loadFile("pizza.ttl");
 
-        String generatedFilePath = "./test_walks3.gz";
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerDefault(pizzaOntology, true, true);
-        generator.generateTextWalks(8,  5, generatedFilePath);
+        File walkDirectory = new File("./test_walks3");
+        walkDirectory.deleteOnExit();
+        walkDirectory.deleteOnExit();
+        WalkGenerationManager generator = new WalkGenerationManager(pizzaOntology, true, true);
+        generator.generateTextWalks(8,  5, walkDirectory);
         generator.close();
 
-        File generatedFile = new File(generatedFilePath);
+        File generatedFile = walkDirectory.listFiles()[0];
         generatedFile.deleteOnExit();
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
         List<String> result = Util.readLinesFromGzippedFile(generatedFile);
@@ -145,7 +147,4 @@ class WalkGeneratorDefaultTest {
             return null;
         }
     }
-
-
-
 }

@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
@@ -12,7 +13,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerat
 import java.io.File;
 import java.time.Instant;
 
-import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault.DEFAULT_WALK_FILE_TO_BE_WRITTEN;
 
 /**
  * This class allows to generate walks and train embeddings for RDF2Vec Light.
@@ -52,11 +52,6 @@ public class RDF2VecLight implements IRDF2Vec {
     int depth = 4;
 
     /**
-     * File to which the walk will be written to.
-     */
-    String walkFilePath = DEFAULT_WALK_FILE_TO_BE_WRITTEN;
-
-    /**
      * The training configuration to be used.
      */
     Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
@@ -92,6 +87,8 @@ public class RDF2VecLight implements IRDF2Vec {
      */
     boolean isVectorTextFileGeneration = true;
 
+    private File walkDirectory;
+
     /**
      * Logger
      */
@@ -119,9 +116,9 @@ public class RDF2VecLight implements IRDF2Vec {
         this.knowledgeGraphFile = knowledgeGraphFile;
         if (walkDirectory == null || !walkDirectory.isDirectory()) {
             LOGGER.warn("walkDirectory is not a directory. Using default.");
-            walkFilePath = DEFAULT_WALK_FILE_TO_BE_WRITTEN;
+            this.walkDirectory = new File(WalkGenerationManager.DEFAULT_WALK_DIRECTORY);
         } else {
-            this.walkFilePath = walkDirectory.getAbsolutePath() + "/walk_file.gz";
+            this.walkDirectory = walkDirectory;
         }
     }
 
@@ -142,7 +139,8 @@ public class RDF2VecLight implements IRDF2Vec {
 
         Instant before = Instant.now();
         WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, entitiesFile, isEmbedText());
-        generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth, configuration.getWindowSize(), this.getWalkFilePath());
+        generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth,
+                configuration.getWindowSize(), this.walkDirectory);
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
@@ -153,10 +151,11 @@ public class RDF2VecLight implements IRDF2Vec {
             gensim = Gensim.getInstance(this.resourceDirectory);
         } else gensim = Gensim.getInstance();
 
-        String fileToWrite = this.getWalkFileDirectoryPath() + File.separator + "model.kv";
-        gensim.trainWord2VecModel(fileToWrite, getWalkFileDirectoryPath(), this.configuration);
+        String fileToWrite = this.getWalkDirectory().getAbsolutePath() + File.separator + "model.kv";
+        gensim.trainWord2VecModel(fileToWrite, getWalkDirectory().getAbsolutePath(), this.configuration);
         if(isVectorTextFileGeneration) {
-            gensim.writeModelAsTextFile(fileToWrite, this.getWalkFileDirectoryPath() + File.separator + "vectors.txt", entitiesFile.getAbsolutePath());
+            gensim.writeModelAsTextFile(fileToWrite, this.getWalkDirectory().getAbsolutePath() +
+                    File.separator + "vectors.txt", entitiesFile.getAbsolutePath());
         }
         Gensim.shutDown();
         after = Instant.now();
@@ -214,19 +213,15 @@ public class RDF2VecLight implements IRDF2Vec {
     }
 
     /**
-     * Returns the path to the walk directory.
-     * @return Path as String.
+     * Returns the walk directory.
+     * @return The walk directory.
      */
-    public String getWalkFileDirectoryPath() {
-        File f = new File(this.getWalkFilePath());
-        if (f != null) {
-            try {
-                return f.getParentFile().getCanonicalPath();
-            } catch (Exception e) {
-                return "." + File.separator + "walks";
-            }
-        } else return "." + File.separator + "walks";
+    public File getWalkDirectory() {
+        return walkDirectory;
+    }
 
+    public void setWalkDirectory(File walkDirectory) {
+        this.walkDirectory = walkDirectory;
     }
 
     /**
@@ -237,22 +232,9 @@ public class RDF2VecLight implements IRDF2Vec {
      */
     public void setWalkFileDirectoryPath(String directory) {
         File f = new File(directory);
-        if (f != null && f.isDirectory()) {
-            this.walkFilePath = f.getAbsolutePath() + "walk_file.gz";
-        } else this.walkFilePath = DEFAULT_WALK_FILE_TO_BE_WRITTEN;
-    }
-
-    public String getWalkFilePath() {
-        return walkFilePath;
-    }
-
-    /**
-     * Set walk file to be written.
-     *
-     * @param walkFilePath File to be written.
-     */
-    public void setWalkFilePath(String walkFilePath) {
-        this.walkFilePath = walkFilePath;
+        if (f.isDirectory()) {
+            this.walkDirectory = f;
+        }
     }
 
     public Word2VecConfiguration getWord2VecConfiguration() {

@@ -25,15 +25,6 @@ class RDF2VecLightTest {
     private static Logger LOGGER = LoggerFactory.getLogger(RDF2VecLightTest.class);
 
     @Test
-    void getWalkFilePath() {
-        File entityFilePath =loadFile("emptyFile.nt");
-        File graphFilePath = loadFile("emptyFile.txt");
-        RDF2VecLight light = new RDF2VecLight(graphFilePath, entityFilePath);
-        assertEquals("." + File.separator + "walks" + File.separator + "walk_file.gz", light.getWalkFilePath());
-        assertTrue(light.getWalkFileDirectoryPath().endsWith(File.separator + "walks"), "Directory path: " + light.getWalkFileDirectoryPath());
-    }
-
-    @Test
     void train() {
         File entityFilePath = loadFile("dummyEntities.txt");
         File graphFilePath = loadFile("dummyGraph.nt");
@@ -44,7 +35,7 @@ class RDF2VecLightTest {
         assertTrue(new File("./walks/model").exists(), "Model file not written.");
         assertTrue(new File("./walks/model.kv").exists(), "Vector file not written.");
         assertTrue(new File("./walks/vectors.txt").exists(), "Text file not written.");
-        assertTrue(new File("./walks/walk_file.gz").exists(), "Walk file not written.");
+        assertTrue(new File("./walks/walk_file_0.txt.gz").exists(), "Walk file not written.");
         assertFalse(light.getRequiredTimeForLastTrainingString().startsWith("<"), "No training time tracked."); // make sure time was tracked
         assertFalse(light.getRequiredTimeForLastWalkGenerationString().startsWith("<"), "No walk time tracked."); // make sure time was tracked
 

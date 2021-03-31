@@ -2,6 +2,8 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
 
+import java.io.File;
+
 /**
  * The available walk generation modes.
  * <p>
@@ -11,9 +13,12 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerat
  *     There must be a runnable for each walk generation option.
  * </li>
  * <li>
- *      The must be a resolution in evey implementation of {@link IWalkGenerationManager#generateWalks(WalkGenerationMode, int, int, int, int, String)} that shall support this walk mode.
- *      This affects, for example {@link WalkGenerationManagerDefault#generateWalks(WalkGenerationMode, int, int, int, int, String)} or
- *      {@link WalkGenerationManagerLight#generateWalks(WalkGenerationMode, int, int, int, int, String)}.
+ *      The must be a resolution in evey implementation of
+ *      {@link IWalkGenerationManager#generateWalks(WalkGenerationMode, int, int, int, int, File)} that shall support
+ *      this walk mode.
+ *      This affects, for example
+ *      {@link WalkGenerationManager#generateWalks(WalkGenerationMode, int, int, int, int, File)} or
+ *      {@link WalkGenerationManagerLight#generateWalks(WalkGenerationMode, int, int, int, int, File)}.
  * </li>
  * </ul>
  */

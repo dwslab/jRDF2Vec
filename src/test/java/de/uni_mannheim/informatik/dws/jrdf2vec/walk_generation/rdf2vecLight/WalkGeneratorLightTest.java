@@ -2,7 +2,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.rdf2vecLight;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManagerDefault;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
 
 import java.io.*;
@@ -27,7 +27,7 @@ class WalkGeneratorLightTest {
         WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(resourceFile, entityFile);
         generatorLight.generateRandomMidWalks(2, 10, 3);
         generatorLight.close();
-        File fileToReadFrom = new File("./walks/walk_file.gz");
+        File fileToReadFrom = new File("./walks/walk_file_0.txt.gz");
         GZIPInputStream gzip;
         try {
             gzip = new GZIPInputStream(new FileInputStream(fileToReadFrom));
@@ -61,13 +61,14 @@ class WalkGeneratorLightTest {
     void generateRandomWalksDuplicateFreeTtlWithSelector() {
         File pizzaOntology = loadFile("pizza.ttl");
 
-        String generatedFilePath = "./test_walks_light_pizza.gz";
+        File walkDirectory = new File("./test_walks_light_pizza");
+        walkDirectory.deleteOnExit();
 
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerLight(pizzaOntology, loadFile("entityFileForPizzaOntology.txt"));
-        generator.generateRandomWalksDuplicateFree(1, 10, 5, generatedFilePath);
+        WalkGenerationManager generator = new WalkGenerationManagerLight(pizzaOntology, loadFile("entityFileForPizzaOntology.txt"));
+        generator.generateRandomWalksDuplicateFree(1, 10, 5, walkDirectory);
         generator.close();
 
-        File generatedFile = new File(generatedFilePath);
+        File generatedFile = walkDirectory.listFiles()[0];
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
 
         GZIPInputStream gzip = null;
@@ -102,16 +103,16 @@ class WalkGeneratorLightTest {
     void generateRandomWalksDuplicateFreeTtl() {
         File pizzaOntology = loadFile("pizza.ttl");
 
-        String generatedFilePath = "./test_walks_light_1.gz";
+        File generatedFilePath = new File("./test_walks_light_1");
 
         HashSet<String> entities = new HashSet<>();
         entities.add("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot");
 
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerLight(pizzaOntology, entities);
+        WalkGenerationManager generator = new WalkGenerationManagerLight(pizzaOntology, entities);
         generator.generateRandomWalksDuplicateFree(8, 5, 5, generatedFilePath);
         generator.close();
 
-        File generatedFile = new File(generatedFilePath);
+        File generatedFile = generatedFilePath.listFiles()[0];
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
 
         GZIPInputStream gzip = null;
@@ -148,15 +149,15 @@ class WalkGeneratorLightTest {
         File pizzaOntology = loadFile("pizza.ttl");
         assertTrue(pizzaOntology.exists());
 
-        String generatedFilePath = "./test_walks_light_mid_test.gz";
+        File generatedFilePath = new File("./test_walks_light_mid_test");
 
         HashSet<String> entities = new HashSet<>();
         entities.add("http://www.co-ode.org/ontologies/pizza/pizza.owl#AmericanHot");
 
-        WalkGenerationManagerDefault generator = new WalkGenerationManagerLight(pizzaOntology, entities);
+        WalkGenerationManager generator = new WalkGenerationManagerLight(pizzaOntology, entities);
         generator.generateRandomMidWalks(1, 1000, 1, generatedFilePath);
         generator.close();
-        File generatedFile = new File(generatedFilePath);
+        File generatedFile = generatedFilePath.listFiles()[0];
         assertTrue(generatedFile.exists(), "Assert that a walk file has been generated.");
 
         GZIPInputStream gzip = null;

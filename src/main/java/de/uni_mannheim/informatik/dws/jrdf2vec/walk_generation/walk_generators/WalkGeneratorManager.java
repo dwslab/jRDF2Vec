@@ -47,6 +47,7 @@ public class WalkGeneratorManager {
     /**
      * Given a triple file, this method determines the appropriate parser and entity selector.
      * @param tripleFile The triple file to be processed.
+     * @param isParseDatatypeTriples True if datatype properties shall also be parsed.
      * @return Pair with parser and entity selector.
      */
     public static Pair<IWalkGenerator, EntitySelector> parseSingleFile(File tripleFile, boolean isParseDatatypeTriples){
