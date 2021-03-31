@@ -50,8 +50,13 @@ public class RDF2Vec implements IRDF2Vec {
 
     /**
      * File to which the walk will be written to.
+     * TODO refactor to File
      */
     String walkFilePath;
+
+    private File walkDirectory;
+
+    private File existingWalkDirectory;
 
     /**
      * The training configuration to be used.
@@ -72,15 +77,6 @@ public class RDF2Vec implements IRDF2Vec {
      * Logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(RDF2Vec.class);
-
-    /**
-     * Constructor
-     *
-     * @param knowledgeGraphFile File containing the knowledge graph.
-     */
-    public RDF2Vec(File knowledgeGraphFile) {
-        this(knowledgeGraphFile, null);
-    }
 
     /**
      * Variable which saves the time it took to generate walks as String (for the last run).
@@ -106,6 +102,19 @@ public class RDF2Vec implements IRDF2Vec {
     boolean isVectorTextFileGeneration = true;
 
     /**
+     * Main constructor
+     * @param knowledgeGraphUri The URI to the knowledge graph.
+     * @param walkDirectory The walk directory that shall be generated.
+     */
+    public RDF2Vec(URI knowledgeGraphUri, File walkDirectory) {
+        this.knowledgeGraphUri = knowledgeGraphUri;
+        if(!isUriOk(knowledgeGraphUri)){
+            LOGGER.error("There is a problem with the provided knowledge graph. RDF2Vec is not functional.");
+        }
+        setWalkDirectory(walkDirectory);
+    }
+
+    /**
      * Constructor
      *
      * @param knowledgeGraphFile File to the knowledge graph.
@@ -127,18 +136,13 @@ public class RDF2Vec implements IRDF2Vec {
     }
 
     /**
-     * Main constructor
-     * @param knowledgeGraphUri The URI to the knowledge graph.
-     * @param walkDirectory The walk directory that shall be generated.
+     * Constructor
+     *
+     * @param knowledgeGraphFile File containing the knowledge graph.
      */
-    public RDF2Vec(URI knowledgeGraphUri, File walkDirectory) {
-        this.knowledgeGraphUri = knowledgeGraphUri;
-        if(!isUriOk(knowledgeGraphUri)){
-            LOGGER.error("There is a problem with the provided knowledge graph. RDF2Vec is not functional.");
-        }
-        setWalkDirectory(walkDirectory);
+    public RDF2Vec(File knowledgeGraphFile) {
+        this(knowledgeGraphFile, null);
     }
-
 
     /**
      * Train a new model with the existing parameters.
@@ -173,7 +177,7 @@ public class RDF2Vec implements IRDF2Vec {
      * @return Returns the path to the trained model.
      */
     public String train() {
-        // if true: file-based gneration
+        // if true: file-based generation
         boolean useFile = true;
         if (ontModel == null) {
 
@@ -194,7 +198,9 @@ public class RDF2Vec implements IRDF2Vec {
 
         WalkGenerationManagerDefault classicGenerator;
         if (useFile) {
-            classicGenerator = new WalkGenerationManagerDefault(getFile(this.knowledgeGraphUri), isEmbedText(), true);
+            // TODO
+            classicGenerator = new WalkGenerationManagerDefault(getFile(this.knowledgeGraphUri).toURI(), isEmbedText(),
+                    true, existingWalkDirectory, this.walkDirectory);
         } else {
             classicGenerator = new WalkGenerationManagerDefault(this.ontModel, isEmbedText());
         }
@@ -381,6 +387,14 @@ public class RDF2Vec implements IRDF2Vec {
     @Override
     public void setEmbedText(boolean embedText) {
         isEmbedText = embedText;
+    }
+
+    public File getExistingWalkDirectory() {
+        return existingWalkDirectory;
+    }
+
+    public void setExistingWalkDirectory(File existingWalkDirectory) {
+        this.existingWalkDirectory = existingWalkDirectory;
     }
 
     static File getFile(URI fileUri) {

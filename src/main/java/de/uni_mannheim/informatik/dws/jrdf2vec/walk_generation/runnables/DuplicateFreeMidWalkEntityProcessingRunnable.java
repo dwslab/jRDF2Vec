@@ -1,9 +1,9 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidWalkDuplicateFreeCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
 
 public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
@@ -32,7 +32,7 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generation manager.
      */
-    WalkGenerationManager walkGenerationManager;
+    IWalkGenerationManager walkGenerationManager;
 
     /**
      * Constructor.
@@ -43,7 +43,8 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
      * @param depth    Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public DuplicateFreeMidWalkEntityProcessingRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
+    public DuplicateFreeMidWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity,
+                                                        int numberOfWalks, int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;
@@ -55,7 +56,7 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
      */
     public void run() {
         if(walkGenerationManager.getWalkGenerator() instanceof IMidWalkDuplicateFreeCapability){
-            walkGenerationManager.writeToFile(((IMidWalkDuplicateFreeCapability) walkGenerationManager.walkGenerator).generateMidWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
-        } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT WALK GENERATOR " + walkGenerationManager.walkGenerator.getClass().toString() + "!");
+            walkGenerationManager.writeToFile(((IMidWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator()).generateMidWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
+        } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT WALK GENERATOR " + walkGenerationManager.getWalkGenerator().getClass().toString() + "!");
     }
 }

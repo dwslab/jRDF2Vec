@@ -1,9 +1,9 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidWalkWeightedCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
 public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
 
@@ -31,7 +31,7 @@ public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generator for which this parser works.
      */
-    WalkGenerationManager walkGenerationManager;
+    IWalkGenerationManager walkGenerationManager;
 
     /**
      * Constructor.
@@ -42,7 +42,8 @@ public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
      * @param depth    Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public WeightedMidWalkEntityProcessingRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
+    public WeightedMidWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity, int numberOfWalks
+            , int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;

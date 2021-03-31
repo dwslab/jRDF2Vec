@@ -1,7 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.MemoryWalkGenerator;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class RandomWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generator for which this parser works.
      */
-    WalkGenerationManager walkGenerator;
+    IWalkGenerationManager walkGenerator;
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ public class RandomWalkEntityProcessingRunnable implements Runnable {
      * @param numberOfWalks The number of walks to be performed per entity.
      * @param walkLength The length of the walk.
      */
-    public RandomWalkEntityProcessingRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int walkLength) {
+    public RandomWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity, int numberOfWalks, int walkLength) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.walkLength = walkLength;
@@ -80,7 +80,7 @@ public class RandomWalkEntityProcessingRunnable implements Runnable {
             currentDepth = 0;
             while (currentDepth < walkLength) {
                 currentDepth++;
-                Triple po = ((MemoryWalkGenerator) walkGenerator.walkGenerator).getRandomTripleForSubjectWithoutTags(lastObject);
+                Triple po = ((MemoryWalkGenerator) walkGenerator.getWalkGenerator()).getRandomTripleForSubjectWithoutTags(lastObject);
                 if(po != null){
                     currentWalk += " " + walkGenerator.shortenUri(po.predicate) + " " + walkGenerator.shortenUri(po.object);
                     lastObject = po.object;

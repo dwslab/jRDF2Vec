@@ -1,6 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.MemoryWalkGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class DatatypeWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generator for which this parser works.
      */
-    private WalkGenerationManager walkGenerator;
+    private IWalkGenerationManager walkGenerator;
 
     /**
      * Constructor.
@@ -39,7 +39,7 @@ public class DatatypeWalkEntityProcessingRunnable implements Runnable {
      * @param depth     Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                  this leads to more walk components than the specified depth.
      */
-    public DatatypeWalkEntityProcessingRunnable(WalkGenerationManager generator, String entity, int depth) {
+    public DatatypeWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity, int depth) {
         this.entity = entity;
         this.depth = depth;
         this.walkGenerator = generator;
@@ -47,10 +47,10 @@ public class DatatypeWalkEntityProcessingRunnable implements Runnable {
 
     @Override
     public void run() {
-        if (walkGenerator.walkGenerator instanceof MemoryWalkGenerator) {
+        if (walkGenerator.getWalkGenerator() instanceof MemoryWalkGenerator) {
             // datatype walks are only implemented for memory options
             // yes, the depth and # of walks parameters are this way
-            walkGenerator.writeToFile(((MemoryWalkGenerator) walkGenerator.walkGenerator).generateTextWalksForEntity(walkGenerator.shortenUri(entity), this.depth));
+            walkGenerator.writeToFile(((MemoryWalkGenerator) walkGenerator.getWalkGenerator()).generateTextWalksForEntity(walkGenerator.shortenUri(entity), this.depth));
         } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT PARSER!");
     }
 }

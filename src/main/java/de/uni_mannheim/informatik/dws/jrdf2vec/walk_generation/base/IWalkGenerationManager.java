@@ -2,6 +2,8 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IWalkGenerator;
 
+import java.util.List;
+
 /**
  * Interface for all walk generation managers.
  */
@@ -126,4 +128,8 @@ public interface IWalkGenerationManager {
     void generateTextWalks(int numberOfThreads, int walkLength, String filePathOfFileToBeWritten);
 
     IWalkGenerator getWalkGenerator();
+
+    void writeToFile(List<String> tmpList);
+
+    String shortenUri(String uri);
 }
