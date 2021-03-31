@@ -9,6 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * The ContinuationEntitySelector is required if the previous walk generation has been stopped after some time.
+ * In order to not restart the walk generation process, walks will only be created for entities for which walks have
+ * not yet been generated. This process does not work for mid walks.
+ */
 public class ContinuationEntitySelector implements EntitySelector {
 
 
@@ -68,8 +73,10 @@ public class ContinuationEntitySelector implements EntitySelector {
             }
         }
 
+        LOGGER.info("Walks already generated for " + existingEntities.size() + " entities.");
+        LOGGER.info("Entities before: " + entities.size());
         entities.removeAll(existingEntities);
+        LOGGER.info("Entities after removing existing ones: " + entities.size());
         return entities;
     }
-
 }

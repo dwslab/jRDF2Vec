@@ -102,3 +102,7 @@ log4j.properties
 
 # allow specific jrdf2vec binaries
 !src/main/bin
+
+# allow specific files required for tests
+!src/test/resources/existing_walk_directory/walk_file.gz
+!src/test/resources/existing_walk_directory/walk_file.txt
