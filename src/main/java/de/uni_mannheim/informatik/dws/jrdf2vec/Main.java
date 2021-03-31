@@ -860,6 +860,12 @@ public class Main {
                 "    -port <port_number> (default: 1808)\n" +
                 "    The port that shall be used for the server.\n\n" +
 
+                "    -continue <existing_walk_directory>\n" +
+                "    In some cases, old walks shall be re-used (e.g. if the program was interrupted after 48h).\n" +
+                "    With the -continue option, the old walks will be re-used and only missing walks are\n" +
+                "    generated. This does not work for MID_WALKS. If you do not need to generate additional walks\n" +
+                "    use -onlyTraining instead.\n\n" +
+
                 "\n" +
 
                 "Additional Services\n" +

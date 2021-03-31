@@ -70,7 +70,7 @@ If added to the call, this switch will also generate walks that contain textual 
 
 **Parameters for the Training Configuration**
 - `-onlyTraining`<br/>
-  If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter `-walkDirectory` must be set. If walk generation parameters are specified, they are ignored.
+If added to the call, this switch will deactivate the walk generation part so that only the training is performed. The parameter `-walkDirectory` must be set. If walk generation parameters are specified, they are ignored.
 - `-trainingMode <cbow | sg>` (default: `sg`) <br/>
 This parameter controls the mode to be used for the word2vec training. Allowed values are `cbow` and `sg`.
 - `-dimension <size_of_vector>` (default: `200`)<br/>
@@ -87,6 +87,14 @@ The size of the window in the training process.
 The number of epochs to use in training.
 - `-port <port_number>` (default: `1808`)<br/>
 The port that shall be used for the server.
+
+**Advanced Parameters**
+- `-continue <existing_walk_directory>`<br/>
+In some cases, old walks need to be re-used (e.g. if the program was interrupted after 48h). 
+With the `-continue` option, the walk generation can be continued; this means that old walks will be re-used and only
+missing walks are generated. This does not work for MID_WALKS (and flavors). If you do not need to generate additional 
+walks use `-onlyTraining` instead.
+  
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.
