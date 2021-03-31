@@ -1,10 +1,12 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.ContinuationEntitySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 
 import java.io.File;
+import java.net.URI;
 import java.util.HashSet;
 
 /**
@@ -17,6 +19,28 @@ public class WalkGenerationManagerLight extends WalkGenerationManager {
      * Default Logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkGenerationManagerLight.class);
+
+    /**
+     * Main Constructor
+     * @param knowledgeGraph
+     * @param entitiesFile
+     * @param isGenerateTextWalks
+     * @param existingWalks
+     * @param newWalkDirectory
+     */
+    public WalkGenerationManagerLight(URI knowledgeGraph, File entitiesFile, boolean isGenerateTextWalks,
+                                      File existingWalks, File newWalkDirectory){
+        super(knowledgeGraph, isGenerateTextWalks, false, existingWalks, newWalkDirectory);
+        if(!entitiesFile.exists()){
+            LOGGER.error("The entities file does not exist: " + entitiesFile.getName() + "\nProgram will fail.");
+        }
+        if(existingWalks != null && newWalkDirectory != null){
+            super.entitySelector = new ContinuationEntitySelector(existingWalks, newWalkDirectory,
+                    new LightEntitySelector(entitiesFile));
+        } else {
+            super.entitySelector = new LightEntitySelector(entitiesFile);
+        }
+    }
 
     /**
      * Constructor
@@ -53,14 +77,17 @@ public class WalkGenerationManagerLight extends WalkGenerationManager {
      * @param isGenerateTextWalks True if datatype properties shall be parsed and text walks shall be generated.
      */
     public WalkGenerationManagerLight(File tripleFile, File entitiesFile, boolean isGenerateTextWalks){
-        super(tripleFile, isGenerateTextWalks, false);
-        if(!tripleFile.exists()){
-            LOGGER.error("The data file does not exist: " + tripleFile.getName() + "\nProgram will fail.");
-        }
-        if(!entitiesFile.exists()){
-            LOGGER.error("The entities file does not exist: " + entitiesFile.getName() + "\nProgram will fail.");
-        }
-        super.entitySelector = new LightEntitySelector(entitiesFile);
+        this(tripleFile.toURI(), entitiesFile, isGenerateTextWalks, null, null);
+    }
+
+    /**
+     * Constructor
+     * @param knowledgeGraph Knowledge graph.
+     * @param entitiesFile File with entities for which walks shall be generated. One entity per line. No tags around the entities.
+     * @param isGenerateTextWalks True if datatype properties shall be parsed and text walks shall be generated.
+     */
+    public WalkGenerationManagerLight(URI knowledgeGraph, File entitiesFile, boolean isGenerateTextWalks){
+        this(knowledgeGraph, entitiesFile, isGenerateTextWalks, null, null);
     }
 
     /**

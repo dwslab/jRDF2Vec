@@ -87,6 +87,12 @@ public class Main {
     private static File walkDirectory = null;
 
     /**
+     * In some cases, some walks may have already been generated. In such cases, the {@code oldWalkDirectory} can be provided.
+     * Note that {@code oldWalkDirectory} must be different from {@link Main#walkDirectory}.
+     */
+    private static File existingWalkDirectory = null;
+
+    /**
      * Walk generation mode.
      */
     private static WalkGenerationMode walkGenerationMode = null;
@@ -140,10 +146,11 @@ public class Main {
 
     /**
      * The main method that is executed when running the JAR.
+     *
      * @param args All the options for walk generation and training. Run with -help in order to get an overview.
      */
     public static void main(String[] args) {
-        if(args == null || args.length == 0) {
+        if (args == null || args.length == 0) {
             ignoredArguments = new HashSet<>();
         } else ignoredArguments = new HashSet<>(Arrays.asList(args));
 
@@ -159,11 +166,11 @@ public class Main {
         }
 
         // check install
-        if(containsIgnoreCase("-checkInstall", args) || containsIgnoreCase("-check", args) || containsIgnoreCase(
-                "-checkRequirements",args) || containsIgnoreCase("-checkInstallation", args)){
+        if (containsIgnoreCase("-checkInstall", args) || containsIgnoreCase("-check", args) || containsIgnoreCase(
+                "-checkRequirements", args) || containsIgnoreCase("-checkInstallation", args)) {
             boolean isOk = Gensim.checkRequirements();
-            if(isOk) {
-               System.out.println("Installation is ok! [✔︎]");
+            if (isOk) {
+                System.out.println("Installation is ok! [✔︎]");
             } else {
                 System.out.println("Installation is not ok! [❌]\nIs Python 3 installed? Please check the log for " +
                         "missing" +
@@ -174,38 +181,38 @@ public class Main {
 
         // check for analysis request
         if (args[0].equalsIgnoreCase("-analyzevocab") || args[0].equalsIgnoreCase("-analyzevocabulary") ||
-                args[0].equalsIgnoreCase("--analyzevocabulary") || args[0].equalsIgnoreCase("--analyzevocab")){
+                args[0].equalsIgnoreCase("--analyzevocabulary") || args[0].equalsIgnoreCase("--analyzevocab")) {
             analyzeVocabulary(args);
             return;
         }
 
-        if(args.length == 2) {
+        if (args.length == 2) {
             String transformationSource = getValue("-generateTxtVectorFile", args);
-            if(transformationSource == null) {
+            if (transformationSource == null) {
                 // check for alternative spelling
                 transformationSource = getValue("-generateTextVectorFile", args);
             }
-            if(transformationSource != null) {
+            if (transformationSource != null) {
                 printIfIgnoredOptionsExist();
                 generateTextVectorFile(transformationSource);
                 return;
             }
         }
 
-        if(args.length == 2){
+        if (args.length == 2) {
             String modelFilePath = getValue("-generateVocabFile", args);
-            if(modelFilePath == null){
+            if (modelFilePath == null) {
                 // check for alternative spelling
                 modelFilePath = getValue("-generateVocabularyFile", args);
             }
-            if(modelFilePath != null){
+            if (modelFilePath != null) {
                 printIfIgnoredOptionsExist();
                 generateVocabFile(modelFilePath);
                 return;
             }
         }
 
-        if(containsIgnoreCase("-embedText", args) ||
+        if (containsIgnoreCase("-embedText", args) ||
                 containsIgnoreCase("-text", args) ||
                 containsIgnoreCase("--text", args) ||
                 containsIgnoreCase("--embedText", args) ||
@@ -214,13 +221,13 @@ public class Main {
             isEmbedText = true;
         }
 
-        if(containsIgnoreCase("-onlyTraining", args)){
+        if (containsIgnoreCase("-onlyTraining", args)) {
             isOnlyTraining = true;
             String walksPath = getValue("-walkDirectory", args);
-            if(walksPath == null){
+            if (walksPath == null) {
                 // try again with a different writing
-                walksPath = getValue("-walkDir",args);
-                if(walksPath == null) {
+                walksPath = getValue("-walkDir", args);
+                if (walksPath == null) {
                     System.out.println("Required parameter -walkDirectory <path to walk directory or file> missing. Aborting program. Call '-help' to learn more about the CLI.");
                     return;
                 }
@@ -228,15 +235,15 @@ public class Main {
         }
 
         String knowledgeGraphFilePath = getValue("-graph", args);
-        if(knowledgeGraphFilePath == null) knowledgeGraphFilePath = getValue("-g", args);
+        if (knowledgeGraphFilePath == null) knowledgeGraphFilePath = getValue("-g", args);
 
         String portString = getValue("-port", args);
-        if(portString != null){
+        if (portString != null) {
             try {
                 int intPort = Integer.parseInt(portString);
                 Gensim.setPort(intPort);
                 port = intPort;
-            } catch (NumberFormatException nfe){
+            } catch (NumberFormatException nfe) {
                 System.out.println("A problem occurred while trying to parse the following port number: " + portString + "\nUsing default port: " + Gensim.DEFAULT_PORT);
             }
         }
@@ -246,7 +253,7 @@ public class Main {
         // allowing a bit more...
         if (!isOnlyWalks) isOnlyWalks = containsIgnoreCase("-walksOnly", args);
 
-        if(!isOnlyTraining) {
+        if (!isOnlyTraining) {
             // the KG file path is only relevant if we want to do walk generation...
             if (knowledgeGraphFilePath == null) {
                 System.out.println("Required parameter '-graph <kg_file>' not set - program cannot be started. " +
@@ -276,9 +283,9 @@ public class Main {
             walkDirectory = new File(walkDirectoryPath);
 
             // Check whether the specified directory exists. If it does not exist, try to make the directory.
-            if(!walkDirectory.exists()){
+            if (!walkDirectory.exists()) {
                 System.out.println("The specified walk directory does not exist. Trying to make the directory.");
-                if(!walkDirectory.mkdirs()){
+                if (!walkDirectory.mkdirs()) {
                     System.out.println("Failed to make new walk directory. Using default.");
                     walkDirectory = null;
                 }
@@ -288,6 +295,22 @@ public class Main {
             if (!walkDirectory.isDirectory()) {
                 System.out.println("Walk directory is no directory! Using default.");
                 walkDirectory = null;
+            }
+        }
+
+        String existingWalkDirectoryPath = getValue("-continue", args);
+        existingWalkDirectoryPath = (existingWalkDirectoryPath == null) ? getValue("--continue", args) :
+                existingWalkDirectoryPath;
+        if (existingWalkDirectoryPath != null) {
+            existingWalkDirectory = new File(existingWalkDirectoryPath);
+
+            // Check whether the specified directory exists.
+            if (!existingWalkDirectory.exists() || !existingWalkDirectory.isDirectory()) {
+                System.out.println("The specified continuation walk directory does not exist. No existing/old walks" +
+                        "will be used.");
+                existingWalkDirectory = null;
+            } else {
+                System.out.println("Re-using existing walks in '" + existingWalkDirectoryPath + "'.");
             }
         }
 
@@ -358,17 +381,17 @@ public class Main {
         } else minCount = Word2VecConfiguration.MIN_COUNT_DEFAULT;
 
         String samplingString = getValue("-sample", args);
-        if(samplingString != null){
+        if (samplingString != null) {
             try {
                 sample = Double.parseDouble(samplingString);
-            } catch (NumberFormatException nfe){
+            } catch (NumberFormatException nfe) {
                 System.out.println("Could not parse the sample parameter. Using default (" + Word2VecConfiguration.SAMPLE_DEFAULT + ").");
                 sample = Word2VecConfiguration.SAMPLE_DEFAULT;
             }
         } else sample = Word2VecConfiguration.SAMPLE_DEFAULT;
 
         String epochsString = getValue("-epochs", args);
-        if(epochsString != null) {
+        if (epochsString != null) {
             try {
                 epochs = Integer.parseInt(epochsString);
             } catch (NumberFormatException nfe) {
@@ -378,18 +401,18 @@ public class Main {
         }
 
         String windowString = getValue("-window", args);
-        if(windowString != null){
+        if (windowString != null) {
             try {
                 window = Integer.parseInt(windowString);
-            } catch (NumberFormatException nfe){
+            } catch (NumberFormatException nfe) {
                 System.out.println("Could not parse the window parameter. Using default (" + Word2VecConfiguration.WINDOW_SIZE_DEFAULT + ").");
                 window = Word2VecConfiguration.WINDOW_SIZE_DEFAULT;
             }
         }
 
-        if(containsIgnoreCase("-noVectorTextFileGeneration", args)){
+        if (containsIgnoreCase("-noVectorTextFileGeneration", args)) {
             isVectorTextFileGeneration = false;
-        } else if(containsIgnoreCase("-vectorTextFileGeneration", args)){
+        } else if (containsIgnoreCase("-vectorTextFileGeneration", args)) {
             isVectorTextFileGeneration = true;
         }
 
@@ -412,10 +435,10 @@ public class Main {
         if (minCount > 0) configuration.setMinCount(minCount);
 
         // setting epochs
-        if(epochs > 0) configuration.setEpochs(epochs);
+        if (epochs > 0) configuration.setEpochs(epochs);
 
         // setting the window
-        if(window > 0) configuration.setWindowSize(window);
+        if (window > 0) configuration.setWindowSize(window);
 
         // set sample
         configuration.setSample(sample);
@@ -427,7 +450,7 @@ public class Main {
         }
 
         // setting the default walk generation mode
-        if(lightEntityFile != null) {
+        if (lightEntityFile != null) {
             walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.MID_WALKS : walkGenerationMode;
         } else {
             walkGenerationMode = (walkGenerationMode == null) ? WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE : walkGenerationMode;
@@ -438,7 +461,7 @@ public class Main {
         // -------------------
         //    only training
         // -------------------
-        if(isOnlyTraining){
+        if (isOnlyTraining) {
             printIfIgnoredOptionsExist();
             System.out.println("Only training is performed, no walks are going to be generated.");
             before = Instant.now();
@@ -455,7 +478,6 @@ public class Main {
         // ------------------
         //     only walks
         // ------------------
-
         if (isOnlyWalks) {
             printIfIgnoredOptionsExist();
             System.out.println("Only walks are being generated, training is performed.");
@@ -470,13 +492,17 @@ public class Main {
             // now distinguish light/non-light
             if (lightEntityFile != null) {
                 // light walk generation:
-                WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, lightEntityFile,
-                        isEmbedText);
+                WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(
+                        knowledgeGraphFile.toURI(),
+                        lightEntityFile,
+                        isEmbedText,
+                        existingWalkDirectory,
+                        walkDirectory);
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkDirectory);
             } else {
                 // classic walk generation
-                WalkGenerationManager classicGenerator = new WalkGenerationManager(knowledgeGraphFile,
-                        isEmbedText, true);
+                WalkGenerationManager classicGenerator = new WalkGenerationManager(knowledgeGraphFile.toURI(),
+                        isEmbedText, true, existingWalkDirectory, walkDirectory);
                 classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkDirectory);
             }
 
@@ -513,6 +539,9 @@ public class Main {
 
             // setting the text embedding option
             rdf2vec.setEmbedText(isEmbedText);
+
+            // setting the continuation walk directory
+            if(existingWalkDirectory != null) rdf2vec.setExistingWalkDirectory(existingWalkDirectory);
 
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
@@ -555,6 +584,9 @@ public class Main {
             // setting the text embedding option
             rdf2VecLight.setEmbedText(isEmbedText);
 
+            // set vector text file
+            rdf2VecLight.setVectorTextFileGeneration(isVectorTextFileGeneration);
+
             rdf2VecLight.setConfiguration(configuration);
             before = Instant.now();
             rdf2VecLight.train();
@@ -576,15 +608,16 @@ public class Main {
 
     /**
      * Write a UTF-8 encoded file containing the specified model's vocabulary.
+     *
      * @param modelFilePath The model of which the vocabulary shall be written.
      */
-    private static void generateVocabFile(String modelFilePath){
+    private static void generateVocabFile(String modelFilePath) {
         File modelFile = new File(modelFilePath);
-        if(!modelFile.exists()){
+        if (!modelFile.exists()) {
             System.out.println("The given file does not exist. Cannot generate vocabulary file.");
             return;
         }
-        if(modelFile.isDirectory()){
+        if (modelFile.isDirectory()) {
             System.out.println("The specified file is a directory. Cannot generate vocabulary file.");
             return;
         }
@@ -594,15 +627,16 @@ public class Main {
 
     /**
      * Given a model or vector file, a text file is generated containing all the vectors.
+     *
      * @param transformationSource File path to the model or vector file.
      */
     private static void generateTextVectorFile(String transformationSource) {
         File sourceFile = new File(transformationSource);
-        if(!sourceFile.exists()){
+        if (!sourceFile.exists()) {
             System.out.println("The given file does not exist. Cannot generate text vector file.");
             return;
         }
-        if(sourceFile.isDirectory()){
+        if (sourceFile.isDirectory()) {
             System.out.println("The specified file is a directory. Cannot generate text vector file.");
             return;
         }
@@ -613,10 +647,10 @@ public class Main {
     /**
      * If there are arguments that are not processed, they will be printed to the console for the user.
      */
-    private static void printIfIgnoredOptionsExist(){
-        if (ignoredArguments != null && ignoredArguments.size() > 0){
+    private static void printIfIgnoredOptionsExist() {
+        if (ignoredArguments != null && ignoredArguments.size() > 0) {
             System.out.println("\nThe following arguments were ignored:");
-            for(String s : ignoredArguments){
+            for (String s : ignoredArguments) {
                 System.out.println("\t- " + s);
             }
             System.out.println();
@@ -658,8 +692,8 @@ public class Main {
 
         // remove from set of ignored options.
         String removeFromIgnoredOptions = "";
-        for(String s : ignoredArguments){
-            if(element.equalsIgnoreCase(s)){
+        for (String s : ignoredArguments) {
+            if (element.equalsIgnoreCase(s)) {
                 removeFromIgnoredOptions = s;
                 break;
             }
@@ -702,6 +736,7 @@ public class Main {
 
     /**
      * Obtain the arguments that were not (yet) parsed.
+     *
      * @return Set of arguments that are not (yet) parsed.
      */
     public static HashSet<String> getIgnoredArguments() {
@@ -710,11 +745,12 @@ public class Main {
 
     /**
      * Perform the analysis of the vocabulary.
+     *
      * @param args The CLI args.
      */
-    public static void analyzeVocabulary(String[] args){
+    public static void analyzeVocabulary(String[] args) {
         // check the amount of parameters
-        if(args.length != 3){
+        if (args.length != 3) {
             System.out.println("ERROR: Two parameters are required for -analyzeVocab! Please use the command as stated below:\n" +
                     "-analyzeVocab <model_file> <training_file | entity_file>\n" +
                     "Please refer to the help for more information (-help).");
@@ -725,14 +761,14 @@ public class Main {
         System.out.println("Model file: " + args[1]);
         System.out.println("Entity file: " + args[2] + "\n\n");
 
-        if(args[2].endsWith(".txt")){
+        if (args[2].endsWith(".txt")) {
             System.out.println("Missing Concepts:");
-            for (String s : VocabularyAnalyzer.detectMissingEntities(args[1], args[2])){
+            for (String s : VocabularyAnalyzer.detectMissingEntities(args[1], args[2])) {
                 System.out.println(s);
             }
             System.out.println("\n\n");
             System.out.println("Additional Concepts:");
-            for (String s : VocabularyAnalyzer.detectAdditionalEntities(args[1], args[2])){
+            for (String s : VocabularyAnalyzer.detectAdditionalEntities(args[1], args[2])) {
                 System.out.println(s);
             }
         } else {
@@ -747,7 +783,7 @@ public class Main {
      * @return Help text as String.
      */
     public static String getHelp() {
-        return  "*****************\n" +
+        return "*****************\n" +
                 "* jRDF2Vec Help *\n" +
                 "*****************\n\n" +
 
@@ -877,5 +913,4 @@ public class Main {
         isEmbedText = false;
         Gensim.shutDown();
     }
-
 }
