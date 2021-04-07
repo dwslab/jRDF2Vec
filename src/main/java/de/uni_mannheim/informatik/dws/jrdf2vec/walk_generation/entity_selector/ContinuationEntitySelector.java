@@ -58,6 +58,13 @@ public class ContinuationEntitySelector implements EntitySelector {
                     "(new walks will be generated for all entities).");
             return entities;
         }
+        if(!newWalkDirectory.exists()){
+            if(newWalkDirectory.mkdirs()){
+                LOGGER.info("Created new walk directory: " + newWalkDirectory.getAbsolutePath());
+            } else {
+                LOGGER.error("Could not create new walk directory: " + newWalkDirectory.getAbsolutePath());
+            }
+        }
 
         Set<String> existingEntities = new HashSet<>();
         for(File file : existingWalkDirectory.listFiles()){
@@ -90,7 +97,7 @@ public class ContinuationEntitySelector implements EntitySelector {
                 LOGGER.info("Copy operation completed.");
             } catch (IOException e) {
                 LOGGER.error("Could not copy file '" + file.getAbsolutePath() + "' to directory '" +
-                        newWalkDirectory.getAbsolutePath() + "'");
+                        newWalkDirectory.getAbsolutePath() + "'", e);
             }
         }
 
@@ -101,7 +108,12 @@ public class ContinuationEntitySelector implements EntitySelector {
         return entities;
     }
 
-
+    /**
+     * Changes the provided file name (suffix {@code copied}) so that copied and newly generated walk files can be
+     * distinguished.
+     * @param name File name.
+     * @return New file name.
+     */
     public static String changeFilePathForCopy(String name){
         if(name.endsWith(".txt.gz")) {
             return name.substring(0, name.length() - 7) + "_copied.txt.gz";

@@ -694,8 +694,8 @@ class MainTest {
         String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
         Main.main(new String[]{"-graph", graphFilePath, "-light", entityFilePath, "-numberOfWalks", "-10", "-minCount", "-3"});
-        assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, ((RDF2VecLight) Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
-        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, ((RDF2VecLight) Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
+        assertEquals(Main.DEFAULT_NUMBER_OF_WALKS, (Main.getRdf2VecInstance()).getNumberOfWalksPerEntity());
+        assertEquals(Word2VecConfiguration.MIN_COUNT_DEFAULT, (Main.getRdf2VecInstance()).getWord2VecConfiguration().getMinCount());
         assertEquals(0, Main.getIgnoredArguments().size());
 
         // important: reset
@@ -1045,12 +1045,32 @@ class MainTest {
     }
 
     @Test
-    public void getValue() {
+    void getValue() {
         assertNull(Main.getValue(null, null));
         assertNull(Main.getValue(null, new String[]{"european", "union"}));
         assertNull(Main.getValue("hello", null));
         assertNull(Main.getValue("-hello", new String[]{"european", "union"}));
         assertEquals("union", Main.getValue("-european", new String[]{"-european", "union"}));
+    }
+
+    @Test
+    void continueOption(){
+        Main.reset();
+        File continueFile = loadFile("existing_walk_directory");
+        File graphFile = loadFile("pizza.owl.nt");
+        File walkDirectory = new File("continue_walks");
+        walkDirectory.deleteOnExit();
+        String[] mainCommand = {"-graph", graphFile.getAbsolutePath(), "-continue", continueFile.getAbsolutePath(),
+                "-walkDirectory", walkDirectory.getAbsolutePath()};
+        Main.main(mainCommand);
+
+        assertTrue(walkDirectory.exists());
+        assertTrue(new File(walkDirectory, "walk_file_copied.txt.gz").exists());
+        assertTrue(new File(walkDirectory, "walk_file_0.txt.gz").exists());
+        assertTrue(new File(walkDirectory, "model").exists());
+        assertTrue(new File(walkDirectory, "model.kv").exists());
+        deleteDirectory(walkDirectory);
+        Main.reset();
     }
 
     /**
@@ -1086,6 +1106,11 @@ class MainTest {
         deleteDirectory("./classicWalks/");
         deleteDirectory("./mainWalks/");
         deleteDirectory("./walksOnlyMidWeighted/");
+        deleteDirectory("./continue_walks/");
+    }
+
+    private static void deleteDirectory (File directory){
+        deleteDirectory(directory.getAbsolutePath());
     }
 
     private static void deleteDirectory(String directoryPath){

@@ -22,11 +22,12 @@ public class WalkGenerationManagerLight extends WalkGenerationManager {
 
     /**
      * Main Constructor
-     * @param knowledgeGraph
-     * @param entitiesFile
-     * @param isGenerateTextWalks
-     * @param existingWalks
-     * @param newWalkDirectory
+     * @param knowledgeGraph Knowledge graph URI.
+     * @param entitiesFile Entities file.
+     * @param isGenerateTextWalks True if text walks shall be generated.
+     * @param existingWalks Directory where existing walks reside.
+     * @param newWalkDirectory The directory where the new walks shall be written to. Must be different from
+     *                         {@code existingWalks}.
      */
     public WalkGenerationManagerLight(URI knowledgeGraph, File entitiesFile, boolean isGenerateTextWalks,
                                       File existingWalks, File newWalkDirectory){

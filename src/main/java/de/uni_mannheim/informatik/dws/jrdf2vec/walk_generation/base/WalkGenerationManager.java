@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream;
  * Default Walk Generator.
  * Intended to work on any data set.
  */
-public class WalkGenerationManager implements IWalkGenerationManager{
+public class WalkGenerationManager implements IWalkGenerationManager {
 
 
     /**
@@ -66,12 +66,12 @@ public class WalkGenerationManager implements IWalkGenerationManager{
     /**
      * For the statistical output.
      */
-    int processedEntities = 0;
+    long processedEntities = 0;
 
     /**
      * For the statistical output.
      */
-    int processedWalks = 0;
+    long processedWalks = 0;
 
     /**
      * For the statistical output.
@@ -178,7 +178,7 @@ public class WalkGenerationManager implements IWalkGenerationManager{
                             "if you use an entity selector that requires one ontology.");
                     this.walkGenerator = new NtMemoryWalkGenerator(isGenerateTextWalks);
                     ((NtMemoryWalkGenerator) this.walkGenerator).readNtTriplesFromDirectoryMultiThreaded(knowledgeGraphFile, false);
-                    if(isSetEntitySelector) {
+                    if (isSetEntitySelector) {
                         EntitySelector entitySelector =
                                 new MemoryEntitySelector(((NtMemoryWalkGenerator) this.walkGenerator).getData());
                         if(existingWalks == null){
@@ -623,7 +623,7 @@ public class WalkGenerationManager implements IWalkGenerationManager{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            int tmpNM = (processedWalks / 3000000);
+            long tmpNM = (processedWalks / 3000000);
             File newFile = new File(this.walkDirectory, "walk_file_" + tmpNM + ".txt.gz");
             try {
                 writer = new OutputStreamWriter(new GZIPOutputStream(

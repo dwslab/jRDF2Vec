@@ -191,7 +191,6 @@ public class RDF2Vec implements IRDF2Vec {
 
         WalkGenerationManager classicGenerator;
         if (useFile) {
-            // TODO
             classicGenerator = new WalkGenerationManager(getFile(this.knowledgeGraphUri).toURI(), isEmbedText(),
                     true, existingWalkDirectory, this.walkDirectory);
         } else {
