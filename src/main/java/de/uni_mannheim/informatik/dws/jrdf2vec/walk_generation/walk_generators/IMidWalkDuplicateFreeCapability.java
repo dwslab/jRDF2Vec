@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Capability: Generation of duplicate-free mid walks.
  */
-public interface IMidWalkDuplicateFreeCapability extends IWalkGenerator {
+public interface IMidWalkDuplicateFreeCapability extends IWalkGenerationCapability{
 
 
     /**

@@ -1,6 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.MemoryWalkGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Runnable for walk entity generation.
  */
-public class DatatypeWalkEntityProcessingRunnable implements Runnable {
+public class DatatypeWalkEntityRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatatypeWalkEntityProcessingRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatatypeWalkEntityRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -29,7 +29,7 @@ public class DatatypeWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generator for which this parser works.
      */
-    private IWalkGenerationManager walkGenerator;
+    private WalkGenerationManager walkGenerator;
 
     /**
      * Constructor.
@@ -39,7 +39,7 @@ public class DatatypeWalkEntityProcessingRunnable implements Runnable {
      * @param depth     Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                  this leads to more walk components than the specified depth.
      */
-    public DatatypeWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity, int depth) {
+    public DatatypeWalkEntityRunnable(WalkGenerationManager generator, String entity, int depth) {
         this.entity = entity;
         this.depth = depth;
         this.walkGenerator = generator;

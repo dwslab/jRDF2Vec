@@ -2,7 +2,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
 import java.util.List;
 
-public interface IMidWalkCapability extends IWalkGenerationCapability{
+public interface IMidTypeWalkDuplicateFreeCapability extends IWalkGenerationCapability {
 
 
     /**
@@ -12,5 +12,5 @@ public interface IMidWalkCapability extends IWalkGenerationCapability{
      * @param depth The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
-    List<String> generateMidWalksForEntity(String entity, int numberOfWalks, int depth);
+    List<String> generateMidTypeWalksForEntity(String entity, int numberOfWalks, int depth);
 }

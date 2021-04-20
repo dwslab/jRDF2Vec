@@ -1,18 +1,18 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidWalkDuplicateFreeCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
+public class DuplicateFreeMidWalkEntityRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(MidWalkEntityProcessingRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MidWalkEntityRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -32,7 +32,7 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generation manager.
      */
-    IWalkGenerationManager walkGenerationManager;
+    WalkGenerationManager walkGenerationManager;
 
     /**
      * Constructor.
@@ -43,8 +43,8 @@ public class DuplicateFreeMidWalkEntityProcessingRunnable implements Runnable {
      * @param depth    Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public DuplicateFreeMidWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity,
-                                                        int numberOfWalks, int depth) {
+    public DuplicateFreeMidWalkEntityRunnable(WalkGenerationManager generator, String entity,
+                                              int numberOfWalks, int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;

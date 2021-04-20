@@ -1,17 +1,20 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidWalkWeightedCapability;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
+/**
+ * Runnable for mid walk generation.
+ */
+public class MidWalkEntityRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(WeightedMidWalkEntityProcessingRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MidWalkEntityRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -31,7 +34,7 @@ public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generator for which this parser works.
      */
-    IWalkGenerationManager walkGenerationManager;
+    WalkGenerationManager walkGenerationManager;
 
     /**
      * Constructor.
@@ -42,8 +45,7 @@ public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
      * @param depth    Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public WeightedMidWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity, int numberOfWalks
-            , int depth) {
+    public MidWalkEntityRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;
@@ -54,8 +56,10 @@ public class WeightedMidWalkEntityProcessingRunnable implements Runnable {
      * Actual thread execution.
      */
     public void run() {
-        if(walkGenerationManager.getWalkGenerator() instanceof IMidWalkWeightedCapability){
-            walkGenerationManager.writeToFile(((IMidWalkWeightedCapability) walkGenerationManager.getWalkGenerator()).generateWeightedMidWalksForEntity(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
+        if(walkGenerationManager.getWalkGenerator()  instanceof IMidWalkCapability){
+            walkGenerationManager.writeToFile(((IMidWalkCapability) walkGenerationManager.getWalkGenerator()).generateMidWalksForEntity(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
         } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT WALK GENERATOR!");
     }
 }
+
+

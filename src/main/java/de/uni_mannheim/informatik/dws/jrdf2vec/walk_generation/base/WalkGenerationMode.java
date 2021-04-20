@@ -1,24 +1,16 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
-
-import java.io.File;
 
 /**
  * The available walk generation modes.
+ * Modes under evaluation are marked with prefix <pre>EXPERIMENTAL_</pre>. Experimental modes may have an implementation
+ * for only one Walk Generator (e.g. they may only work with memory walk generators).
+ *
  * <p>
  * Developer note:
  * <ul>
  * <li>
  *     There must be a runnable for each walk generation option.
- * </li>
- * <li>
- *      The must be a resolution in evey implementation of
- *      {@link IWalkGenerationManager#generateWalks(WalkGenerationMode, int, int, int, int, File)} that shall support
- *      this walk mode.
- *      This affects, for example
- *      {@link WalkGenerationManager#generateWalks(WalkGenerationMode, int, int, int, int, File)} or
- *      {@link WalkGenerationManagerLight#generateWalks(WalkGenerationMode, int, int, int, int, File)}.
  * </li>
  * </ul>
  */
@@ -54,7 +46,12 @@ public enum WalkGenerationMode {
      * Plain random walks generated in a forward-fashion (going backwards is not allowed).
      * Duplicates are not allowed.
      */
-    RANDOM_WALKS_DUPLICATE_FREE;
+    RANDOM_WALKS_DUPLICATE_FREE,
+
+    /**
+     * Generates mid walks but with only edges and the node of interest.
+     */
+    EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE;
 
 
     /**
@@ -94,5 +91,4 @@ public enum WalkGenerationMode {
         result = result.substring(0, result.length() - 3);
         return result;
     }
-
 }

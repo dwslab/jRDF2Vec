@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream;
  * Default Walk Generator.
  * Intended to work on any data set.
  */
-public class WalkGenerationManager implements IWalkGenerationManager {
+public class WalkGenerationManager {
 
 
     /**
@@ -217,7 +217,6 @@ public class WalkGenerationManager implements IWalkGenerationManager {
         this(new File(pathToTripleFile));
     }
 
-    @Override
     public void generateWalks(WalkGenerationMode generationMode, int numberOfThreads, int numberOfWalks, int depth,
                               int textWalkLength, File walkDirectory) {
         if (generationMode == null) {
@@ -238,6 +237,9 @@ public class WalkGenerationManager implements IWalkGenerationManager {
         } else if (generationMode == WalkGenerationMode.MID_WALKS_WEIGHTED) {
             System.out.println("Generate weighted mid walks...");
             this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
+        } else if (generationMode == WalkGenerationMode.EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE) {
+            System.out.println("Generate mid type walks duplicate free...");
+            generateRandomMidTypeWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else {
             System.out.println("ERROR. Cannot identify the \"walkGenenerationMode\" chosen. Aborting program.");
         }
@@ -270,7 +272,6 @@ public class WalkGenerationManager implements IWalkGenerationManager {
         generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
     }
 
-    @Override
     public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
         if(!isWalkGeneratorOk()) return;
         this.walkDirectory = walkDirectory;
@@ -289,6 +290,13 @@ public class WalkGenerationManager implements IWalkGenerationManager {
 
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
         generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
+    }
+
+    public void generateRandomMidTypeWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth,
+                                                     File walkDirectory) {
+        if(!isWalkGeneratorOk()) return;
+        this.walkDirectory = walkDirectory;
+        generateRandomMidTypeWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
     }
 
     public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
@@ -344,7 +352,7 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            RandomWalkEntityProcessingRunnable th = new RandomWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            RandomWalkEntityRunnable th = new RandomWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
 
@@ -403,7 +411,36 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            DuplicateFreeMidWalkEntityProcessingRunnable th = new DuplicateFreeMidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            DuplicateFreeMidWalkEntityRunnable th = new DuplicateFreeMidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
+            pool.execute(th);
+        }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(timeout, timeoutUnit);
+        } catch (InterruptedException e) {
+            LOGGER.error("Interrupted Exception");
+            e.printStackTrace();
+        }
+        flushWriter();
+    }
+
+    /**
+     * Generate TYPE walks for the entities that are duplicate free (i.e., no walk exists twice in the resulting file).
+     *
+     * @param entities        The entities for which walks shall be generated.
+     * @param numberOfThreads The number of threads to be used.
+     * @param numberOfWalks   The number of walks to be generated per thread.
+     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
+     */
+    public void generateRandomMidTypeWalksForEntitiesDuplicateFree(Set<String> entities, int numberOfThreads,
+                                                                int numberOfWalks, int walkLength) {
+        setOutputFileWriter();
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
+                0, TimeUnit.SECONDS,
+                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
+
+        for (String entity : entities) {
+            DuplicateFreeMidWalkEntityRunnable th = new DuplicateFreeMidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();
@@ -432,7 +469,7 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            WeightedMidWalkEntityProcessingRunnable th = new WeightedMidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            WeightedMidWalkEntityRunnable th = new WeightedMidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();
@@ -458,7 +495,7 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 0, TimeUnit.SECONDS,
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
         for (String entity : entities) {
-            DatatypeWalkEntityProcessingRunnable runnable = new DatatypeWalkEntityProcessingRunnable(this, entity,
+            DatatypeWalkEntityRunnable runnable = new DatatypeWalkEntityRunnable(this, entity,
                     walkLength);
             pool.execute(runnable);
         }
@@ -488,7 +525,7 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            MidWalkEntityProcessingRunnable th = new MidWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            MidWalkEntityRunnable th = new MidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();
@@ -517,7 +554,7 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            DuplicateFreeWalkEntityProcessingRunnable th = new DuplicateFreeWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            DuplicateFreeWalkEntityRunnable th = new DuplicateFreeWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();
@@ -546,7 +583,7 @@ public class WalkGenerationManager implements IWalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            RandomWalkEntityProcessingRunnable th = new RandomWalkEntityProcessingRunnable(this, entity, numberOfWalks, walkLength);
+            RandomWalkEntityRunnable th = new RandomWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();

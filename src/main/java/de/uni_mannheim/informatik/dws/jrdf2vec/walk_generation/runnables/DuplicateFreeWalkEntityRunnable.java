@@ -1,6 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.IWalkGenerationManager;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IRandomWalkDuplicateFreeCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 /**
  * A single task for the thread pool.
  */
-public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
+public class DuplicateFreeWalkEntityRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateFreeWalkEntityProcessingRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateFreeWalkEntityRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -34,7 +34,7 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
     /**
      * The walk generation manager.
      */
-    IWalkGenerationManager walkGenerationManager;
+    WalkGenerationManager walkGenerationManager;
 
     /**
      * Constructor.
@@ -44,7 +44,7 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
      * @param numberOfWalks The number of walks to be performed per entity.
      * @param depth Desired length of the walk.
      */
-    public DuplicateFreeWalkEntityProcessingRunnable(IWalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
+    public DuplicateFreeWalkEntityRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;
@@ -56,7 +56,10 @@ public class DuplicateFreeWalkEntityProcessingRunnable implements Runnable {
      */
     public void run() {
         if(walkGenerationManager.getWalkGenerator()  instanceof IRandomWalkDuplicateFreeCapability){
-            walkGenerationManager.writeToFile(((IRandomWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator()).generateDuplicateFreeRandomWalksForEntity(walkGenerationManager.shortenUri(entity), numberOfWalks, this.depth));
+            walkGenerationManager
+                    .writeToFile(
+                            ((IRandomWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
+                                    .generateDuplicateFreeRandomWalksForEntity(walkGenerationManager.shortenUri(entity), numberOfWalks, this.depth));
         } else {
             LOGGER.error("NOT YET IMPLEMENTED FOR THIS WALK GENERATOR (" + walkGenerationManager.getWalkGenerator().getClass() + ")!" +
                     " Make sure" +
