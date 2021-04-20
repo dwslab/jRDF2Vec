@@ -13,4 +13,12 @@ class WalkGenerationModeTest {
         assertFalse(result.endsWith("|"));
         //System.out.println(result);
     }
+
+
+    @Test
+    void assertImplementationOfGetModeFromString(){
+        for(WalkGenerationMode mode : WalkGenerationMode.values()){
+            assertNotNull(WalkGenerationMode.getModeFromString(mode.toString()), "Failure for " + mode.toString());
+        }
+    }
 }

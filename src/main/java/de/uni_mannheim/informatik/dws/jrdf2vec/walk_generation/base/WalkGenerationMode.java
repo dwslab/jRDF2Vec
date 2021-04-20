@@ -73,6 +73,9 @@ public enum WalkGenerationMode {
                 return RANDOM_WALKS;
             case "random_walks_duplicate_free":
                 return RANDOM_WALKS_DUPLICATE_FREE;
+            case "experimental_mid_type_walks_duplicate_free":
+            case "mid_type_walks_duplicate_free":
+                return EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE;
             default:
                 return null;
         }

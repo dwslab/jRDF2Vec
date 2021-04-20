@@ -66,6 +66,79 @@ class NtMemoryWalkGeneratorTest {
     }
 
     @Test
+    void generateMidTypeWalksForEntityDuplicateFree(){
+        NtMemoryWalkGenerator parser = new NtMemoryWalkGenerator(loadFile("dummyGraph.nt").getAbsolutePath());
+        List<String> result_1 = parser.generateMidTypeWalksForEntityDuplicateFree("A", 100, 8);
+
+        // for debugging
+        //for(String s : result_1) System.out.println(s);
+
+        // A never (!) appears as object. Hence all walks must start with A. Afterwards all walks must
+        // start with P in this example.
+        for(String walk : result_1){
+            String[] tokens = walk.split(" ");
+            for(int i = 0; i< tokens.length; i++){
+                if(i == 0){
+                    assertEquals("A", tokens[i]);
+                } else {
+                    assertTrue(tokens[i].startsWith("P"));
+                }
+            }
+        }
+
+        List<String> result_2 = parser.generateMidTypeWalksForEntityDuplicateFree("V2", 100, 8);
+
+        // for debugging
+        // for(String s : result_2) System.out.println(s);
+
+        // V2 is referred to. Make sure there is only one non-property in the walk which is V2.
+        for(String walk : result_2){
+            boolean containsV2 = false;
+            for(String token : walk.split(" ")){
+                if(token.equals("V2")){
+                    assertFalse(containsV2);
+                    containsV2 = true;
+                } else {
+                    assertTrue(token.startsWith("P"));
+                }
+            }
+            assertTrue(containsV2);
+        }
+
+        // check with infinity loops:
+        parser = new NtMemoryWalkGenerator(loadFile("dummyGraph_3.nt").getAbsolutePath());
+        List<String> result_3 = parser.generateMidTypeWalksForEntityDuplicateFree("V1", 100, 8);
+
+        // for debugging
+        for(String s : result_3) System.out.println(s);
+
+
+        // V2 is referred to. Make sure there is only one non-property in the walk which is V2.
+        for(String walk : result_3){
+            boolean containsV1 = false;
+            String[] tokens = walk.split(" ");
+
+            // ensure a correct walk length
+            // TODO: Check intention
+            // Node of interest only once -> use 9
+            // General case -> use 2 * depth + 1
+            assertTrue(tokens.length <= 17, "Problematic Walk:\n" + walk);
+
+            for(String token : tokens){
+                if(token.equals("V1")){
+                    // TODO: evaluate whether this is really intended here:
+                    //assertFalse(containsV1);
+                    containsV1 = true;
+                } else {
+                    assertTrue(token.startsWith("P"));
+                }
+            }
+
+            assertTrue(containsV1);
+        }
+    }
+
+    @Test
     void testDepthForRandomWalks(){
         String graphPath = loadFile("dummyGraph_3.nt").getAbsolutePath();
         NtMemoryWalkGenerator parser = new NtMemoryWalkGenerator(graphPath);
@@ -95,7 +168,6 @@ class NtMemoryWalkGeneratorTest {
 
         assertEquals(1 + 2 * 8, maxLengh);
 
-
         List<String> result_4 = parser.generateDuplicateFreeRandomWalksForEntity("W", 100, 1);
         System.out.println("\nWalks 4");
         for(String s : result_4) System.out.println(s);
@@ -108,7 +180,6 @@ class NtMemoryWalkGeneratorTest {
 
         assertEquals(3, maxLengh);
     }
-
 
     @Test
     void generateMidWalksForEntity(){
@@ -124,13 +195,13 @@ class NtMemoryWalkGeneratorTest {
             assertNotNull(walks1);
 
             // check number of generated walks
-            assertTrue(walks1.size() == 12);
+            assertEquals(walks1.size(), 12);
 
             nextWalk:
             for (String walk : walks1) {
 
                 // check walk size
-                assertTrue((walk.split(" ").length % 2) == 1.0, "Walks must be uneven. Number of elements in walk: " + walk.split(" ").length + "\nWalk:\n" + walk);
+                assertEquals((walk.split(" ").length % 2), 1.0, "Walks must be uneven. Number of elements in walk: " + walk.split(" ").length + "\nWalk:\n" + walk);
 
                 for (String component : walk.split(" ")) {
                     if (component.equals(concept)) {
@@ -154,9 +225,7 @@ class NtMemoryWalkGeneratorTest {
                                 + "\nSentence:\n" + walk);
                     }
                 }
-            } catch (IOException e) {
-                fail("No exception should occur.", e);
-            } catch (NotFoundException e) {
+            } catch (Exception e) {
                 fail("No exception should occur.", e);
             } finally {
                 fileToUse.delete();
@@ -198,9 +267,7 @@ class NtMemoryWalkGeneratorTest {
                                 + walkArray[i - 2] + " " + walkArray[i - 1] + " " + walkArray[i]
                                 + "\nSentence:\n" + walk1);
                     }
-                } catch (NotFoundException e) {
-                    fail("Exception", e);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     fail("Exception", e);
                 } finally {
                     fileToUse.delete();

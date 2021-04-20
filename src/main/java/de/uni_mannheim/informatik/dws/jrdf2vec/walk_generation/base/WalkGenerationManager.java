@@ -440,7 +440,7 @@ public class WalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            DuplicateFreeMidWalkEntityRunnable th = new DuplicateFreeMidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
+            DuplicateFreeMidTypeWalkEntityRunnable th = new DuplicateFreeMidTypeWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();

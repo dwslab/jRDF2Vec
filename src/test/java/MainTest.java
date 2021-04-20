@@ -797,6 +797,53 @@ class MainTest {
         walkDirectory.delete();
     }
 
+    @Test
+    public void midTypeWalksDuplicateFree() {
+        File graphFileToUse = loadFile("./dummyGraph_3.nt");
+        String directoryName = "./midTypeWalksDuplicateFreeDirectory";
+        File directory = new File(directoryName);
+        directory.deleteOnExit();
+        Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "10", "-walkDir",
+                directoryName, "-walkGenerationMode", "MID_TYPE_WALKS_DUPLICATE_FREE", "-depth", "3"});
+
+        // check ignored arguments
+        assertEquals(0, Main.getIgnoredArguments().size());
+
+        // make sure that there is only a walk file
+        HashSet<String> files = Sets.newHashSet(directory.list());
+        assertTrue(files.contains("model.kv"));
+
+        // now check out the walk file
+        try {
+            File walkFile = new File(directory, "walk_file_0.txt.gz");
+            assertTrue(walkFile.exists(), "The walk file does not exist.");
+            assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
+
+            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(walkFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+
+            String readLine;
+            int numberOfLines = 0;
+            while ((readLine = reader.readLine()) != null) {
+                numberOfLines++;
+                //System.out.println(readLine);
+
+                String[] tokens = readLine.split(" ");
+                for(String token : tokens){
+                    // TODO token specific tests... if desired
+                }
+            }
+            assertTrue(numberOfLines > 10);
+            reader.close();
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+            fail("Could not read from walk file due to a file not found exception.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Could not read from walk file.");
+        }
+    }
+
     /**
      * Weighted mid walk generation.
      */
@@ -1107,6 +1154,7 @@ class MainTest {
         deleteDirectory("./mainWalks/");
         deleteDirectory("./walksOnlyMidWeighted/");
         deleteDirectory("./continue_walks/");
+        deleteDirectory("./midTypeWalksDuplicateFreeDirectory");
     }
 
     private static void deleteDirectory (File directory){

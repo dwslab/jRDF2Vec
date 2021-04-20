@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
  */
 public abstract class MemoryWalkGenerator implements IWalkGenerator,
         IMidWalkCapability, IMidWalkDuplicateFreeCapability, IRandomWalkDuplicateFreeCapability,
-        IMidWalkWeightedCapability {
+        IMidWalkWeightedCapability, IMidTypeWalkDuplicateFreeCapability {
 
 
     /**
@@ -153,6 +153,8 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
         return result;
     }
 
+
+
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
      *
@@ -170,8 +172,8 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * Walks of length 1, i.e., walks that contain only one node, are ignored.
      *
      * @param entity        The entity for which walks shall be generated.
-     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @param numberOfWalks The number of walks to be performed.
+     * @param depth         The depth of each walk (where the depth is the number of hops).
      * @return A data structure describing the walks.
      */
     public List<List<String>> generateMidWalkForEntityAsArray(String entity, int numberOfWalks, int depth) {
@@ -193,9 +195,42 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * @param depth         The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
+    @Override
     public List<String> generateMidWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth) {
-        return Util.convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, depth, numberOfWalks));
+        return Util.convertToStringWalksDuplicateFree(generateMidWalkForEntityAsArray(entity, numberOfWalks, depth));
     }
+
+    /**
+     * Generates walks that are ready to be processed further (already concatenated, space-separated).
+     * @param entity The entity for which a walk shall be generated.
+     * @param numberOfWalks The number of walks to be generated.
+     * @param depth The depth of each walk.
+     * @return List where every item is a walk separated by spaces.
+     */
+    @Override
+    public List<String> generateMidTypeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
+        List<List<String>> walksWithNodes = generateMidWalkForEntityAsArray(entity, numberOfWalks, depth);
+        List<List<String>> result = new ArrayList<>();
+        for(List<String> walkWithNodes : walksWithNodes){
+            List<String> walk = new ArrayList<>();
+            for(int i = 0; i < walkWithNodes.size(); i++){
+                if(i % 2 == 0){
+                    String node = walkWithNodes.get(i);
+                    if(node.equals(entity)){
+                        walk.add(node);
+                    } else {
+                        continue;
+                    }
+                } else {
+                    String edge = walkWithNodes.get(i);
+                    walk.add(edge);
+                }
+            }
+            result.add(walk);
+        }
+        return Util.convertToStringWalksDuplicateFree(result);
+    }
+
 
     /**
      * Generates a single walk for the given entity with the given depth.

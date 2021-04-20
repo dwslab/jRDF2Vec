@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Runnable for type walks.
  */
-public class DuplicateFreeMidTypeWalkEntityRunnable {
+public class DuplicateFreeMidTypeWalkEntityRunnable implements Runnable {
 
 
     /**
@@ -64,7 +64,7 @@ public class DuplicateFreeMidTypeWalkEntityRunnable {
             walkGenerationManager
                     .writeToFile(
                             ((IMidTypeWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
-                                    .generateMidTypeWalksForEntity(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
+                                    .generateMidTypeWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
         } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT WALK GENERATOR!");
     }
 }

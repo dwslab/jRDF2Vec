@@ -12,5 +12,5 @@ public interface IMidTypeWalkDuplicateFreeCapability extends IWalkGenerationCapa
      * @param depth The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
-    List<String> generateMidTypeWalksForEntity(String entity, int numberOfWalks, int depth);
+    List<String> generateMidTypeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth);
 }
