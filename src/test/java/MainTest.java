@@ -87,7 +87,7 @@ class MainTest {
     }
 
     @Test
-    void trainWithMixedInputFilesCommandLine(){
+    void trainWithMixedInputFilesCommandLine() {
         LOGGER.info("Running test: trainWithMixedInputFilesCommandLine()");
         File graphFilePath = new File(loadFile("mixedWalkDirectory").getAbsolutePath());
         Main.main(new String[]{"-graph", graphFilePath.getAbsolutePath(), "-dimension", "100", "-depth", "4", "-trainingMode", "sg", "-numberOfWalks", "100", "-walkGenerationMode", "RANDOM_WALKS_DUPLICATE_FREE"});
@@ -108,7 +108,7 @@ class MainTest {
     }
 
     @Test
-    public void onlyTraining(){
+    public void onlyTraining() {
         LOGGER.info("Running test: onlyTraining()");
         String walkDirectory = loadFile("walk_directory_test").getAbsolutePath();
         Main.main(new String[]{"-onlyTraining", "-walkDirectory", walkDirectory, "-dimensions", "80"});
@@ -137,7 +137,7 @@ class MainTest {
      * Just making sure that the program does not fail if used inappropriately.
      */
     @Test
-    public void onlyTrainingFail(){
+    public void onlyTrainingFail() {
         LOGGER.info("Running test: onlyTrainingFail()");
         Main.main(new String[]{"-onlyTraining"});
         Main.main(new String[]{"-onlyTraining", "-minCount", "5"});
@@ -150,7 +150,7 @@ class MainTest {
      */
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    public void trainClassicNoTextVectorFile(boolean isRunOnDefaultPort){
+    public void trainClassicNoTextVectorFile(boolean isRunOnDefaultPort) {
         LOGGER.info("Running test: trainClassicNoTextVectorFile()");
         String walkPath = "./mainWalks/";
         File walkDirectory = new File(walkPath);
@@ -159,7 +159,7 @@ class MainTest {
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
 
         String[] args;
-        if(isRunOnDefaultPort){
+        if (isRunOnDefaultPort) {
             args = new String[]{"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration"};
         } else {
             // run on other port
@@ -201,7 +201,7 @@ class MainTest {
      * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
      */
     @Test
-    public void trainClassicWithNqFile(){
+    public void trainClassicWithNqFile() {
         String walkPath = "./mainWalksNq/";
         File walkDirectory = new File(walkPath);
         walkDirectory.mkdir();
@@ -232,7 +232,7 @@ class MainTest {
     }
 
     @Test
-    public void trainClassicWithOwlFileTextGeneration(){
+    public void trainClassicWithOwlFileTextGeneration() {
         String walkPath = "." + File.separator + "mainWalksOwlText" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
@@ -272,7 +272,7 @@ class MainTest {
      * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
      */
     @Test
-    public void trainClassicWithNtFileTextGeneration(){
+    public void trainClassicWithNtFileTextGeneration() {
         Main.reset();
         String walkPath = "." + File.separator + "mainWalksNtText" + File.separator;
         File walkDirectory = new File(walkPath);
@@ -297,7 +297,7 @@ class MainTest {
         List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file_0.txt.gz"));
 
         // make sure that we do not paste mass text
-        for(String line : lines){
+        for (String line : lines) {
             assertTrue(line.split(" ").length <= 8);
         }
 
@@ -318,8 +318,8 @@ class MainTest {
      * Testing whether a vector text file is not generated for classic if it is explicitly stated so.
      */
     @Test
-    public void trainLightWithNtFileTextGeneration(){
-        String walkPath = "." + File.separator +  "mainWalksNtText_light" + File.separator;
+    public void trainLightWithNtFileTextGeneration() {
+        String walkPath = "." + File.separator + "mainWalksNtText_light" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
         walkDirectory.mkdir();
@@ -343,7 +343,7 @@ class MainTest {
         List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file_0.txt.gz"));
 
         // make sure that we do not paste mass text
-        for(String line : lines){
+        for (String line : lines) {
             String[] splitLine = line.split(" ");
             assertTrue(splitLine.length <= 8);
             assertTrue(splitLine[0].equals("W") || splitLine[0].equals("Z"));
@@ -351,7 +351,7 @@ class MainTest {
 
         // look for specific walk
         String expectedString = "W rdf:Description freude schöner götterfunken tochter aus elysium";
-        assertTrue(lines.contains(expectedString), "Could not find the expected line: '" + expectedString + "'\nIn the walks\n:" + transformToString(lines) );
+        assertTrue(lines.contains(expectedString), "Could not find the expected line: '" + expectedString + "'\nIn the walks\n:" + transformToString(lines));
 
         // test sample parameter
         assertEquals(0.01, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
@@ -365,59 +365,60 @@ class MainTest {
 
     /**
      * Transform the toBeTransformed list to a single string.
+     *
      * @param toBeTransformed List that shall be converted into a single String.
      * @return Single String.
      */
-    private String transformToString(List<String> toBeTransformed){
+    private String transformToString(List<String> toBeTransformed) {
         StringBuilder buffer = new StringBuilder();
-        for(String s : toBeTransformed){
+        for (String s : toBeTransformed) {
             buffer.append(s).append("\n");
         }
         return buffer.toString();
     }
 
     @Test
-    public void analyzeVocabFail(){
+    public void analyzeVocabFail() {
         // just making sure nothing fails
         try {
             Main.main(new String[]{"-analyzeVocab", "b"});
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("An exception occurred while calling the analysis wrongly. This should fail gracefully.");
             fail(e);
         }
     }
 
     @Test
-    void analyzeVocabWithInputFile(){
+    void analyzeVocabWithInputFile() {
         // This just tests whether everything works fine end-to-end.
         // It is hard to check the console output for correctness.
         // The correct results for the test cases stated here are checked in the test of the VocabularyAnalyzer!
         try {
             Main.main(new String[]{"-analyzeVocabulary", getPathOfResource("pizza_full_model.kv"), getPathOfResource("pizza.ttl")});
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("An exception occurred while calling the analysis. This should not fail.");
             fail(e);
         }
     }
 
     @Test
-    void analyzeVocabWithEntityFile(){
+    void analyzeVocabWithEntityFile() {
         // This just tests whether everything works fine end-to-end.
         // It is hard to check the console output for correctness.
         // The correct results for the test cases stated here are checked in the test of the VocabularyAnalyzer!
         try {
             Main.main(new String[]{"-analyzeVocab", getPathOfResource("freude_vectors.txt"), getPathOfResource("freude_vectors_incomplete_concepts.txt")});
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("An exception occurred while calling the analysis. This should not fail.");
             fail(e);
         }
     }
 
     @Test
-    public void testTxtVectorGeneration(){
+    public void testTxtVectorGeneration() {
         String modelFilePath = loadFile("test_model_vectors.kv").getAbsolutePath();
         File modelFile = new File(modelFilePath);
-        if(!modelFile.exists()){
+        if (!modelFile.exists()) {
             fail("Could not find required test file.");
         }
         String[] args = {"-generateTxtVectorFile", modelFilePath};
@@ -429,10 +430,10 @@ class MainTest {
     }
 
     @Test
-    public void testTxtVectorGenerationFail(){
+    public void testTxtVectorGenerationFail() {
         String modelFilePath = loadFile("test_model_vectors.kv").getAbsolutePath();
         File modelFile = new File(modelFilePath);
-        if(!modelFile.exists()){
+        if (!modelFile.exists()) {
             fail("Could not find required test file.");
         }
         String[] args = {"-generateTxtVectorFile"};
@@ -665,7 +666,7 @@ class MainTest {
     }
 
     @Test
-    void checkRequirements(){
+    void checkRequirements() {
         Main.main(new String[]{"-checkInstallation"});
     }
 
@@ -680,11 +681,11 @@ class MainTest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(vocabFile), StandardCharsets.UTF_8));
             Set<String> vocabulary = new HashSet<>();
             String line;
-            while((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 vocabulary.add(line);
             }
             assertTrue(vocabulary.contains("Europe"));
-        } catch (IOException  e) {
+        } catch (IOException e) {
             fail(e);
         }
     }
@@ -800,11 +801,11 @@ class MainTest {
     @Test
     public void midTypeWalksDuplicateFree() {
         File graphFileToUse = loadFile("./dummyGraph_3.nt");
-        String directoryName = "./midTypeWalksDuplicateFreeDirectory";
+        String directoryName = "./midEdgeWalksDuplicateFreeDirectory";
         File directory = new File(directoryName);
         directory.deleteOnExit();
         Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "10", "-walkDir",
-                directoryName, "-walkGenerationMode", "MID_TYPE_WALKS_DUPLICATE_FREE", "-depth", "3"});
+                directoryName, "-walkGenerationMode", "MID_EDGE_WALKS_DUPLICATE_FREE", "-depth", "3"});
 
         // check ignored arguments
         assertEquals(0, Main.getIgnoredArguments().size());
@@ -829,8 +830,12 @@ class MainTest {
                 //System.out.println(readLine);
 
                 String[] tokens = readLine.split(" ");
-                for(String token : tokens){
-                    // TODO token specific tests... if desired
+                boolean nonPropertyAppeared = false;
+                for (String token : tokens) {
+                    if (!token.startsWith("P")) {
+                        assertFalse(nonPropertyAppeared);
+                        nonPropertyAppeared = true;
+                    }
                 }
             }
             assertTrue(numberOfLines > 10);
@@ -1101,7 +1106,7 @@ class MainTest {
     }
 
     @Test
-    void continueOption(){
+    void continueOption() {
         Main.reset();
         File continueFile = loadFile("existing_walk_directory");
         File graphFile = loadFile("pizza.owl.nt");
@@ -1122,15 +1127,16 @@ class MainTest {
 
     /**
      * Helper function to load files in class path that contain spaces.
+     *
      * @param fileName Name of the file.
      * @return File in case of success, else null.
      */
-    private File loadFile(String fileName){
+    private File loadFile(String fileName) {
         try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
+            File result = FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
             assertTrue(result.exists(), "Required resource not available.");
             return result;
-        } catch (URISyntaxException | MalformedURLException exception){
+        } catch (URISyntaxException | MalformedURLException exception) {
             exception.printStackTrace();
             fail("Could not load file.");
             return null;
@@ -1154,14 +1160,14 @@ class MainTest {
         deleteDirectory("./mainWalks/");
         deleteDirectory("./walksOnlyMidWeighted/");
         deleteDirectory("./continue_walks/");
-        deleteDirectory("./midTypeWalksDuplicateFreeDirectory");
+        deleteDirectory("./midEdgeWalksDuplicateFreeDirectory");
     }
 
-    private static void deleteDirectory (File directory){
+    private static void deleteDirectory(File directory) {
         deleteDirectory(directory.getAbsolutePath());
     }
 
-    private static void deleteDirectory(String directoryPath){
+    private static void deleteDirectory(String directoryPath) {
         try {
             FileUtils.deleteDirectory(new File(directoryPath));
         } catch (IOException e) {
@@ -1171,13 +1177,14 @@ class MainTest {
 
     /**
      * Helper method to obtain the canonical path of a (test) resource.
+     *
      * @param resourceName File/directory name.
      * @return Canonical path of resource.
      */
-    public String getPathOfResource(String resourceName){
+    public String getPathOfResource(String resourceName) {
         try {
             URL res = getClass().getClassLoader().getResource(resourceName);
-            if(res == null) throw new IOException();
+            if (res == null) throw new IOException();
             File file = Paths.get(res.toURI()).toFile();
             return file.getCanonicalPath();
         } catch (URISyntaxException | IOException ex) {

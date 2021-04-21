@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
  */
 public abstract class MemoryWalkGenerator implements IWalkGenerator,
         IMidWalkCapability, IMidWalkDuplicateFreeCapability, IRandomWalkDuplicateFreeCapability,
-        IMidWalkWeightedCapability, IMidTypeWalkDuplicateFreeCapability {
+        IMidWalkWeightedCapability, IMidEdgeWalkDuplicateFreeCapability {
 
 
     /**
@@ -154,7 +154,6 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
     }
 
 
-
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
      *
@@ -202,24 +201,38 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).
-     * @param entity The entity for which a walk shall be generated.
+     *
+     * @param entity        The entity for which a walk shall be generated.
      * @param numberOfWalks The number of walks to be generated.
-     * @param depth The depth of each walk.
+     * @param depth         The depth of each walk.
      * @return List where every item is a walk separated by spaces.
      */
     @Override
-    public List<String> generateMidTypeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
+    public List<String> generateMidEdgeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth) {
         List<List<String>> walksWithNodes = generateMidWalkForEntityAsArray(entity, numberOfWalks, depth);
         List<List<String>> result = new ArrayList<>();
-        for(List<String> walkWithNodes : walksWithNodes){
+        for (List<String> walkWithNodes : walksWithNodes) {
+
+            // determine how often the entity appears
+            int appearances = getNumberOfAppearances(entity, walkWithNodes);
+
+            // draw the desired position to keep
+            int choice = getRandomNumberBetweenZeroAndX(appearances);
+
             List<String> walk = new ArrayList<>();
-            for(int i = 0; i < walkWithNodes.size(); i++){
-                if(i % 2 == 0){
+            int currentNodeOfInterestPosition = 0;
+            for (int i = 0; i < walkWithNodes.size(); i++) {
+                if (i % 2 == 0) {
                     String node = walkWithNodes.get(i);
-                    if(node.equals(entity)){
-                        walk.add(node);
-                    } else {
-                        continue;
+                    if (node.equals(entity)) {
+                        // we found the node of interest
+                        if (currentNodeOfInterestPosition == choice) {
+                            walk.add(node);
+                            currentNodeOfInterestPosition++;
+                        } else {
+                            // -> we will not add the node of interest this time
+                            currentNodeOfInterestPosition++;
+                        }
                     }
                 } else {
                     String edge = walkWithNodes.get(i);
@@ -231,6 +244,30 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
         return Util.convertToStringWalksDuplicateFree(result);
     }
 
+    /**
+     * Count how often entity appears in array and return result.
+     *
+     * @param entity Entity.
+     * @param array  String array.
+     * @return Number of times the entity appears in the array.
+     */
+    static int getNumberOfAppearances(String entity, Iterable<String> array) {
+        int result = 0;
+        for (String s : array) {
+            if (s.equals(entity)) result++;
+        }
+        return result;
+    }
+
+    /**
+     * Returns a random number between 0 and x (exclusive!).
+     *
+     * @param x Integer upper bound (exclusive).
+     * @return Integer
+     */
+    static int getRandomNumberBetweenZeroAndX(int x) {
+        return ThreadLocalRandom.current().nextInt(x);
+    }
 
     /**
      * Generates a single walk for the given entity with the given depth.

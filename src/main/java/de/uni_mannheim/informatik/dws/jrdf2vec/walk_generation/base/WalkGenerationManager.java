@@ -237,7 +237,7 @@ public class WalkGenerationManager {
         } else if (generationMode == WalkGenerationMode.MID_WALKS_WEIGHTED) {
             System.out.println("Generate weighted mid walks...");
             this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE) {
+        } else if (generationMode == WalkGenerationMode.EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE) {
             System.out.println("Generate mid type walks duplicate free...");
             generateRandomMidTypeWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
         } else {
@@ -440,7 +440,7 @@ public class WalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            DuplicateFreeMidTypeWalkEntityRunnable th = new DuplicateFreeMidTypeWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
+            DuplicateFreeMidEdgeWalkEntityRunnable th = new DuplicateFreeMidEdgeWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
             pool.execute(th);
         }
         pool.shutdown();

@@ -4,7 +4,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.T
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.TripleDataSetMemory;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
@@ -68,7 +67,7 @@ class NtMemoryWalkGeneratorTest {
     @Test
     void generateMidTypeWalksForEntityDuplicateFree(){
         NtMemoryWalkGenerator parser = new NtMemoryWalkGenerator(loadFile("dummyGraph.nt").getAbsolutePath());
-        List<String> result_1 = parser.generateMidTypeWalksForEntityDuplicateFree("A", 100, 8);
+        List<String> result_1 = parser.generateMidEdgeWalksForEntityDuplicateFree("A", 100, 8);
 
         // for debugging
         //for(String s : result_1) System.out.println(s);
@@ -86,7 +85,7 @@ class NtMemoryWalkGeneratorTest {
             }
         }
 
-        List<String> result_2 = parser.generateMidTypeWalksForEntityDuplicateFree("V2", 100, 8);
+        List<String> result_2 = parser.generateMidEdgeWalksForEntityDuplicateFree("V2", 100, 8);
 
         // for debugging
         // for(String s : result_2) System.out.println(s);
@@ -107,7 +106,7 @@ class NtMemoryWalkGeneratorTest {
 
         // check with infinity loops:
         parser = new NtMemoryWalkGenerator(loadFile("dummyGraph_3.nt").getAbsolutePath());
-        List<String> result_3 = parser.generateMidTypeWalksForEntityDuplicateFree("V1", 100, 8);
+        List<String> result_3 = parser.generateMidEdgeWalksForEntityDuplicateFree("V1", 100, 8);
 
         // for debugging
         for(String s : result_3) System.out.println(s);
@@ -119,21 +118,19 @@ class NtMemoryWalkGeneratorTest {
             String[] tokens = walk.split(" ");
 
             // ensure a correct walk length
-            // TODO: Check intention
             // Node of interest only once -> use 9
             // General case -> use 2 * depth + 1
-            assertTrue(tokens.length <= 17, "Problematic Walk:\n" + walk);
+            assertTrue(tokens.length <= 9, "Problematic Walk:\n" + walk);
 
             for(String token : tokens){
                 if(token.equals("V1")){
-                    // TODO: evaluate whether this is really intended here:
-                    //assertFalse(containsV1);
+                    // make sure our node of interest appears only once
+                    assertFalse(containsV1);
                     containsV1 = true;
                 } else {
                     assertTrue(token.startsWith("P"));
                 }
             }
-
             assertTrue(containsV1);
         }
     }

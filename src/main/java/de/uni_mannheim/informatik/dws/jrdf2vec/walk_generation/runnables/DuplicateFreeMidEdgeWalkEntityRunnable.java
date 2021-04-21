@@ -1,7 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.runnables;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidTypeWalkDuplicateFreeCapability;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidEdgeWalkDuplicateFreeCapability;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.IMidWalkCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,13 +9,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Runnable for type walks.
  */
-public class DuplicateFreeMidTypeWalkEntityRunnable implements Runnable {
+public class DuplicateFreeMidEdgeWalkEntityRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateFreeMidTypeWalkEntityRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateFreeMidEdgeWalkEntityRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -46,7 +46,7 @@ public class DuplicateFreeMidTypeWalkEntityRunnable implements Runnable {
      * @param depth         Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public DuplicateFreeMidTypeWalkEntityRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
+    public DuplicateFreeMidEdgeWalkEntityRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;
@@ -63,8 +63,8 @@ public class DuplicateFreeMidTypeWalkEntityRunnable implements Runnable {
 
             walkGenerationManager
                     .writeToFile(
-                            ((IMidTypeWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
-                                    .generateMidTypeWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
+                            ((IMidEdgeWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
+                                    .generateMidEdgeWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
         } else LOGGER.error("NOT YET IMPLEMENTED FOR THE CURRENT WALK GENERATOR!");
     }
 }
