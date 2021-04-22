@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
  */
 public abstract class MemoryWalkGenerator implements IWalkGenerator,
         IMidWalkCapability, IMidWalkDuplicateFreeCapability, IRandomWalkDuplicateFreeCapability,
-        IMidWalkWeightedCapability, IMidEdgeWalkDuplicateFreeCapability {
+        IMidWalkWeightedCapability, IMidEdgeWalkDuplicateFreeCapability, IRandomWalkCapability {
 
 
     /**
@@ -454,6 +454,37 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
 
         // now we need to translate our walks into strings
         return Util.convertToStringWalks(walks, entity, isUnifyAnonymousNodes());
+    }
+
+
+    @Override
+    public List<String> generateRandomWalksForEntity(String entity, int numberOfWalks, int depth){
+        List<String> result = new ArrayList<>();
+        int currentDepth;
+        String currentWalk;
+        int currentWalkNumber = 0;
+
+        nextWalk:
+        while (currentWalkNumber < numberOfWalks) {
+            currentWalkNumber++;
+            String lastObject = entity;
+            currentWalk = entity;
+            currentDepth = 0;
+            while (currentDepth < depth) {
+                currentDepth++;
+                Triple po = getRandomTripleForSubjectWithoutTags(lastObject);
+                if(po != null){
+                    currentWalk += " " + uriShortenerFunction.apply(po.predicate) + " " + uriShortenerFunction.apply(po.object);
+                    lastObject = po.object;
+                } else {
+                    // The current walk cannot be continued -> add to list (if there is a walk of depth 1) and create next walk.
+                    if(currentWalk.length() != entity.length()) result.add(currentWalk);
+                    continue nextWalk;
+                }
+            }
+            result.add(currentWalk);
+        }
+        return result;
     }
 
     /**

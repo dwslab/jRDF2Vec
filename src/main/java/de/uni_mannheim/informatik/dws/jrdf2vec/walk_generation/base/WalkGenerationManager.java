@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -97,16 +96,17 @@ public class WalkGenerationManager {
 
     /**
      * Constructor
+     *
      * @param ontModel Model for which walks shall be generated.
      */
-    public WalkGenerationManager(OntModel ontModel){
+    public WalkGenerationManager(OntModel ontModel) {
         this(ontModel, false);
     }
 
     /**
      * Constructor for OntModel.
      *
-     * @param ontModel Model for which walks shall be generated.
+     * @param ontModel            Model for which walks shall be generated.
      * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
      */
     public WalkGenerationManager(OntModel ontModel, boolean isGenerateTextWalks) {
@@ -119,35 +119,37 @@ public class WalkGenerationManager {
 
     /**
      * Constructor
+     *
      * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
      */
-    public WalkGenerationManager(File tripleFile){
+    public WalkGenerationManager(File tripleFile) {
         this(tripleFile, false, true);
     }
 
     /**
      * Constructor for triple file.
      *
-     * @param tripleFile File to the NT file or, alternatively, to a directory of NT files.
+     * @param tripleFile          File to the NT file or, alternatively, to a directory of NT files.
      * @param isGenerateTextWalks Indicator whether text shall also appear in the embedding space.
      * @param isSetEntitySelector If true, an entity selector will be chosen automatically.
      */
-    public WalkGenerationManager(File tripleFile, boolean isGenerateTextWalks, boolean isSetEntitySelector){
+    public WalkGenerationManager(File tripleFile, boolean isGenerateTextWalks, boolean isSetEntitySelector) {
         this(tripleFile.toURI(), isGenerateTextWalks, isSetEntitySelector, null, null);
     }
 
     /**
      * Main Constructor
+     *
      * @param knowledgeGraphResource A URI representing the graph for which an embedding shall be trained.
-     * @param isGenerateTextWalks True if text shall also appear in the embedding space.
-     * @param isSetEntitySelector If true, an entity selector will be chosen automatically.
-     * @param existingWalks If existing walks shall be parsed, the existing walk directory can be specified here.
-     * @param newWalkDirectory The new walk directory that is to be written. If there are existing walks, those will
-     *                         be copied if the file is not corrupted.
+     * @param isGenerateTextWalks    True if text shall also appear in the embedding space.
+     * @param isSetEntitySelector    If true, an entity selector will be chosen automatically.
+     * @param existingWalks          If existing walks shall be parsed, the existing walk directory can be specified here.
+     * @param newWalkDirectory       The new walk directory that is to be written. If there are existing walks, those will
+     *                               be copied if the file is not corrupted.
      */
     public WalkGenerationManager(URI knowledgeGraphResource, boolean isGenerateTextWalks,
                                  boolean isSetEntitySelector, File existingWalks, File newWalkDirectory) {
-        if(Util.uriIsFile(knowledgeGraphResource)) {
+        if (Util.uriIsFile(knowledgeGraphResource)) {
             File knowledgeGraphFile = new File(knowledgeGraphResource);
             if (!knowledgeGraphFile.exists()) {
                 LOGGER.error("The knowledge graph resource file you specified does not exist. ABORT.");
@@ -157,15 +159,15 @@ public class WalkGenerationManager {
                 // DIRECTORY OPTIONS
                 // (1) TDB
                 // (2) Directory with multiple NT files
-                if(Util.isTdbDirectory(knowledgeGraphFile)){
+                if (Util.isTdbDirectory(knowledgeGraphFile)) {
                     // (1) TDB
                     LOGGER.info("TDB directory recognized. Using disk-based TDB walk generator.");
                     this.walkGenerator = new TdbWalkGenerator(knowledgeGraphResource);
-                    if(isSetEntitySelector) {
+                    if (isSetEntitySelector) {
                         LOGGER.info("Setting TDB entity selector...");
                         EntitySelector entitySelector =
                                 new TdbEntitySelector(((TdbWalkGenerator) walkGenerator).getTdbModel());
-                        if(existingWalks == null){
+                        if (existingWalks == null) {
                             this.entitySelector = entitySelector;
                         } else {
                             this.entitySelector = new ContinuationEntitySelector(existingWalks, newWalkDirectory,
@@ -181,7 +183,7 @@ public class WalkGenerationManager {
                     if (isSetEntitySelector) {
                         EntitySelector entitySelector =
                                 new MemoryEntitySelector(((NtMemoryWalkGenerator) this.walkGenerator).getData());
-                        if(existingWalks == null){
+                        if (existingWalks == null) {
                             this.entitySelector = entitySelector;
                         } else {
                             this.entitySelector = new ContinuationEntitySelector(existingWalks, newWalkDirectory,
@@ -194,9 +196,9 @@ public class WalkGenerationManager {
                 // decide on parser depending on file ending
                 Pair<IWalkGenerator, EntitySelector> parserSelectorPair = WalkGeneratorManager.parseSingleFile(knowledgeGraphFile, isGenerateTextWalks);
                 this.walkGenerator = parserSelectorPair.getValue0();
-                if(isSetEntitySelector) {
+                if (isSetEntitySelector) {
                     this.entitySelector = parserSelectorPair.getValue1();
-                    if(existingWalks == null){
+                    if (existingWalks == null) {
                         this.entitySelector = entitySelector;
                     } else {
                         this.entitySelector = new ContinuationEntitySelector(existingWalks, newWalkDirectory,
@@ -221,118 +223,27 @@ public class WalkGenerationManager {
                               int textWalkLength, File walkDirectory) {
         if (generationMode == null) {
             System.out.println("walkGeneration mode is null... Using default: RANDOM_WALKS_DUPLICATE_FREE");
-            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.MID_WALKS) {
-            System.out.println("Generate random mid walks...");
-            this.generateRandomMidWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.MID_WALKS_DUPLICATE_FREE) {
-            System.out.println("Generate random mid walks duplicate free...");
-            this.generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.RANDOM_WALKS) {
-            System.out.println("Generate random walks...");
-            this.generateRandomWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE) {
-            System.out.println("Generate random walks duplicate free...");
-            this.generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.MID_WALKS_WEIGHTED) {
-            System.out.println("Generate weighted mid walks...");
-            this.generateWeightedMidWalks(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else if (generationMode == WalkGenerationMode.EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE) {
-            System.out.println("Generate mid type walks duplicate free...");
-            generateRandomMidTypeWalksDuplicateFree(numberOfThreads, numberOfWalks, depth, walkDirectory);
-        } else {
-            System.out.println("ERROR. Cannot identify the \"walkGenenerationMode\" chosen. Aborting program.");
+            generationMode = WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
         }
+        generateWalks(generationMode, numberOfThreads, numberOfWalks, depth, walkDirectory);
 
-        if(isGenerateTextWalks()){
+        // optionally generate text walks on top
+        if (isGenerateTextWalks()) {
             this.generateTextWalks(numberOfThreads, textWalkLength);
         }
         this.close();
     }
 
-    public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
+    public void generateWalks(WalkGenerationMode mode, int numberOfThreads, int numberOfWalksPerEntity, int depth,
+                              String walkDirectoryPath) {
+        generateWalks(mode, numberOfThreads, numberOfWalksPerEntity, depth, new File(walkDirectoryPath));
     }
 
-    public void generateRandomWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
+    public void generateWalks(WalkGenerationMode mode, int numberOfThreads, int numberOfWalksPerEntity, int depth,
+                              File walkDirectory) {
         this.walkDirectory = walkDirectory;
-        generateRandomWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
-    }
-
-    public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
-        this.walkDirectory = walkDirectory;
-        generateDuplicateFreeWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
-    }
-
-    public void generateRandomWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
-    }
-
-    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
-    }
-
-    public void generateRandomMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
-        if(!isWalkGeneratorOk()) return;
-        this.walkDirectory = walkDirectory;
-        generateRandomMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
-    }
-
-    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateWeightedMidWalks(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
-    }
-
-    public void generateWeightedMidWalks(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
-        if(!isWalkGeneratorOk()) return;
-        this.walkDirectory = walkDirectory;
-        generateWeightedMidWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
-    }
-
-    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth) {
-        generateRandomMidWalksDuplicateFree(numberOfThreads, numberOfWalksPerEntity, depth, new File(DEFAULT_WALK_DIRECTORY));
-    }
-
-    public void generateRandomMidTypeWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth,
-                                                     File walkDirectory) {
-        if(!isWalkGeneratorOk()) return;
-        this.walkDirectory = walkDirectory;
-        generateRandomMidTypeWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
-    }
-
-    public void generateRandomMidWalksDuplicateFree(int numberOfThreads, int numberOfWalksPerEntity, int depth, File walkDirectory) {
-        if(!isWalkGeneratorOk()) return;
-        this.walkDirectory = walkDirectory;
-        generateRandomMidWalksForEntitiesDuplicateFree(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth);
-    }
-
-    public void generateTextWalks(int numberOfThreads, int walkLength) {
-        generateTextWalks(numberOfThreads, walkLength, new File(DEFAULT_WALK_DIRECTORY));
-    }
-
-    public void generateTextWalks(int numberOfThreads, int walkLength, File walkDirectory) {
-        if(!isWalkGeneratorOk()) return;
-        this.walkDirectory = walkDirectory;
-        generateTextWalksForEntities(entitySelector.getEntities(), numberOfThreads, walkLength);
-    }
-
-    public IWalkGenerator getWalkGenerator() {
-        return this.walkGenerator;
-    }
-
-    /**
-     * Helper method to check parser and manage log output.
-     * @return True if parser is ok, false if parser is not ok.
-     */
-    private boolean isWalkGeneratorOk(){
-        if (this.walkGenerator == null) {
-            LOGGER.error("Parser not initialized. Aborting program.");
-            return false;
-        }
-        if (!isWalkGeneratorOk) {
-            LOGGER.error("Will not execute walk generation due to parser initialization error.");
-            return false;
-        }
-        return true;
+        generateWalksForEntities(entitySelector.getEntities(), numberOfThreads, numberOfWalksPerEntity, depth,
+                mode);
     }
 
     /**
@@ -343,7 +254,8 @@ public class WalkGenerationManager {
      * @param numberOfWalks   The number of walks to be generated per entity.
      * @param walkLength      The length of each walk.
      */
-    public void generateRandomWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
+    public void generateWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength,
+                                         WalkGenerationMode mode) {
         setOutputFileWriter();
 
         // thread pool
@@ -352,7 +264,7 @@ public class WalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            RandomWalkEntityRunnable th = new RandomWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
+            GenericRunnable th = new GenericRunnable(this, entity, numberOfWalks, walkLength, mode);
             pool.execute(th);
         }
 
@@ -364,6 +276,37 @@ public class WalkGenerationManager {
             e.printStackTrace();
         }
         flushWriter();
+    }
+
+    public void generateTextWalks(int numberOfThreads, int walkLength) {
+        generateTextWalks(numberOfThreads, walkLength, new File(DEFAULT_WALK_DIRECTORY));
+    }
+
+    public void generateTextWalks(int numberOfThreads, int walkLength, File walkDirectory) {
+        if (!isWalkGeneratorOk()) return;
+        this.walkDirectory = walkDirectory;
+        generateTextWalksForEntities(entitySelector.getEntities(), numberOfThreads, walkLength);
+    }
+
+    public IWalkGenerator getWalkGenerator() {
+        return this.walkGenerator;
+    }
+
+    /**
+     * Helper method to check parser and manage log output.
+     *
+     * @return True if parser is ok, false if parser is not ok.
+     */
+    private boolean isWalkGeneratorOk() {
+        if (this.walkGenerator == null) {
+            LOGGER.error("Parser not initialized. Aborting program.");
+            return false;
+        }
+        if (!isWalkGeneratorOk) {
+            LOGGER.error("Will not execute walk generation due to parser initialization error.");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -378,6 +321,7 @@ public class WalkGenerationManager {
 
     /**
      * Gets the function to be used to shorten URIs.
+     *
      * @return Function to shorten URIs (String -&gt; String).
      */
     public UnaryOperator<String> getUriShortenerFunction() {
@@ -396,100 +340,13 @@ public class WalkGenerationManager {
     private TimeUnit timeoutUnit = TimeUnit.DAYS;
 
     /**
-     * Generate walks for the entities that are duplicate free (i.e., no walk exists twice in the resulting file).
-     *
-     * @param entities        The entities for which walks shall be generated.
-     * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks   The number of walks to be generated per thread.
-     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
-     */
-    public void generateRandomMidWalksForEntitiesDuplicateFree(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        setOutputFileWriter();
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
-                0, TimeUnit.SECONDS,
-                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
-
-        for (String entity : entities) {
-            DuplicateFreeMidWalkEntityRunnable th = new DuplicateFreeMidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
-            pool.execute(th);
-        }
-        pool.shutdown();
-        try {
-            pool.awaitTermination(timeout, timeoutUnit);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted Exception");
-            e.printStackTrace();
-        }
-        flushWriter();
-    }
-
-    /**
-     * Generate TYPE walks for the entities that are duplicate free (i.e., no walk exists twice in the resulting file).
-     *
-     * @param entities        The entities for which walks shall be generated.
-     * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks   The number of walks to be generated per thread.
-     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
-     */
-    public void generateRandomMidTypeWalksForEntitiesDuplicateFree(Set<String> entities, int numberOfThreads,
-                                                                int numberOfWalks, int walkLength) {
-        setOutputFileWriter();
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
-                0, TimeUnit.SECONDS,
-                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
-
-        for (String entity : entities) {
-            DuplicateFreeMidEdgeWalkEntityRunnable th = new DuplicateFreeMidEdgeWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
-            pool.execute(th);
-        }
-        pool.shutdown();
-        try {
-            pool.awaitTermination(timeout, timeoutUnit);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted Exception");
-            e.printStackTrace();
-        }
-        flushWriter();
-    }
-
-    /**
-     * Generate walks for the entities.
-     *
-     * @param entities        The entities for which walks shall be generated.
-     * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks   The number of walks to be generated per thread.
-     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
-     */
-    public void generateWeightedMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        setOutputFileWriter();
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
-                0, TimeUnit.SECONDS,
-                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
-
-        for (String entity : entities) {
-            WeightedMidWalkEntityRunnable th = new WeightedMidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
-            pool.execute(th);
-        }
-        pool.shutdown();
-        try {
-            pool.awaitTermination(timeout, timeoutUnit);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted Exception");
-            e.printStackTrace();
-        }
-        flushWriter();
-    }
-
-    /**
      * Generates text walks for the given entities.
      *
-     * @param entities The set of entities for which text walks (datatype property based walks) shall be generated.
+     * @param entities        The set of entities for which text walks (datatype property based walks) shall be generated.
      * @param numberOfThreads The number of threads to be used.
-     * @param walkLength The length of each walks
+     * @param walkLength      The length of each walks
      */
-    public void generateTextWalksForEntities(Set<String> entities, int numberOfThreads, int walkLength){
+    public void generateTextWalksForEntities(Set<String> entities, int numberOfThreads, int walkLength) {
         setOutputFileWriter();
         ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
                 0, TimeUnit.SECONDS,
@@ -509,99 +366,12 @@ public class WalkGenerationManager {
         flushWriter();
     }
 
-    /**
-     * Generate walks for the entities.
-     *
-     * @param entities        The entities for which walks shall be generated.
-     * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks   The number of walks to be generated per thread.
-     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore). Aka depth.
-     */
-    public void generateRandomMidWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        setOutputFileWriter();
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
-                0, TimeUnit.SECONDS,
-                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
-
-        for (String entity : entities) {
-            MidWalkEntityRunnable th = new MidWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
-            pool.execute(th);
-        }
-        pool.shutdown();
-        try {
-            pool.awaitTermination(timeout, timeoutUnit);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted Exception");
-            e.printStackTrace();
-        }
-        flushWriter();
-    }
-
-    /**
-     * Generate walks for the entities that are free of duplicates (i.e., no walk exists twice in the resulting file).
-     *
-     * @param entities        The entities for which walks shall be generated.
-     * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks   The number of walks to be generated per thread.
-     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
-     */
-    public void generateDuplicateFreeWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        setOutputFileWriter();
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
-                0, TimeUnit.SECONDS,
-                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
-
-        for (String entity : entities) {
-            DuplicateFreeWalkEntityRunnable th = new DuplicateFreeWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
-            pool.execute(th);
-        }
-        pool.shutdown();
-        try {
-            pool.awaitTermination(timeout, timeoutUnit);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted Exception");
-            e.printStackTrace();
-        }
-        flushWriter();
-    }
-
-    /**
-     * Generate walks for the entities.
-     *
-     * @param entities        The entities for which walks shall be generated.
-     * @param numberOfThreads The number of threads to be used.
-     * @param numberOfWalks   The number of walks to be generated per thread.
-     * @param walkLength      The maximal length of each walk (a walk may be shorter if it cannot be continued anymore).
-     */
-    public void generateWalksForEntities(HashSet<String> entities, int numberOfThreads, int numberOfWalks, int walkLength) {
-        setOutputFileWriter();
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(numberOfThreads, numberOfThreads,
-                0, TimeUnit.SECONDS,
-                new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
-
-        for (String entity : entities) {
-            RandomWalkEntityRunnable th = new RandomWalkEntityRunnable(this, entity, numberOfWalks, walkLength);
-            pool.execute(th);
-        }
-        pool.shutdown();
-
-        try {
-            pool.awaitTermination(timeout, timeoutUnit);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted Exception");
-            e.printStackTrace();
-        }
-        flushWriter();
-    }
 
     /**
      * Flushes the walk writer.
      */
-    void flushWriter(){
-        if(this.writer != null){
+    void flushWriter() {
+        if (this.writer != null) {
             try {
                 this.writer.flush();
             } catch (IOException e) {
@@ -613,11 +383,11 @@ public class WalkGenerationManager {
     /**
      * Initialize {@link WalkGenerationManager#writer}.
      */
-    void setOutputFileWriter(){
+    void setOutputFileWriter() {
         // only act if the writer has not yet been initialized.
-        if(this.writer == null) {
+        if (this.writer == null) {
             File outputFile = new File(this.walkDirectory, "walk_file_0.txt.gz");
-            if(outputFile.getParentFile().mkdirs()){
+            if (outputFile.getParentFile().mkdirs()) {
                 LOGGER.info("Directory created.");
             }
 
@@ -682,7 +452,7 @@ public class WalkGenerationManager {
         } catch (IOException ioe) {
             LOGGER.error("There was an error when closing the writer.", ioe);
         }
-        if(getWalkGenerator() instanceof ICloseableWalkGenerator){
+        if (getWalkGenerator() instanceof ICloseableWalkGenerator) {
             ((ICloseableWalkGenerator) this.walkGenerator).close();
         }
     }

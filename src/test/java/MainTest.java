@@ -799,7 +799,7 @@ class MainTest {
     }
 
     @Test
-    public void midTypeWalksDuplicateFree() {
+    public void midEdgeWalksDuplicateFree() {
         File graphFileToUse = loadFile("./dummyGraph_3.nt");
         String directoryName = "./midEdgeWalksDuplicateFreeDirectory";
         File directory = new File(directoryName);

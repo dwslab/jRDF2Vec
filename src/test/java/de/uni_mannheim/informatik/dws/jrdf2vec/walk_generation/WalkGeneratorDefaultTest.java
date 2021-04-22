@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WalkGeneratorDefaultTest {
@@ -24,7 +26,8 @@ class WalkGeneratorDefaultTest {
 
         File walkDirectory = new File("./test_walks");
         WalkGenerationManager generator = new WalkGenerationManager(pizzaOntology);
-        generator.generateRandomWalksDuplicateFree(8, 5, 5, walkDirectory);
+        generator.generateWalks(RANDOM_WALKS_DUPLICATE_FREE, 8, 5, 5,
+                walkDirectory);
         generator.close();
 
         File generatedFile = walkDirectory.listFiles()[0];
@@ -62,7 +65,7 @@ class WalkGeneratorDefaultTest {
 
         File generatedFilePath = new File("./test_walks2");
         WalkGenerationManager generator = new WalkGenerationManager(pizzaOntology);
-        generator.generateRandomWalksDuplicateFree(8, 5, 5, generatedFilePath);
+        generator.generateWalks(RANDOM_WALKS_DUPLICATE_FREE, 8, 5, 5, generatedFilePath);
         generator.close();
 
         File generatedFile = generatedFilePath.listFiles()[0];

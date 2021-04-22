@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WalkGenerationModeTest {
 
+
     @Test
     void getOptions() {
         String result = WalkGenerationMode.getOptions();
@@ -13,7 +14,6 @@ class WalkGenerationModeTest {
         assertFalse(result.endsWith("|"));
         //System.out.println(result);
     }
-
 
     @Test
     void assertImplementationOfGetModeFromString(){

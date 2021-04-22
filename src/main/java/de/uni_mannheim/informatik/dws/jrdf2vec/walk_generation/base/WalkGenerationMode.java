@@ -16,6 +16,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base;
  */
 public enum WalkGenerationMode {
 
+
     /**
      * Mid-walk walk generation: Given an entity, it is randomly decided whether to go backwards or forwards during
      * the walk generation.
@@ -49,10 +50,16 @@ public enum WalkGenerationMode {
     RANDOM_WALKS_DUPLICATE_FREE,
 
     /**
+     * Generates walks where every instance is replaced by its type except for the entity of interest.
+     * Conceptually similar to {@link WalkGenerationMode#EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE} where
+     * the entities are completely removed.
+     */
+    EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE,
+
+    /**
      * Generates mid walks but with only edges and the node of interest.
      */
     EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE;
-
 
     /**
      * String representation of mode.
@@ -76,6 +83,9 @@ public enum WalkGenerationMode {
             case "experimental_mid_edge_walks_duplicate_free":
             case "mid_edge_walks_duplicate_free":
                 return EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE;
+            case "experimental_mid_type_walks_duplicate_free":
+            case "mid_type_walks_duplicate_free":
+                return EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE;
             default:
                 return null;
         }
