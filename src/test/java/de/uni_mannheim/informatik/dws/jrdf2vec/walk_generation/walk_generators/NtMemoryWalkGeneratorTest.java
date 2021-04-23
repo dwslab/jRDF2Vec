@@ -79,7 +79,7 @@ class NtMemoryWalkGeneratorTest {
         //for(String s : result_1) System.out.println(s);
 
         parser = new NtMemoryWalkGenerator(loadFile("type_file.nt").getAbsolutePath());
-        List<String> result_2 = parser.generateMidTypeWalksForEntityDuplicateFree("I_Jan", 150, 5);
+        List<String> result_2 = parser.generateMidTypeWalksForEntityDuplicateFree("http://www.jan-portisch.eu/I_Jan", 150, 5);
 
         // for debugging
         for(String s : result_2) System.out.println(s);
@@ -87,15 +87,14 @@ class NtMemoryWalkGeneratorTest {
         for(String walk : result_2){
             boolean instanceAppeared = false;
             for(String token : walk.split(" ")){
-                if(token.startsWith("I_")){
+                if(token.startsWith("http://www.jan-portisch.eu/I_")){
                     assertFalse(instanceAppeared);
                     instanceAppeared = true;
                 }
             }
         }
-
         Set<String> walks = new HashSet<>(result_2);
-        assertTrue(walks.contains("P_knows I_Jan P_knows C_human"));
+        assertTrue(walks.contains("http://www.jan-portisch.eu/P_knows http://www.jan-portisch.eu/I_Jan http://www.jan-portisch.eu/P_knows http://www.jan-portisch.eu/C_human"));
     }
 
     @Test

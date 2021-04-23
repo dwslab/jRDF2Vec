@@ -849,6 +849,61 @@ class MainTest {
         }
     }
 
+    @Test
+    public void midTypeWalksDuplicateFree() {
+        File graphFileToUse = loadFile("./type_file.nt");
+        String directoryName = "./midTypeWalksDuplicateFreeDirectory";
+        File directory = new File(directoryName);
+        directory.deleteOnExit();
+
+        // we randomly throw in one ignored argument
+        Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "25", "-walkDir",
+                directoryName, "-walkGenerationMode", "MID_TYPE_WALKS_DUPLICATE_FREE", "-depth", "3", "XZY"});
+
+        // check ignored arguments
+        assertEquals(1, Main.getIgnoredArguments().size());
+
+        // make sure that there is only a walk file
+        HashSet<String> files = Sets.newHashSet(directory.list());
+        assertTrue(files.contains("model.kv"));
+
+        // now check out the walk file
+        try {
+            File walkFile = new File(directory, "walk_file_0.txt.gz");
+            assertTrue(walkFile.exists(), "The walk file does not exist.");
+            assertFalse(walkFile.isDirectory(), "The walk file is a directory (expected: file).");
+
+            GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(walkFile));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(gzip));
+
+            String readLine;
+            int numberOfLines = 0;
+            while ((readLine = reader.readLine()) != null) {
+                numberOfLines++;
+
+                // for debugging
+                System.out.println(readLine);
+
+                String[] tokens = readLine.split(" ");
+                boolean nonPropertyAppeared = false;
+                for (String token : tokens) {
+                    if (token.startsWith("http://www.jan-portisch.eu/I_")) {
+                        assertFalse(nonPropertyAppeared);
+                        nonPropertyAppeared = true;
+                    }
+                }
+            }
+            assertTrue(numberOfLines > 5);
+            reader.close();
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+            fail("Could not read from walk file due to a file not found exception.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("Could not read from walk file.");
+        }
+    }
+
     /**
      * Weighted mid walk generation.
      */
@@ -1009,11 +1064,8 @@ class MainTest {
             assertTrue(1 <= pcmCount, "pcmCount not within boundaries. Values: " + pcmCount);
 
             reader.close();
-        } catch (FileNotFoundException fnfe) {
+        } catch (IOException fnfe) {
             fnfe.printStackTrace();
-            fail("Could not read from walk file.");
-        } catch (IOException e) {
-            e.printStackTrace();
             fail("Could not read from walk file.");
         }
 
@@ -1161,6 +1213,7 @@ class MainTest {
         deleteDirectory("./walksOnlyMidWeighted/");
         deleteDirectory("./continue_walks/");
         deleteDirectory("./midEdgeWalksDuplicateFreeDirectory");
+        deleteDirectory("./midTypeWalksDuplicateFreeDirectory");
     }
 
     private static void deleteDirectory(File directory) {
