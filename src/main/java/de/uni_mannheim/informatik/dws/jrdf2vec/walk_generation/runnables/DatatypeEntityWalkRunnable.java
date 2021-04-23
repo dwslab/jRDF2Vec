@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Runnable for walk entity generation.
  */
-public class DatatypeWalkEntityRunnable implements Runnable {
+public class DatatypeEntityWalkRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatatypeWalkEntityRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatatypeEntityWalkRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -39,7 +39,7 @@ public class DatatypeWalkEntityRunnable implements Runnable {
      * @param depth     Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                  this leads to more walk components than the specified depth.
      */
-    public DatatypeWalkEntityRunnable(WalkGenerationManager generator, String entity, int depth) {
+    public DatatypeEntityWalkRunnable(WalkGenerationManager generator, String entity, int depth) {
         this.entity = entity;
         this.depth = depth;
         this.walkGenerator = generator;

@@ -6,13 +6,13 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.*
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericRunnable implements Runnable {
+public class DefaultEntityWalkRunnable implements Runnable {
 
 
     /**
      * Default Logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenericRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEntityWalkRunnable.class);
 
     /**
      * Entity that is processed by this thread.
@@ -45,8 +45,8 @@ public class GenericRunnable implements Runnable {
      * @param depth         Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
      */
-    public GenericRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth,
-                           WalkGenerationMode mode) {
+    public DefaultEntityWalkRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth,
+                                     WalkGenerationMode mode) {
         this.entity = entity;
         this.numberOfWalks = numberOfWalks;
         this.depth = depth;

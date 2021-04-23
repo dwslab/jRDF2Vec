@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TripleDataSetMemoryTest {
 
+
     @Test
      void addDatatypeTriple(){
         TripleDataSetMemory ds = new TripleDataSetMemory();
@@ -82,5 +83,21 @@ class TripleDataSetMemoryTest {
         assertTrue(ds.getObjectTriplesInvolvingSubject("D").get(0).object == "F" || ds.getObjectTriplesInvolvingSubject("D").get(0).object == "G");
         assertTrue(ds.getObjectTriplesInvolvingSubject("D").get(1).object == "F" || ds.getObjectTriplesInvolvingSubject("D").get(1).object == "G");
         assertFalse(ds.getObjectTriplesInvolvingSubject("D").get(0).object.equals(ds.getObjectTriplesInvolvingSubject("D").get(1).object));
+    }
+
+    @Test
+    void getTriplesWithSubjectPredicate(){
+        TripleDataSetMemory ds = new TripleDataSetMemory();
+        ds.addObjectTriple("A", "B", "C");
+
+        for(Triple s : ds.getObjectTriplesWithSubjectPredicate("A", "B")){
+            assertEquals(new Triple("A", "B", "C"), s);
+        }
+
+        assertNull(ds.getObjectTriplesWithSubjectPredicate(null, "B"));
+        assertNull(ds.getObjectTriplesWithSubjectPredicate("A", null));
+        assertNull(ds.getObjectTriplesWithSubjectPredicate(null, null));
+        assertNull(ds.getObjectTriplesWithSubjectPredicate("A", "Z"));
+        assertNull(ds.getObjectTriplesWithSubjectPredicate("Z", "A"));
     }
 }

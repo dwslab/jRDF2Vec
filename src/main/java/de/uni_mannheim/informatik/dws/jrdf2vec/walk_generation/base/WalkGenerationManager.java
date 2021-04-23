@@ -264,7 +264,7 @@ public class WalkGenerationManager {
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
 
         for (String entity : entities) {
-            GenericRunnable th = new GenericRunnable(this, entity, numberOfWalks, walkLength, mode);
+            DefaultEntityWalkRunnable th = new DefaultEntityWalkRunnable(this, entity, numberOfWalks, walkLength, mode);
             pool.execute(th);
         }
 
@@ -352,7 +352,7 @@ public class WalkGenerationManager {
                 0, TimeUnit.SECONDS,
                 new java.util.concurrent.ArrayBlockingQueue<>(entities.size()));
         for (String entity : entities) {
-            DatatypeWalkEntityRunnable runnable = new DatatypeWalkEntityRunnable(this, entity,
+            DatatypeEntityWalkRunnable runnable = new DatatypeEntityWalkRunnable(this, entity,
                     walkLength);
             pool.execute(runnable);
         }

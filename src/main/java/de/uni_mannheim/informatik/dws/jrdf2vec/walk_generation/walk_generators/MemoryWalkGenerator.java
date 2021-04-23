@@ -16,7 +16,8 @@ import java.util.function.UnaryOperator;
  */
 public abstract class MemoryWalkGenerator implements IWalkGenerator,
         IMidWalkCapability, IMidWalkDuplicateFreeCapability, IRandomWalkDuplicateFreeCapability,
-        IMidWalkWeightedCapability, IMidEdgeWalkDuplicateFreeCapability, IRandomWalkCapability {
+        IMidWalkWeightedCapability, IMidEdgeWalkDuplicateFreeCapability, IRandomWalkCapability,
+        IMidTypeWalkDuplicateFreeCapability {
 
 
     /**
@@ -37,7 +38,6 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
 
     /**
      * By default false.
-     * TODO: Include in parsers which inherit!
      */
     boolean isParseDatatypeProperties = false;
 
@@ -50,6 +50,20 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * Function to transform data type text.
      */
     UnaryOperator<String> textProcessingFunction = new TextProcessor();
+
+    /**
+     * Only required for {@link IMidTypeWalkDuplicateFreeCapability}.
+     */
+    private Set<String> typeProperties = new HashSet<>();
+
+    private static final String[] DEFAULT_TYPE_PROPERTIES = {"http://www.w3.org/1999/02/22-rdf-syntax-ns#type"};
+
+    /**
+     * Constructor
+     */
+    public MemoryWalkGenerator(){
+        typeProperties.addAll(Arrays.asList(DEFAULT_TYPE_PROPERTIES));
+    }
 
     /**
      * Weighted mid walk: If there are more options to go forward, it is more likely to go forward.
@@ -335,6 +349,25 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
     }
 
     /**
+     * Draw a random value from a set. This method is thread-safe.
+     *
+     * @param setToDrawFrom The set from which shall be drawn.
+     * @param <T> Type
+     * @return Drawn value of type T.
+     */
+    public static<T> T randomDrawFromSet(Set<T> setToDrawFrom) {
+        int randomNumber = ThreadLocalRandom.current().nextInt(setToDrawFrom.size());
+        int i = 0;
+        for(T t : setToDrawFrom){
+            if(i == randomNumber){
+                return t;
+            }
+            i++;
+        }
+        return null;
+    }
+
+    /**
      * Obtain a triple for the given subject.
      *
      * @param subject The subject for which a random predicate and object shall be found.
@@ -375,7 +408,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
             int currentWalkLength = 2;
             for (String text : texts) {
                 for (String token : text.split(" ")) {
-                    walk.append(" " + this.textProcessingFunction.apply(token));
+                    walk.append(" ").append(this.textProcessingFunction.apply(token));
                     currentWalkLength++;
                     if (currentWalkLength == depth) {
                         result.add(walk.toString());
@@ -409,7 +442,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * spaces.
      */
     public List<String> generateDuplicateFreeRandomWalksForEntity(String entity, int numberOfWalks, int depth) {
-        List<List<Triple>> walks = new ArrayList();
+        List<List<Triple>> walks = new ArrayList<>();
         boolean isFirstIteration = true;
         for (int currentDepth = 0; currentDepth < depth; currentDepth++) {
             // initialize with first node
@@ -426,8 +459,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
                 isFirstIteration = false;
             } else {
                 // create a copy
-                List<List<Triple>> walks_tmp = new ArrayList<>();
-                walks_tmp.addAll(walks);
+                List<List<Triple>> walks_tmp = new ArrayList<>(walks);
 
                 // loop over current walks
                 for (List<Triple> walk : walks_tmp) {
@@ -456,6 +488,80 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
         return Util.convertToStringWalks(walks, entity, isUnifyAnonymousNodes());
     }
 
+    @Override
+    public List<String> generateMidTypeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
+        // TODO
+        // the code given below is from the EDGE walks...
+
+        List<List<String>> walksWithNodes = generateMidWalkForEntityAsArray(entity, numberOfWalks, depth);
+        List<List<String>> result = new ArrayList<>();
+        for (List<String> walkWithNodes : walksWithNodes) {
+
+            // determine how often the entity appears
+            int appearances = getNumberOfAppearances(entity, walkWithNodes);
+
+            // draw the desired position to keep
+            int choice = getRandomNumberBetweenZeroAndX(appearances);
+
+            List<String> walk = new ArrayList<>();
+            int currentNodeOfInterestPosition = 0;
+            for (int i = 0; i < walkWithNodes.size(); i++) {
+                if (i % 2 == 0) {
+                    String node = walkWithNodes.get(i);
+                    if (node.equals(entity)) {
+                        // we found the node of interest
+                        if (currentNodeOfInterestPosition == choice) {
+                            walk.add(node);
+                            currentNodeOfInterestPosition++;
+                        } else {
+                            // -> we will not add the node of interest this time but instead its supertype
+                            String type = getRandomSupertypeOfEntity(node);
+                            if(type != null){
+                                walk.add(type);
+                            }
+                            currentNodeOfInterestPosition++;
+                        }
+                    } else {
+                        // we have a normal node that is not a node of interest
+                        String type = getRandomSupertypeOfEntity(node);
+                        if(type != null){
+                            walk.add(type);
+                        }
+                    }
+                } else {
+                    String edge = walkWithNodes.get(i);
+                    walk.add(edge);
+                }
+            }
+            result.add(walk);
+        }
+        return Util.convertToStringWalksDuplicateFree(result);
+    }
+
+    /**
+     * Draw a random supertype. Note that the predicates of {@link MemoryWalkGenerator#typeProperties} are used.
+     * @param entity The entity for which the type shall be obtained.
+     * @return Type. Null if there is no type.
+     */
+    public String getRandomSupertypeOfEntity(String entity){
+        if(entity == null){
+            return null;
+        }
+        Set<String> candidates = new HashSet<>();
+        for(String property : getTypeProperties()) {
+            Set<Triple> triples = this.getData().getObjectTriplesWithSubjectPredicate(entity, property);
+            if(triples != null && triples.size() > 0){
+                for(Triple triple : triples){
+                    candidates.add(triple.object);
+                }
+            }
+        }
+        if(candidates.size() == 0){
+            return null;
+        } else {
+            return randomDrawFromSet(candidates);
+        }
+    }
 
     @Override
     public List<String> generateRandomWalksForEntity(String entity, int numberOfWalks, int depth){
@@ -554,5 +660,10 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
 
     public void setTextProcessingFunction(UnaryOperator<String> textProcessingFunction) {
         this.textProcessingFunction = textProcessingFunction;
+    }
+
+    @Override
+    public Set<String> getTypeProperties() {
+        return typeProperties;
     }
 }

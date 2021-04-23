@@ -1,0 +1,5 @@
+<I_Jan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <C_human>
+<I_Heiko> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <C_human>
+<I_Jan> <P_knows> <I_Heiko>
+<I_Heiko> <P_profession> <C_professor>
+<I_Sven> <P_knows> <I_Jan>

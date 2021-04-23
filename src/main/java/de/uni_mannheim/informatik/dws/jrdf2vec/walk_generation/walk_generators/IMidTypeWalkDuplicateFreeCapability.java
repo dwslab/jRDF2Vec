@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
 import java.util.List;
+import java.util.Set;
 
 public interface IMidTypeWalkDuplicateFreeCapability extends IWalkGenerationCapability {
 
@@ -13,4 +14,10 @@ public interface IMidTypeWalkDuplicateFreeCapability extends IWalkGenerationCapa
      * @return List where every item is a walk separated by spaces.
      */
     List<String> generateMidTypeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth);
+
+    /**
+     * Get the properties used to obtain a type.
+     * @return The set of type properties.
+     */
+    Set<String> getTypeProperties();
 }

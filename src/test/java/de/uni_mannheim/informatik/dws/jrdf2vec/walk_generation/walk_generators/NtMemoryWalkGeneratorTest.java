@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,6 +67,39 @@ class NtMemoryWalkGeneratorTest {
 
     @Test
     void generateMidTypeWalksForEntityDuplicateFree(){
+        NtMemoryWalkGenerator parser = new NtMemoryWalkGenerator(loadFile("pizza.owl.nt").getAbsolutePath());
+        List<String> result_1 = parser.generateMidTypeWalksForEntityDuplicateFree("http://www.co-ode" +
+                ".org/ontologies/pizza/pizza.owl#DeepPanBase", 10, 5);
+
+        // somewhat cheap test but the given dataset is not sufficient for testing this
+        assertNotNull(result_1);
+        assertTrue(result_1.size() > 0);
+
+        // for debugging
+        //for(String s : result_1) System.out.println(s);
+
+        parser = new NtMemoryWalkGenerator(loadFile("type_file.nt").getAbsolutePath());
+        List<String> result_2 = parser.generateMidTypeWalksForEntityDuplicateFree("I_Jan", 150, 5);
+
+        // for debugging
+        for(String s : result_2) System.out.println(s);
+
+        for(String walk : result_2){
+            boolean instanceAppeared = false;
+            for(String token : walk.split(" ")){
+                if(token.startsWith("I_")){
+                    assertFalse(instanceAppeared);
+                    instanceAppeared = true;
+                }
+            }
+        }
+
+        Set<String> walks = new HashSet<>(result_2);
+        assertTrue(walks.contains("P_knows I_Jan P_knows C_human"));
+    }
+
+    @Test
+    void generateMidEdgeWalksForEntityDuplicateFree(){
         NtMemoryWalkGenerator parser = new NtMemoryWalkGenerator(loadFile("dummyGraph.nt").getAbsolutePath());
         List<String> result_1 = parser.generateMidEdgeWalksForEntityDuplicateFree("A", 100, 8);
 

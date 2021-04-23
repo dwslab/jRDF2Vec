@@ -1,5 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -24,7 +26,7 @@ public class TripleDataSetMemory {
         objectTriples = new HashSet<>();
     }
 
-    Map<String, ArrayList<Triple>> subjectToObjectTriples;
+    Map<String, Map<String, Set<Triple>>> subjectToObjectTriples;
     Map<String, ArrayList<Triple>> predicateToObjectTriples;
     Map<String, ArrayList<Triple>> objectToObjectTriples;
     Set<Triple> objectTriples;
@@ -90,12 +92,26 @@ public class TripleDataSetMemory {
         if(this.objectTriples.contains(tripleToAdd)){
             return;
         }
-        ArrayList<Triple> subjectToTripleList = subjectToObjectTriples.get(tripleToAdd.subject);
-        if(subjectToTripleList == null){
-            ArrayList<Triple> newList = new ArrayList<>();
-            newList.add(tripleToAdd);
-            subjectToObjectTriples.put(tripleToAdd.subject, newList);
-        } else subjectToTripleList.add(tripleToAdd);
+        Map<String, Set<Triple>> subjectToTripleMap = subjectToObjectTriples.get(tripleToAdd.subject);
+        if(subjectToTripleMap == null){
+            Map<String, Set<Triple>> predicateToObjectMap = new HashMap<>();
+            Set<Triple> triples = new HashSet<>();
+            triples.add(tripleToAdd);
+            predicateToObjectMap.put(tripleToAdd.predicate, triples);
+            subjectToObjectTriples.put(tripleToAdd.subject, predicateToObjectMap);
+        } else {
+            // there is already an entry for the subject
+            // check for predicate
+            if (subjectToTripleMap.containsKey(tripleToAdd.predicate)) {
+                // predicate contained, add our object
+                subjectToTripleMap.get(tripleToAdd.predicate).add(tripleToAdd);
+            } else {
+                // predicate not contained, add predicate -> object
+                Set<Triple> triples = new HashSet<>();
+                triples.add(tripleToAdd);
+                subjectToTripleMap.put(tripleToAdd.predicate, triples);
+            }
+        }
 
         ArrayList<Triple> predicateToTripleList = predicateToObjectTriples.get(tripleToAdd.predicate);
         if(predicateToTripleList == null){
@@ -133,7 +149,13 @@ public class TripleDataSetMemory {
     }
 
     public List<Triple> getObjectTriplesInvolvingSubject(String subject){
-        return subjectToObjectTriples.get(subject);
+        Map<String, Set<Triple>> subjectObjects = subjectToObjectTriples.get(subject);
+        if(subjectObjects == null) return null;
+        List<Triple> result = new ArrayList<>();
+        for(Map.Entry<String, Set<Triple>> entry : subjectObjects.entrySet()){
+            result.addAll(entry.getValue());
+        }
+        return result;
     }
 
     public List<Triple> getObjectTriplesInvolvingPredicate(String predicate){
@@ -142,6 +164,21 @@ public class TripleDataSetMemory {
 
     public List<Triple> getObjectTriplesInvolvingObject(String object){
         return objectToObjectTriples.get(object);
+    }
+
+    /**
+     * This method allows to state (S, P, ?) queries for object properties.
+     * It will not return datatype triples.
+     * @param subject The desired subject.
+     * @param predicate Desired predicate.
+     * @return Set of triples. Null if nothing was found.
+     */
+    public Set<Triple> getObjectTriplesWithSubjectPredicate(String subject, String predicate){
+        if(subject == null || predicate == null) return null;
+        Map<String, Set<Triple>> s = subjectToObjectTriples.get(subject);
+        if(s == null) return null;
+        Set<Triple> result = s.get(predicate);
+        return result;
     }
 
     /**
@@ -205,5 +242,4 @@ public class TripleDataSetMemory {
     public Set<String> getUniqueObjectTriplePredicates(){
         return predicateToObjectTriples.keySet();
     }
-
 }
