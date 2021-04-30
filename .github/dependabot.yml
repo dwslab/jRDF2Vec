@@ -1,0 +1,17 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.junit.jupiter:junit-jupiter-engine
+    versions:
+    - 5.7.0
+    - 5.7.1
+    - 5.8.0-M1
+  - dependency-name: org.apache.jena:jena-tdb
+    versions:
+    - 3.17.0
