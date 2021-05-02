@@ -100,6 +100,8 @@ walks use `-onlyTraining` instead.
 Besides generating walks and training embeddings, the CLI offers additional services which are described below.
 
 #### Generating a Vector Text File
+
+*(1) Full Vocabulary*<br/>
 jRDF2vec is compatible with the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation 
 framework for KG embeddings (GEval)</a>. 
 This framework requires the vectors to be present in a text file. If you have a gensim model or vector file, you can
@@ -108,14 +110,22 @@ use the following command to generate this file:
 ```
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
-You can find the file (named `vectors.txt`) in the directory where the model/vector file is located,
+You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
+
+*(2) Subset of the  Vocabulary*<br/>
+If you want to write a `vectors.txt` file that contains only a subset of the vocabulary, you can alternatively 
+specify the entities of interest using the `-light <entity_file>` option (The `<entity_file>` should contain one entity 
+(full URI) per line.):
+
+```
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file -light ./path-to-entity-file
+```
 
 #### Generating a Vocabulary Text File
 jRDF2vec provides functionality to print all concepts for which a vector has been trained.
 One word of the vocabulary will be printed per line to a file named `vocabulary.txt`.
 The model or vector file needs to be specified. If you have a gensim model or vector file, you can
 use the following command to generate this file:
-
 
 ```
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateVocabularyFile ./path-to-your-model-or-vector-file

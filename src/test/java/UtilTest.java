@@ -139,6 +139,11 @@ class UtilTest {
         }
     }
 
+    @Test
+    void getNumberOfLines(){
+        assertEquals(2, Util.getNumberOfLines(loadFile("./subset_concepts.txt")));
+    }
+
     /**
      * Helper function to load files in class path that contain spaces.
      * @param fileName Name of the file.
@@ -147,5 +152,4 @@ class UtilTest {
     public static File loadFile(String fileName){
         return Util.loadFile(fileName);
     }
-
 }

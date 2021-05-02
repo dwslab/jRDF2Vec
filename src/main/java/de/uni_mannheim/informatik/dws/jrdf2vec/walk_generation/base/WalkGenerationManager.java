@@ -405,13 +405,17 @@ public class WalkGenerationManager {
      * Adds new walks to the list; If the list is filled, it is written to the
      * file.
      *
-     * @param tmpList Entries that shall be written.
+     * @param walksToWrite Entries that shall be written.
      */
-    public synchronized void writeToFile(List<String> tmpList) {
+    public synchronized void writeToFile(List<String> walksToWrite) {
+        if(walksToWrite == null){
+            LOGGER.error("walksToWrite null. No walk will be written.");
+            return;
+        }
         processedEntities++;
-        processedWalks += tmpList.size();
-        fileProcessedLines += tmpList.size();
-        for (String str : tmpList)
+        processedWalks += walksToWrite.size();
+        fileProcessedLines += walksToWrite.size();
+        for (String str : walksToWrite)
             try {
                 writer.write(str + "\n");
             } catch (IOException e) {

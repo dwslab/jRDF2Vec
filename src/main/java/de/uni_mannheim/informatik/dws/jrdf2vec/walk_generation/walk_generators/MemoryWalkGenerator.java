@@ -490,9 +490,6 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
 
     @Override
     public List<String> generateMidTypeWalksForEntityDuplicateFree(String entity, int numberOfWalks, int depth){
-        // TODO
-        // the code given below is from the EDGE walks...
-
         List<List<String>> walksWithNodes = generateMidWalkForEntityAsArray(entity, numberOfWalks, depth);
         List<List<String>> result = new ArrayList<>();
         for (List<String> walkWithNodes : walksWithNodes) {

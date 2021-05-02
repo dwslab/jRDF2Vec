@@ -647,10 +647,11 @@ def write_vectors_as_text_file():
     vectors = get_vectors(model_path=model_path, vector_path=vector_path)
     print("Writing the vectors as text file.")
     with open(file_to_write, "w+") as f:
+        count = 0
         if entity_file is None:
+            logging.info("Classic mode: Writing the full vocabulary.")
             number_of_vectors_as_str = str(len(vectors.vocab))
-            print("Processing " + number_of_vectors_as_str + " vectors...")
-            count = 0
+            logging.info("Processing " + number_of_vectors_as_str + " vectors...")
             for concept in vectors.vocab:
                 line_to_write = ""
                 count += 1
@@ -661,7 +662,7 @@ def write_vectors_as_text_file():
                 line_to_write += "\n"
                 f.write(line_to_write)
                 if count % 10000 == 0:
-                    print(
+                    logging.info(
                         "Vectors processed: "
                         + str(count)
                         + " of "
@@ -670,8 +671,10 @@ def write_vectors_as_text_file():
         else:
             concepts = read_concept_file(entity_file)
             number_of_vectors_as_str = str(len(concepts))
-            print("Processing " + number_of_vectors_as_str + " vectors...")
+            logging.info("Light mode: Writing subset to text vector file.")
+            logging.info("Processing " + number_of_vectors_as_str + " vectors...")
             for concept in concepts:
+                count += 1
                 line_to_write = ""
                 if concept in vectors.vocab:
                     vector = vectors.get_vector(concept)

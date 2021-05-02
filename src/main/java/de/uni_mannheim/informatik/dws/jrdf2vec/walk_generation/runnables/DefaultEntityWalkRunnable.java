@@ -117,7 +117,9 @@ public class DefaultEntityWalkRunnable implements Runnable {
                     walkGenerationManager
                             .writeToFile(
                                     ((IMidEdgeWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
-                                            .generateMidEdgeWalksForEntityDuplicateFree(walkGenerationManager.shortenUri(entity), this.numberOfWalks, this.depth));
+                                            .generateMidEdgeWalksForEntityDuplicateFree(
+                                                    walkGenerationManager.shortenUri(entity),
+                                                    this.numberOfWalks, this.depth));
                 } else {
                     printNotImplementedWarning();
                 }

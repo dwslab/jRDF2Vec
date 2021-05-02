@@ -186,15 +186,20 @@ public class Main {
             return;
         }
 
-        if (args.length == 2) {
+        if (args.length == 2 || args.length == 4) {
             String transformationSource = getValue("-generateTxtVectorFile", args);
             if (transformationSource == null) {
                 // check for alternative spelling
                 transformationSource = getValue("-generateTextVectorFile", args);
             }
             if (transformationSource != null) {
+                String entityFile = getValue("-light", args);
                 printIfIgnoredOptionsExist();
-                generateTextVectorFile(transformationSource);
+                if(entityFile != null) {
+                    generateTextVectorFile(transformationSource, entityFile);
+                } else {
+                    generateTextVectorFile(transformationSource, null);
+                }
                 return;
             }
         }
@@ -630,7 +635,7 @@ public class Main {
      *
      * @param transformationSource File path to the model or vector file.
      */
-    private static void generateTextVectorFile(String transformationSource) {
+    private static void generateTextVectorFile(String transformationSource, String entityFilePath) {
         File sourceFile = new File(transformationSource);
         if (!sourceFile.exists()) {
             System.out.println("The given file does not exist. Cannot generate text vector file.");
@@ -641,6 +646,21 @@ public class Main {
             return;
         }
         File fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        if(entityFilePath != null){
+            File entityFile = new File(entityFilePath);
+            if(entityFile.exists()){
+                if(!entityFile.isDirectory()){
+                    Gensim.getInstance().writeModelAsTextFile(transformationSource, fileToGenerate.getAbsolutePath(),
+                            entityFile.getAbsolutePath());
+                    // we need to stop here:
+                    return;
+                } else {
+                    System.out.println("ERROR: The given entity file is a directory. Writing vector file for all entities.");
+                }
+            } else {
+                System.out.println("ERROR: The given entity file does not exist. Writing vector file for all entities.");
+            }
+        }
         Gensim.getInstance().writeModelAsTextFile(transformationSource, fileToGenerate.getAbsolutePath());
     }
 

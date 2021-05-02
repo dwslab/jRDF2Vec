@@ -85,7 +85,7 @@ public class TripleDataSetMemory {
     }
 
     /**
-     * Add the given triple.
+     * Add the given triple (thread-safe).
      * @param tripleToAdd Triple to be added.
      */
     public synchronized void addObjectTriple(Triple tripleToAdd){

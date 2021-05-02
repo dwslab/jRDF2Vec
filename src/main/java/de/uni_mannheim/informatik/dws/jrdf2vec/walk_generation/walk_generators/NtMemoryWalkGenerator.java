@@ -261,10 +261,10 @@ public class NtMemoryWalkGenerator extends MemoryWalkGenerator {
             this.isOptimizedFile = optimized;
         }
 
-        private boolean isOptimizedFile;
-        private NtMemoryWalkGenerator parser;
-        private File fileToRead;
-        private boolean isGzipped;
+        private final boolean isOptimizedFile;
+        private final NtMemoryWalkGenerator parser;
+        private final File fileToRead;
+        private final boolean isGzipped;
 
         @Override
         public void run() {
