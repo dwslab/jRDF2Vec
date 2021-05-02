@@ -1,0 +1,5 @@
+<http://www.jan-portisch.eu/I_Jan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.jan-portisch.eu/C_human> .
+<http://www.jan-portisch.eu/I_Heiko> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.jan-portisch.eu/C_human> .
+<http://www.jan-portisch.eu/I_Jan> <http://www.jan-portisch.eu/P_knows> <http://www.jan-portisch.eu/I_Heiko> .
+<http://www.jan-portisch.eu/I_Heiko> <http://www.jan-portisch.eu/P_profession> <http://www.jan-portisch.eu/C_professor>.
+<http://www.jan-portisch.eu/I_Sven> <http://www.jan-portisch.eu/P_knows> <http://www.jan-portisch.eu/I_Jan> .

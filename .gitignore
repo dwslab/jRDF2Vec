@@ -106,3 +106,4 @@ log4j.properties
 # allow specific files required for tests
 !src/test/resources/existing_walk_directory/walk_file.gz
 !src/test/resources/existing_walk_directory/walk_file.txt
+!src/test/resources/nt_directory_type_walks/*

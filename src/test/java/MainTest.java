@@ -444,6 +444,22 @@ class MainTest {
         assertTrue(vectorFile.exists());
         assertEquals(2, getNumberOfLines(vectorFile));
         vectorFile.delete();
+
+        // error case 1: directory
+        args = new String[]{"-generateTxtVectorFile", modelFilePath, "-light", "./"};
+        Main.main(args);
+        vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        assertTrue(vectorFile.exists());
+        assertTrue(getNumberOfLines(vectorFile) > 5);
+        vectorFile.delete();
+
+        // error case 2: non-existing file
+        args = new String[]{"-generateTxtVectorFile", modelFilePath, "-light", "./this_file_does_not_exist.txt"};
+        Main.main(args);
+        vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        assertTrue(vectorFile.exists());
+        assertTrue(getNumberOfLines(vectorFile) > 5);
+        vectorFile.delete();
     }
 
     @Test
