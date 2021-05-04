@@ -195,7 +195,7 @@ public class Main {
             if (transformationSource != null) {
                 String entityFile = getValue("-light", args);
                 printIfIgnoredOptionsExist();
-                if(entityFile != null) {
+                if (entityFile != null) {
                     generateTextVectorFile(transformationSource, entityFile);
                 } else {
                     generateTextVectorFile(transformationSource, null);
@@ -546,7 +546,7 @@ public class Main {
             rdf2vec.setEmbedText(isEmbedText);
 
             // setting the continuation walk directory
-            if(existingWalkDirectory != null) rdf2vec.setExistingWalkDirectory(existingWalkDirectory);
+            if (existingWalkDirectory != null) rdf2vec.setExistingWalkDirectory(existingWalkDirectory);
 
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
@@ -634,6 +634,9 @@ public class Main {
      * Given a model or vector file, a text file is generated containing all the vectors.
      *
      * @param transformationSource File path to the model or vector file.
+     * @param entityFilePath The entity file path pointing to a file containing the entities that shall be added
+     *                       to the text vector file. The file must contain one entity per line. The file
+     *                       must be UTF-8 encoded.
      */
     private static void generateTextVectorFile(String transformationSource, String entityFilePath) {
         File sourceFile = new File(transformationSource);
@@ -646,10 +649,10 @@ public class Main {
             return;
         }
         File fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
-        if(entityFilePath != null){
+        if (entityFilePath != null) {
             File entityFile = new File(entityFilePath);
-            if(entityFile.exists()){
-                if(!entityFile.isDirectory()){
+            if (entityFile.exists()) {
+                if (!entityFile.isDirectory()) {
                     Gensim.getInstance().writeModelAsTextFile(transformationSource, fileToGenerate.getAbsolutePath(),
                             entityFile.getAbsolutePath());
                     // we need to stop here:
