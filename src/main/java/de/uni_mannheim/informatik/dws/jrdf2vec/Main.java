@@ -131,7 +131,7 @@ public class Main {
     /**
      * Args that were not parsed. Intended to show the user which parts were ignored.
      */
-    private static HashSet<String> ignoredArguments;
+    private static HashSet<String> ignoredArguments = new HashSet<>();
 
     /**
      * If true, text will be included in the embeddings.
@@ -186,22 +186,9 @@ public class Main {
             return;
         }
 
-        if (args.length == 2 || args.length == 4) {
-            String transformationSource = getValue("-generateTxtVectorFile", args);
-            if (transformationSource == null) {
-                // check for alternative spelling
-                transformationSource = getValue("-generateTextVectorFile", args);
-            }
-            if (transformationSource != null) {
-                String entityFile = getValue("-light", args);
-                printIfIgnoredOptionsExist();
-                if(entityFile != null) {
-                    generateTextVectorFile(transformationSource, entityFile);
-                } else {
-                    generateTextVectorFile(transformationSource, null);
-                }
-                return;
-            }
+        if (containsIgnoreCase("-generateTxtVectorFile", args) || containsIgnoreCase("-generateTextVectorFile", args)) {
+            cliTextFileGeneration(args);
+            return;
         }
 
         if (args.length == 2) {
@@ -546,7 +533,7 @@ public class Main {
             rdf2vec.setEmbedText(isEmbedText);
 
             // setting the continuation walk directory
-            if(existingWalkDirectory != null) rdf2vec.setExistingWalkDirectory(existingWalkDirectory);
+            if (existingWalkDirectory != null) rdf2vec.setExistingWalkDirectory(existingWalkDirectory);
 
             // set resource directory for python server files
             if (resourcesDirectory != null) rdf2vec.setPythonServerResourceDirectory(resourcesDirectory);
@@ -630,12 +617,25 @@ public class Main {
         Gensim.getInstance().writeVocabularyToFile(modelFilePath, fileToGenerate.getAbsolutePath());
     }
 
+    private static void cliTextFileGeneration(String[] args) {
+        String transformationSource = getValueMultiOption(args, "-generateTxtVectorFile", "-generateTextVectorFile");
+        if (transformationSource != null) {
+            String entityFile = getValue("-light", args);
+            String fileToWritePath = getValueMultiOption(args, "-file", "-newFile");
+            printIfIgnoredOptionsExist();
+            generateTextVectorFile(transformationSource, entityFile, fileToWritePath);
+        }
+    }
+
     /**
      * Given a model or vector file, a text file is generated containing all the vectors.
      *
      * @param transformationSource File path to the model or vector file.
+     * @param entityFilePath Entity file path.
+     * @param filePathToBeWritten File path to be written.
      */
-    private static void generateTextVectorFile(String transformationSource, String entityFilePath) {
+    private static void generateTextVectorFile(String transformationSource, String entityFilePath,
+                                               String filePathToBeWritten) {
         File sourceFile = new File(transformationSource);
         if (!sourceFile.exists()) {
             System.out.println("The given file does not exist. Cannot generate text vector file.");
@@ -645,11 +645,16 @@ public class Main {
             System.out.println("The specified file is a directory. Cannot generate text vector file.");
             return;
         }
-        File fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
-        if(entityFilePath != null){
+        File fileToGenerate;
+        if(filePathToBeWritten == null) {
+            fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
+        } else {
+            fileToGenerate = new File(filePathToBeWritten);
+        }
+        if (entityFilePath != null) {
             File entityFile = new File(entityFilePath);
-            if(entityFile.exists()){
-                if(!entityFile.isDirectory()){
+            if (entityFile.exists()) {
+                if (!entityFile.isDirectory()) {
                     Gensim.getInstance().writeModelAsTextFile(transformationSource, fileToGenerate.getAbsolutePath(),
                             entityFile.getAbsolutePath());
                     // we need to stop here:
@@ -698,6 +703,25 @@ public class Main {
             ignoredArguments.remove(arguments[positionSet + 1]);
             return arguments[positionSet + 1];
         } else return null;
+    }
+
+    /**
+     * Helper method. Obtains the value following the first key found in {@code keys}.
+     * @param args Args array.
+     * @param keys Keys for which the array shall be checked.
+     * @return First value that is found.
+     */
+    public static String getValueMultiOption(String[] args, String... keys){
+        if(args == null || keys == null){
+            return null;
+        }
+        for(String key : keys){
+            String result = getValue(key, args);
+            if(result != null){
+                return result;
+            }
+        }
+        return null;
     }
 
     /**

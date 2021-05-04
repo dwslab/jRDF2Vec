@@ -1247,6 +1247,16 @@ class MainTest {
     }
 
     @Test
+    void getValueMultiOption() {
+        assertNull(Main.getValueMultiOption(null, null));
+        assertNull(Main.getValueMultiOption(null, new String[]{"european", "union"}));
+        assertNull(Main.getValueMultiOption(new String[]{"european", "union"}, null));
+        assertNull(Main.getValueMultiOption(new String[]{"european", "union"}, "-hello"));
+        assertEquals("union", Main.getValueMultiOption(new String[]{"-european", "union"}, "-european"));
+        assertEquals("union", Main.getValueMultiOption(new String[]{"-european", "union"}, "pax", "-european"));
+    }
+
+    @Test
     void continueOption() {
         Main.reset();
         File continueFile = loadFile("existing_walk_directory");
