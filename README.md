@@ -111,15 +111,18 @@ use the following command to generate this file:
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
 You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
+If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`.
 
 *(2) Subset of the  Vocabulary*<br/>
-If you want to write a `vectors.txt` file that contains only a subset of the vocabulary, you can alternatively 
+If you want to write a `vectors.txt` file that contains only a subset of the vocabulary, you can additionally 
 specify the entities of interest using the `-light <entity_file>` option (The `<entity_file>` should contain one entity 
 (full URI) per line.):
 
 ```
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file -light ./path-to-entity-file
 ```
+You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
+If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`.
 
 #### Generating a Vocabulary Text File
 jRDF2vec provides functionality to print all concepts for which a vector has been trained.

@@ -131,7 +131,7 @@ public class Main {
     /**
      * Args that were not parsed. Intended to show the user which parts were ignored.
      */
-    private static HashSet<String> ignoredArguments = new HashSet<>();
+    private static HashSet<String> ignoredArguments;
 
     /**
      * If true, text will be included in the embeddings.
@@ -186,17 +186,14 @@ public class Main {
             return;
         }
 
+        // check for text file generation feature
         if (containsIgnoreCase("-generateTxtVectorFile", args) || containsIgnoreCase("-generateTextVectorFile", args)) {
             cliTextFileGeneration(args);
             return;
         }
 
         if (args.length == 2) {
-            String modelFilePath = getValue("-generateVocabFile", args);
-            if (modelFilePath == null) {
-                // check for alternative spelling
-                modelFilePath = getValue("-generateVocabularyFile", args);
-            }
+            String modelFilePath = getValueMultiOption(args, "-generateVocabFile", "-generateVocabularyFile");
             if (modelFilePath != null) {
                 printIfIgnoredOptionsExist();
                 generateVocabFile(modelFilePath);
@@ -340,9 +337,7 @@ public class Main {
         } else depth = DEFAULT_DEPTH;
         System.out.println("Using depth " + depth);
 
-        String numberOfWalksText = getValue("-numberOfWalks", args);
-        numberOfWalksText = (numberOfWalksText == null) ? getValue("-numOfWalks", args) : numberOfWalksText;
-        numberOfWalksText = (numberOfWalksText == null) ? getValue("-numOfWalks", args) : numberOfWalksText;
+        String numberOfWalksText = getValueMultiOption(args, "-numberOfWalks", "-numOfWalks", "-numOfWalks");
         if (numberOfWalksText != null) {
             try {
                 numberOfWalks = Integer.parseInt(numberOfWalksText);
@@ -409,8 +404,7 @@ public class Main {
         }
 
         // determining the configuration for the training
-        String trainingModeText = getValue("-trainingMode", args);
-        trainingModeText = (trainingModeText == null) ? getValue("-trainMode", args) : trainingModeText;
+        String trainingModeText = getValueMultiOption(args, "-trainingMode", "-trainMode");
         if (trainingModeText != null) {
             if (trainingModeText.equalsIgnoreCase("sg")) {
                 configuration = new Word2VecConfiguration(Word2VecType.SG);
@@ -435,8 +429,7 @@ public class Main {
         // set sample
         configuration.setSample(sample);
 
-        String walkGenerationModeText = getValue("-walkGenerationMode", args);
-        walkGenerationModeText = (walkGenerationModeText == null) ? getValue("-walkMode", args) : walkGenerationModeText;
+        String walkGenerationModeText = getValueMultiOption(args, "-walkGenerationMode", "-walkMode");
         if (walkGenerationModeText != null) {
             walkGenerationMode = WalkGenerationMode.getModeFromString(walkGenerationModeText);
         }
@@ -617,6 +610,10 @@ public class Main {
         Gensim.getInstance().writeVocabularyToFile(modelFilePath, fileToGenerate.getAbsolutePath());
     }
 
+    /**
+     * Text vector file generation was triggered and will be further executed in this method.
+     * @param args The args.
+     */
     private static void cliTextFileGeneration(String[] args) {
         String transformationSource = getValueMultiOption(args, "-generateTxtVectorFile", "-generateTextVectorFile");
         if (transformationSource != null) {
@@ -700,9 +697,11 @@ public class Main {
                 break;
             }
         }
-        if (positionSet != -1 && arguments.length >= positionSet + 1) {
-            ignoredArguments.remove(key);
-            ignoredArguments.remove(arguments[positionSet + 1]);
+        if (positionSet != -1 && arguments.length > positionSet + 1) {
+            if(ignoredArguments != null && ignoredArguments.contains(key)) {
+                ignoredArguments.remove(key);
+                ignoredArguments.remove(arguments[positionSet + 1]);
+            }
             return arguments[positionSet + 1];
         } else return null;
     }
@@ -924,6 +923,13 @@ public class Main {
                 "       -generateTextVectorFile <model_or_vector_file>\n" +
                 "       The file path to the model or vector file that shall be used to write the vectors in a text\n" +
                 "       file needs to be specified.\n\n" +
+                "   If you want to write a `vectors.txt` file that contains only a subset of the vocabulary, you\n" +
+                "   can additionally specify the entities of interest using the `-light <entity_file>` option\n" +
+                "   (The `<entity_file>` should contain one entity (full URI) per line.).\n" +
+                "   You can find the file (named `vectors.txt`) in the directory where the model/vector file is\n" +
+                "   located.\n" +
+                "   If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`." +
+                "   \n\n" +
                 "B) Generation of Vocabulary Text File\n" +
                 "   jRDF2vec provides functionality to print all concepts for which a vector has been trained:\n\n" +
                 "       -generateVocabularyFile <model_or_vector_file>\n" +
