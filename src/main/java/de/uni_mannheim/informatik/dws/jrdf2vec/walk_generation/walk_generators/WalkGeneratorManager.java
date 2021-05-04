@@ -80,7 +80,7 @@ public class WalkGeneratorManager {
                 File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");
                 NtMemoryWalkGenerator.saveAsNt(model, newResourceFile);
                 parser = new NtMemoryWalkGenerator(newResourceFile, isParseDatatypeTriples);
-            } else if (fileName.toLowerCase().endsWith(".xml")) {
+            } else if (fileName.toLowerCase().endsWith(".xml") || fileName.toLowerCase().endsWith(".rdf")) {
                 OntModel model = readOntology(pathToTripleFile, Lang.RDFXML);
                 entitySelector = new OntModelEntitySelector(model);
                 File newResourceFile = new File(tripleFile.getParent(), fileName.substring(0, fileName.length() - 3) + "nt");

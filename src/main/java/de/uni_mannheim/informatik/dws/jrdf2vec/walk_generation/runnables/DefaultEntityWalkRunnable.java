@@ -44,6 +44,7 @@ public class DefaultEntityWalkRunnable implements Runnable {
      * @param numberOfWalks The number of walks to be performed per entity.
      * @param depth         Desired length of the walk. Defines how many entity steps are allowed. Note that
      *                      this leads to more walk components than the specified depth.
+     * @param mode          The walk generation mode.
      */
     public DefaultEntityWalkRunnable(WalkGenerationManager generator, String entity, int numberOfWalks, int depth,
                                      WalkGenerationMode mode) {

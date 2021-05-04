@@ -631,7 +631,9 @@ public class Main {
      * Given a model or vector file, a text file is generated containing all the vectors.
      *
      * @param transformationSource File path to the model or vector file.
-     * @param entityFilePath Entity file path.
+     * @param entityFilePath The entity file path pointing to a file containing the entities that shall be added
+     *                       to the text vector file. The file must contain one entity per line. The file
+     *                       must be UTF-8 encoded.
      * @param filePathToBeWritten File path to be written.
      */
     private static void generateTextVectorFile(String transformationSource, String entityFilePath,

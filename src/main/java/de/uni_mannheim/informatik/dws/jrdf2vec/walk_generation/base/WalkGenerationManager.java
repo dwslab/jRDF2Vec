@@ -253,6 +253,7 @@ public class WalkGenerationManager {
      * @param numberOfThreads The number of threads involved in generating the walks.
      * @param numberOfWalks   The number of walks to be generated per entity.
      * @param walkLength      The length of each walk.
+     * @param mode            The walk generation mode.
      */
     public void generateWalksForEntities(Set<String> entities, int numberOfThreads, int numberOfWalks, int walkLength,
                                          WalkGenerationMode mode) {
