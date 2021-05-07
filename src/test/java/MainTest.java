@@ -414,6 +414,9 @@ class MainTest {
         }
     }
 
+    /**
+     * Vector text file generation test.
+     */
     @Test
     public void testTxtVectorGeneration() {
         String modelFilePath = loadFile("test_model_vectors.kv").getAbsolutePath();
@@ -429,6 +432,9 @@ class MainTest {
         vectorFile.delete();
     }
 
+    /**
+     * Vector text file generation light test.
+     */
     @Test
     public void testTxtVectorGenerationLight() {
         String modelFilePath = loadFile("test_model_vectors.kv").getAbsolutePath();
@@ -444,6 +450,7 @@ class MainTest {
         assertTrue(vectorFile.exists());
         assertEquals(2, getNumberOfLines(vectorFile));
         vectorFile.delete();
+        assertEquals(0, Main.getIgnoredArguments().size());
 
         // error case 1: directory
         File newVectorFile = new File("./myNewVectors");

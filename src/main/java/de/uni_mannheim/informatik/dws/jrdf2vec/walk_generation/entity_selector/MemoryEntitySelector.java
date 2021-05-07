@@ -2,8 +2,12 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.TripleDataSetMemory;
 
+import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This entity selector selects all unique nodes.
+ */
 public class MemoryEntitySelector implements EntitySelector {
 
 
@@ -19,6 +23,9 @@ public class MemoryEntitySelector implements EntitySelector {
 
     @Override
     public Set<String> getEntities() {
-        return data.getUniqueSubjects();
+        Set<String> result = new HashSet<>();
+        result.addAll(data.getUniqueSubjects());
+        result.addAll(data.getUniqueObjectTripleObjects());
+        return result;
     }
 }

@@ -46,10 +46,11 @@ public class HdtEntitySelector implements EntitySelector {
     @Override
     public Set<String> getEntities() {
         HashSet<String> result = new HashSet<>();
-        IteratorTripleString iterator = null;
+        IteratorTripleString iterator;
         try {
             iterator = hdtDataSet.search("", "", "");
             TripleString ts;
+            // TODO: We currently miss objects in this selector (can lead to vocab loss in some cases)
             while (iterator.hasNext()) {
                 ts = iterator.next();
                 result.add(ts.getSubject().toString());

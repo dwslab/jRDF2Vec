@@ -33,20 +33,28 @@ public class OntModelEntitySelector implements EntitySelector {
     public HashSet<String> getEntities() {
         HashSet<String> result = new HashSet<>(100000);
 
-        // NOTE: it is sufficient to do a query only for subjects b/c walks for concepts that appear only as object
-        // cannot be calculated.
+        // (1) Subjects
         String queryString = "SELECT distinct ?s WHERE { ?s ?p ?o . }";
         Query query = QueryFactory.create(queryString);
         QueryExecution queryExecution = QueryExecutionFactory.create(query, model);
         ResultSet queryResult = queryExecution.execSelect();
         while (queryResult.hasNext()) {
             String conceptUri = queryResult.next().getResource("s").getURI();
-
             if(conceptUri == null) continue;
-
-            // no concepts will be added
             result.add(conceptUri);
         }
+
+        // (2) Objects
+        queryString = "SELECT distinct ?o WHERE {?s ?p ?o . FILTER(!isLiteral(?o)) .}";
+        query = QueryFactory.create(queryString);
+        queryExecution = QueryExecutionFactory.create(query, model);
+        queryResult = queryExecution.execSelect();
+        while (queryResult.hasNext()) {
+            String conceptUri = queryResult.next().getResource("o").getURI();
+            if(conceptUri == null) continue;
+            result.add(conceptUri);
+        }
+
         return result;
     }
 }

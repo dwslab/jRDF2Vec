@@ -698,7 +698,7 @@ public class Main {
             }
         }
         if (positionSet != -1 && arguments.length > positionSet + 1) {
-            if(ignoredArguments != null && ignoredArguments.contains(key)) {
+            if(ignoredArguments != null) {
                 ignoredArguments.remove(key);
                 ignoredArguments.remove(arguments[positionSet + 1]);
             }
