@@ -1,4 +1,5 @@
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.LightEntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.HdtWalkGenerator;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -142,6 +143,16 @@ class UtilTest {
     @Test
     void getNumberOfLines(){
         assertEquals(2, Util.getNumberOfLines(loadFile("./subset_concepts.txt")));
+    }
+
+    @Test
+    void readEntitiesFromFile() {
+        Set<String> result = Util.readEntitiesFromFile(loadFile("entityFileForTest.txt"));
+        assertTrue(result.contains("http://dbpedia.org/resource/Amp"));
+        assertTrue(result.contains("http://dbpedia.org/resource/SQM"));
+        assertTrue(result.contains("http://dbpedia.org/resource/Grupa_Lotos"));
+        assertTrue(result.contains("http://dbpedia.org/resource/State_Bank_of_India"));
+        assertFalse(result.contains("http://dbpedia.org/resource/War"));
     }
 
     /**

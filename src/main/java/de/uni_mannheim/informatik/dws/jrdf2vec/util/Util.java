@@ -363,13 +363,54 @@ public class Util {
      */
     public static File loadFile(String fileName){
         try {
-            File result =  FileUtils.toFile(Util.class.getClassLoader().getResource(fileName).toURI().toURL());
-            assertTrue(result.exists(), "Required resource not available.");
-            return result;
+            URL fileUrl = Util.class.getClassLoader().getResource(fileName);
+            File result;
+            if(fileUrl != null){
+                result = FileUtils.toFile(fileUrl.toURI().toURL());
+                assertTrue(result.exists(), "Required resource not available.");
+                return result;
+            } else {
+                fail("FileName URL is null.");
+                return null;
+            }
         } catch (URISyntaxException | MalformedURLException exception){
             exception.printStackTrace();
             fail("Could not load file.");
             return null;
         }
+    }
+
+    /**
+     * Reads the entities in the specified file into a HashSet.
+     *
+     * @param pathToEntityFile The file to be read from. The file must be UTF-8 encoded.
+     * @return A HashSet of entities.
+     */
+    public static Set<String> readEntitiesFromFile(String pathToEntityFile) {
+        return readEntitiesFromFile(new File(pathToEntityFile));
+    }
+
+    /**
+     * Reads the entities in the specified file into a HashSet.
+     *
+     * @param entityFile The file to be read from. The file must be UTF-8 encoded.
+     * @return A HashSet of entities.
+     */
+    public static Set<String> readEntitiesFromFile(File entityFile) {
+        HashSet<String> result = new HashSet<>();
+        if(!entityFile.exists()){
+            LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
+        }
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile), StandardCharsets.UTF_8));
+            String readLine = "";
+            while((readLine = reader.readLine()) != null){
+                result.add(readLine);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to read file.", e);
+        }
+        LOGGER.info("Number of read entities: " + result.size());
+        return result;
     }
 }

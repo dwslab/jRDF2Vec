@@ -1,0 +1,6 @@
+Freude 1.0 -5 3
+schöner 5.0 -3.4 5.3
+Götterfunken -1.0 -3 -4
+Tochter -10 5.3 4.3
+aus -50 -20 -30
+Elysium 100 100 100

@@ -1283,18 +1283,56 @@ class MainTest {
         Main.reset();
     }
 
+    @Test
+    void generateTextVectorFile(){
+        String fileToWritePath = "./reduced_vocab.txt";
+        String vectorTxtFilePath = getPathOfResource("txtVectorFile.txt");
+        String entityFilePath = getPathOfResource("txtVectorFileEntities.txt");
+
+        // try error cases first
+        String[] mainCommand = {"-generateTxtVectorFile", vectorTxtFilePath};
+        Main.main(mainCommand);
+
+        File fileToWrite1 = new File(fileToWritePath);
+        assertFalse(fileToWrite1.exists());
+        String parent = (new File(vectorTxtFilePath)).getParent();
+        File fileToWrite2 = new File(parent,"reduced_vectors.txt");
+        assertFalse(fileToWrite2.exists());
+
+        // auto naming
+        String[] mainCommand2 = {"-generateTxtVectorFile", vectorTxtFilePath, "-light", entityFilePath};
+        Main.main(mainCommand2);
+        assertTrue(fileToWrite2.exists());
+        assertTrue(getNumberOfLines(fileToWrite2) <= 3);
+
+        String[] mainCommand3 = {"-generateTxtVectorFile", vectorTxtFilePath, "-light", entityFilePath, "-newFile",
+        fileToWritePath};
+        Main.main(mainCommand3);
+        assertTrue(fileToWrite1.exists());
+        assertTrue(getNumberOfLines(fileToWrite1) <= 3);
+
+        fileToWrite1.delete();
+        fileToWrite2.delete();
+    }
+
     /**
      * Helper function to load files in class path that contain spaces.
-     *
      * @param fileName Name of the file.
      * @return File in case of success, else null.
      */
-    private File loadFile(String fileName) {
+    public static File loadFile(String fileName){
         try {
-            File result = FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
-            assertTrue(result.exists(), "Required resource not available.");
-            return result;
-        } catch (URISyntaxException | MalformedURLException exception) {
+            URL fileUrl = Util.class.getClassLoader().getResource(fileName);
+            File result;
+            if(fileUrl != null){
+                result = FileUtils.toFile(fileUrl.toURI().toURL());
+                assertTrue(result.exists(), "Required resource not available.");
+                return result;
+            } else {
+                fail("FileName URL is null.");
+                return null;
+            }
+        } catch (URISyntaxException | MalformedURLException exception){
             exception.printStackTrace();
             fail("Could not load file.");
             return null;
@@ -1321,6 +1359,17 @@ class MainTest {
         deleteDirectory("./midEdgeWalksDuplicateFreeDirectory");
         deleteDirectory("./midTypeWalksDuplicateFreeDirectory");
         deleteDirectory("./midTypeWalksDuplicateFreeDirectory2");
+        deleteFile("./reduced_vocab.txt");
+    }
+
+    private static void deleteFile(String filePath){
+        File file = new File(filePath);
+        if(file.exists()){
+            boolean isSuccess = file.delete();
+            if(!isSuccess){
+                System.out.println("Could not delete file: " + filePath);
+            }
+        }
     }
 
     private static void deleteDirectory(File directory) {

@@ -27,7 +27,7 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
         super(entityFile);
     }
 
-    public DBpediaLightEntitySelector(HashSet<String> entitiesToProcess) {
+    public DBpediaLightEntitySelector(Set<String> entitiesToProcess) {
         super(entitiesToProcess);
     }
 
@@ -37,19 +37,21 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
      * @param entityFile The file to be read from. The file must be UTF-8 encoded.
      * @return A HashSet of entities.
      */
-    public static HashSet<String> readEntitiesFromFile(File entityFile) {
-        HashSet<String> result = new HashSet<>();
+    public static Set<String> readEntitiesFromFile(File entityFile) {
+        Set<String> result = new HashSet<>();
         if(!entityFile.exists()){
             LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
         }
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile), StandardCharsets.UTF_8));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile),
+                    StandardCharsets.UTF_8));
             String readLine = "";
             while((readLine = reader.readLine()) != null){
                 result.add(readLine);
                 String alternativeUri = getRedirectUrl(readLine);
                 if(!alternativeUri.equals(readLine)){
-                    LOGGER.info("Alternative URI for " + readLine + " found: " + alternativeUri + "\nURI will be added to set of entities.");
+                    LOGGER.info("Alternative URI for " + readLine + " found: " + alternativeUri + "\n" +
+                            "URI will be added to set of entities.");
                     result.add(alternativeUri);
                 }
             }
@@ -85,10 +87,9 @@ public class DBpediaLightEntitySelector extends LightEntitySelector {
 
     @Override
     public Set<String> getEntities() {
-        if(entitiesToProcess != null) return this.entitiesToProcess;
-        else {
+        if(entitiesToProcess == null) {
             entitiesToProcess = readEntitiesFromFile(this.entityFile);
-            return this.entitiesToProcess;
         }
+        return this.entitiesToProcess;
     }
 }

@@ -644,7 +644,28 @@ public class Main {
             System.out.println("The specified file is a directory. Cannot generate text vector file.");
             return;
         }
+
         File fileToGenerate;
+
+        // check text vector reduction
+        if(transformationSource.endsWith(".txt")){
+            if(entityFilePath == null){
+                System.out.println("You already have a vector txt file. You must specify an entity file (-light) to " +
+                        "reduce it. Doing nothing.");
+                return;
+            }
+            if(filePathToBeWritten == null) {
+                // auto-assign name:
+                System.out.println("A file with the name: reduced_vectors.txt will be written (in the directory of " +
+                        "the txt vector source file.)");
+                fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "reduced_vectors.txt");
+            } else {
+                fileToGenerate = new File(filePathToBeWritten);
+            }
+            Gensim.writeReducedTextVectorFile(transformationSource, fileToGenerate.getAbsolutePath(), entityFilePath);
+            return;
+        }
+
         if(filePathToBeWritten == null) {
             fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
         } else {

@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.training;
 
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -9,6 +10,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -811,10 +813,59 @@ public class Gensim {
     }
 
     /**
+     * Given a text vector file, only the vectors for the entities in {@code entityFile} are transferred
+     * @param textVectorPath Path to a text vector file.
+     * @param fileToWritePath The file that will be written.
+     * @param entityPath The vocabulary that shall appear in the text file.
+     *                   The file must contain one word per line. The contents must be a subset of the vocabulary.
+     */
+    @NotNull
+    public static void writeReducedTextVectorFile(String textVectorPath, String fileToWritePath, String entityPath){
+        if(entityPath == null){
+            LOGGER.error("You must provide an entityFile. Aborting program.");
+            return;
+        }
+        if(textVectorPath == null){
+            LOGGER.error("You must provide a textVectorPath. Aborting program.");
+            return;
+        }
+        if(fileToWritePath == null){
+            LOGGER.error("You must provide a fileToWritePath. Aborting program.");
+            return;
+        }
+        File textVectorFile = new File(textVectorPath);
+        File entityFile = new File(entityPath);
+        if(!textVectorFile.exists() || !textVectorFile.isFile() || !entityFile.exists() || !entityFile.isFile()){
+            LOGGER.error("Either the text vector file or the entity file do not exist or are no files. Aborting " +
+                    "program.");
+            return;
+        }
+        File fileToWrite = new File(fileToWritePath);
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite),
+                    StandardCharsets.UTF_8));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textVectorFile),
+                    StandardCharsets.UTF_8));
+            Set<String> entities = Util.readEntitiesFromFile(entityFile);
+            String readLine;
+            while((readLine = reader.readLine()) != null){
+                String concept = readLine.split(" ")[0];
+                if(entities.contains(concept)){
+                    writer.write(readLine + "\n");
+                }
+            }
+            reader.close();
+            writer.close();
+        } catch (IOException e) {
+            LOGGER.error("An error occurred while trying to write the file.", e);
+        }
+    }
+
+    /**
      * Writes the vectors to a human-readable text file.
      *
      * @param modelOrVectorPath The path to the model or vector file. Note that the vector file MUST end with .kv in
-     *                          *                          order to be recognized as vector file.
+     *                          order to be recognized as vector file.
      * @param fileToWrite       The file that will be written.
      * @param entityFile        The vocabulary that shall appear in the text file (can be null if all words shall be written).
      *                          The file must contain one word per line. The contents must be a subset of the vocabulary.

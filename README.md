@@ -104,8 +104,8 @@ Besides generating walks and training embeddings, the CLI offers additional serv
 *(1) Full Vocabulary*<br/>
 jRDF2vec is compatible with the <a href="https://github.com/mariaangelapellegrino/Evaluation-Framework">evaluation 
 framework for KG embeddings (GEval)</a>. 
-This framework requires the vectors to be present in a text file. If you have a gensim model or vector file, you can
-use the following command to generate this file:
+The latter framework requires the vectors to be present in a text file. If you have a gensim model or vector file, 
+you can use the following command to generate this file:
 
 ```
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
@@ -123,6 +123,7 @@ java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model
 ```
 You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
 If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`.
+This command also works if `./path-to-your-model-or-vector-file` is an existing vector text file that shall be reduced.
 
 #### Generating a Vocabulary Text File
 jRDF2vec provides functionality to print all concepts for which a vector has been trained.
