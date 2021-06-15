@@ -59,7 +59,6 @@ public class DefaultEntityWalkRunnable implements Runnable {
      * Actual thread execution.
      */
     public void run() {
-
         switch (walkGenerationMode) {
             case RANDOM_WALKS_DUPLICATE_FREE:
                 if (walkGenerationManager.getWalkGenerator() instanceof IRandomWalkDuplicateFreeCapability) {
@@ -108,7 +107,8 @@ public class DefaultEntityWalkRunnable implements Runnable {
                             ((IMidTypeWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
                                     .generateMidTypeWalksForEntityDuplicateFree(
                                             walkGenerationManager.shortenUri(entity),
-                                            this.numberOfWalks, this.depth));
+                                            this.numberOfWalks, this.depth)
+                    );
                 } else {
                     printNotImplementedWarning();
                 }
@@ -120,11 +120,23 @@ public class DefaultEntityWalkRunnable implements Runnable {
                                     ((IMidEdgeWalkDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
                                             .generateMidEdgeWalksForEntityDuplicateFree(
                                                     walkGenerationManager.shortenUri(entity),
-                                                    this.numberOfWalks, this.depth));
+                                                    this.numberOfWalks, this.depth)
+                            );
                 } else {
                     printNotImplementedWarning();
                 }
                 break;
+            case EXPERIMENTAL_NODE_WALKS_DUPLICATE_FREE:
+                if(walkGenerationManager.getWalkGenerator() instanceof INodeWalksDuplicateFreeCapability) {
+                    walkGenerationManager
+                            .writeToFile(
+                                    ((INodeWalksDuplicateFreeCapability) walkGenerationManager.getWalkGenerator())
+                                    .generateNodeWalksForEntity(walkGenerationManager.shortenUri(entity),
+                                            this.numberOfWalks, this.depth)
+                            );
+                } else {
+                    printNotImplementedWarning();
+                }
         }
     }
 

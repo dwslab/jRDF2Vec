@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 /**
  * Memory based walk generator using the {@link TripleDataSetMemory} data structure.
@@ -17,7 +18,7 @@ import java.util.function.UnaryOperator;
 public abstract class MemoryWalkGenerator implements IWalkGenerator,
         IMidWalkCapability, IMidWalkDuplicateFreeCapability, IRandomWalkDuplicateFreeCapability,
         IMidWalkWeightedCapability, IMidEdgeWalkDuplicateFreeCapability, IRandomWalkCapability,
-        IMidTypeWalkDuplicateFreeCapability {
+        IMidTypeWalkDuplicateFreeCapability, INodeWalksDuplicateFreeCapability {
 
 
     /**
@@ -167,6 +168,28 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
         return result;
     }
 
+    @Override
+    public List<String> generateNodeWalksForEntity(String entity, int numberOfWalks, int depth){
+        List<String> fullWalks = generateDuplicateFreeRandomWalksForEntity(entity, numberOfWalks, depth);
+        Set<String> finalWalks = new HashSet<>();
+        for (String walk : fullWalks){
+            String[] walkComponents = walk.split(" ");
+            StringBuilder sb = new StringBuilder();
+            boolean isFirst = true;
+            for(int i = 0; i < walkComponents.length; i++){
+                if(i % 2 == 0){
+                    if(isFirst) {
+                        sb.append(walkComponents[i]);
+                        isFirst = false;
+                    } else {
+                        sb.append(" ").append(walkComponents[i]);
+                    }
+                }
+            }
+            finalWalks.add(sb.toString());
+        }
+        return new ArrayList<>(finalWalks);
+    }
 
     /**
      * Generates walks that are ready to be processed further (already concatenated, space-separated).

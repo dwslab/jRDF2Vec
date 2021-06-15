@@ -59,7 +59,12 @@ public enum WalkGenerationMode {
     /**
      * Generates mid walks but with only edges and the node of interest.
      */
-    EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE;
+    EXPERIMENTAL_MID_EDGE_WALKS_DUPLICATE_FREE,
+
+    /**
+     * Generates forward walks with only nodes.
+     */
+    EXPERIMENTAL_NODE_WALKS_DUPLICATE_FREE;
 
     /**
      * String representation of mode.
@@ -86,6 +91,9 @@ public enum WalkGenerationMode {
             case "experimental_mid_type_walks_duplicate_free":
             case "mid_type_walks_duplicate_free":
                 return EXPERIMENTAL_MID_TYPE_WALKS_DUPLICATE_FREE;
+            case "experimental_node_walks_duplicate_free":
+            case "node_walks_duplicate_free":
+                return EXPERIMENTAL_NODE_WALKS_DUPLICATE_FREE;
             default:
                 return null;
         }
