@@ -35,9 +35,23 @@ class NtMemoryWalkGeneratorTest {
     }
 
     @Test
-    void generateWalkForEntity(){
+    void generateWalkForEntity() {
         testWalkForEntity(loadFile("dummyGraph.nt").getAbsolutePath());
         testWalkForEntity(loadFile("dummyGraph_2.nt").getAbsolutePath());
+    }
+
+    @Test
+    void generateNodeWalksForEntity() {
+        File dummyGraphFile = loadFile("dummyGraph.nt");
+        assertNotNull(dummyGraphFile);
+        String dummyGraphFilePath = dummyGraphFile.getAbsolutePath();
+
+        NtMemoryWalkGenerator parser = new NtMemoryWalkGenerator(dummyGraphFilePath);
+        List<String> result = parser.generateNodeWalksForEntity("A", 100, 8);
+        assertTrue(result.size() >= 2);
+        for (String sentence : result) {
+            assertFalse(sentence.toLowerCase().contains("p"));
+        }
     }
 
     /**

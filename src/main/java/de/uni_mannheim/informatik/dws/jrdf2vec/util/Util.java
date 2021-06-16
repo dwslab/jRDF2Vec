@@ -37,11 +37,12 @@ public class Util {
     /**
      * Helper method. Formats the time delta between {@code before} and {@code after} to a string with human readable
      * time difference in days, hours, minutes, and seconds.
+     *
      * @param before Start time instance.
-     * @param after End time instance.
+     * @param after  End time instance.
      * @return Human-readable string.
      */
-    public static String getDeltaTimeString(Instant before, Instant after){
+    public static String getDeltaTimeString(Instant before, Instant after) {
 
         // unfortunately Java 1.9 which is currently incompatible with coveralls maven plugin...
         //long days = Duration.between(before, after).toDaysPart();
@@ -70,21 +71,22 @@ public class Util {
 
     /**
      * Helper method to obtain the number of read lines.
+     *
      * @param file File to be read.
      * @return Number of lines in the file.
      */
-    public static int getNumberOfLines(File file){
-        if (file == null){
+    public static int getNumberOfLines(File file) {
+        if (file == null) {
             return 0;
         }
         int linesRead = 0;
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            while(br.readLine() != null){
+            while (br.readLine() != null) {
                 linesRead++;
             }
             br.close();
-        } catch (IOException fnfe){
+        } catch (IOException fnfe) {
             LOGGER.error("Could not get number of lines for file " + file.getAbsolutePath(), fnfe);
         }
         return linesRead;
@@ -92,11 +94,12 @@ public class Util {
 
     /**
      * Given a vector text file, this method determines the dimensionality within the file based on the first valid line.
+     *
      * @param vectorTextFilePath Path to the file.
      * @return Dimensionality as int.
      */
-    public static int getDimensionalityFromVectorTextFile(String vectorTextFilePath){
-        if(vectorTextFilePath == null){
+    public static int getDimensionalityFromVectorTextFile(String vectorTextFilePath) {
+        if (vectorTextFilePath == null) {
             LOGGER.error("The specified file is null.");
             return -1;
         }
@@ -105,15 +108,16 @@ public class Util {
 
     /**
      * Given a vector text file, this method determines the dimensionality within the file based on the first valid line.
+     *
      * @param vectorTextFile Vector text file for which dimensionality of containing vectors shall be determined.
      * @return Dimensionality as int.
      */
-    public static int getDimensionalityFromVectorTextFile(File vectorTextFile){
-        if(vectorTextFile == null){
+    public static int getDimensionalityFromVectorTextFile(File vectorTextFile) {
+        if (vectorTextFile == null) {
             LOGGER.error("The specified file is null.");
             return -1;
         }
-        if(!vectorTextFile.exists()){
+        if (!vectorTextFile.exists()) {
             LOGGER.error("The given file does not exist.");
             return -1;
         }
@@ -124,19 +128,19 @@ public class Util {
             int validationLimit = 3;
             int currentValidationRun = 0;
 
-            while((readLine = reader.readLine()) != null) {
-                if(readLine.trim().equals("") || readLine.trim().equals("\n")){
+            while ((readLine = reader.readLine()) != null) {
+                if (readLine.trim().equals("") || readLine.trim().equals("\n")) {
                     continue;
                 }
-                if(currentValidationRun == 0){
-                    result = readLine.split(" ").length -1;
+                if (currentValidationRun == 0) {
+                    result = readLine.split(" ").length - 1;
                 }
-                int tempResult = readLine.split(" ").length -1;
-                if(tempResult != result){
+                int tempResult = readLine.split(" ").length - 1;
+                if (tempResult != result) {
                     LOGGER.error("Inconsistency in Dimensionality!");
                 }
                 currentValidationRun++;
-                if(currentValidationRun == validationLimit){
+                if (currentValidationRun == validationLimit) {
                     break;
                 }
             }
@@ -180,18 +184,19 @@ public class Util {
         }
     }
 
-    public static List<String> readLinesFromGzippedFile(String filePath){
+    public static List<String> readLinesFromGzippedFile(String filePath) {
         return readLinesFromGzippedFile(new File(filePath));
     }
 
     /**
      * Reads each line of the gzipped file into a list. The file must be UTF-8 encoded.
+     *
      * @param file File to be read from.
      * @return List. Each entry refers to one line in the file.
      */
-    public static List<String> readLinesFromGzippedFile(File file){
+    public static List<String> readLinesFromGzippedFile(File file) {
         List<String> result = new ArrayList<>();
-        if(file == null){
+        if (file == null) {
             LOGGER.error("The file is null. Cannot read from file.");
             return result;
         }
@@ -209,7 +214,7 @@ public class Util {
             while ((readLine = reader.readLine()) != null) {
                 result.add(readLine);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             fail("Could not read gzipped file.");
         }
@@ -223,11 +228,12 @@ public class Util {
 
     /**
      * Checks whether the provided URI points to a file.
+     *
      * @param uriToCheck The URI that shall be checked.
      * @return True if the URI is a file, else false.
      */
-    public static boolean uriIsFile(URI uriToCheck){
-        if(uriToCheck == null){
+    public static boolean uriIsFile(URI uriToCheck) {
+        if (uriToCheck == null) {
             return false;
         } else {
             return uriToCheck.getScheme().equals("file");
@@ -236,18 +242,19 @@ public class Util {
 
     /**
      * Returns true if the provided directory is a TDB directory, else false.
+     *
      * @param directoryToCheck The directory that shall be checked.
      * @return True if TDB directory, else false.
      */
-    public static boolean isTdbDirectory(File directoryToCheck){
-        if(directoryToCheck == null || !directoryToCheck.exists() || !directoryToCheck.isDirectory()){
+    public static boolean isTdbDirectory(File directoryToCheck) {
+        if (directoryToCheck == null || !directoryToCheck.exists() || !directoryToCheck.isDirectory()) {
             return false;
         }
         boolean isDatFileAvailable = false;
         // note: we already checked that directoryToCheck is a directory
-        for(File file : directoryToCheck.listFiles()){
+        for (File file : directoryToCheck.listFiles()) {
             // we accept the directory as tdb directory if it contains a dat file.
-            if(file.getAbsolutePath().endsWith(".dat")){
+            if (file.getAbsolutePath().endsWith(".dat")) {
                 isDatFileAvailable = true;
                 break;
             }
@@ -259,6 +266,7 @@ public class Util {
      * Given a list of walks where a walk is represented as a List of strings, this method will convert that
      * into a list of strings where a walk is one string (and the elements are separated by spaces).
      * The lists are duplicate free.
+     *
      * @param dataStructureToConvert The data structure that shall be converted.
      * @return Data structure converted to string list.
      */
@@ -267,8 +275,8 @@ public class Util {
         for (List<String> individualWalk : dataStructureToConvert) {
             StringBuilder walk = new StringBuilder();
             boolean isFirst = true;
-            for(String walkComponent : individualWalk){
-                if(isFirst){
+            for (String walkComponent : individualWalk) {
+                if (isFirst) {
                     isFirst = false;
                     walk.append(walkComponent);
                 } else {
@@ -282,24 +290,30 @@ public class Util {
 
     public static List<String> convertToStringWalks(List<List<Triple>> walks,
                                                     String entity,
-                                                    boolean isUnifyAnonymousNodes){
+                                                    boolean isUnifyAnonymousNodes) {
         List<String> result = new ArrayList<>();
         for (List<Triple> walk : walks) {
-            String finalSentence = entity;
+            StringBuilder finalSentence = new StringBuilder(entity);
             if (isUnifyAnonymousNodes) {
                 for (Triple po : walk) {
                     String object = po.object;
                     if (isAnonymousNode(object)) {
                         object = "ANode";
                     }
-                    finalSentence += " " + po.predicate + " " + object;
+                    finalSentence.append(" ")
+                            .append(po.predicate)
+                            .append(" ")
+                            .append(object);
                 }
             } else {
                 for (Triple po : walk) {
-                    finalSentence += " " + po.predicate + " " + po.object;
+                    finalSentence.append(" ")
+                            .append(po.predicate)
+                            .append(" ")
+                            .append(po.object);
                 }
             }
-            result.add(finalSentence);
+            result.add(finalSentence.toString());
         }
         return result;
     }
@@ -320,16 +334,17 @@ public class Util {
     /**
      * Given a list of walks where a walk is represented as a List of strings, this method will convert that
      * into a list of strings where a walk is one string (and the elements are separated by spaces).
+     *
      * @param dataStructureToConvert The data structure that shall be converted.
      * @return Data structure converted to string list.
      */
     public static List<String> convertToStringWalks(List<List<String>> dataStructureToConvert) {
         List<String> result = new ArrayList<>();
-        for (List<String> individualWalk : dataStructureToConvert){
+        for (List<String> individualWalk : dataStructureToConvert) {
             StringBuilder walk = new StringBuilder();
             boolean isFirst = true;
-            for(String walkComponent : individualWalk){
-                if(isFirst){
+            for (String walkComponent : individualWalk) {
+                if (isFirst) {
                     isFirst = false;
                     walk.append(walkComponent);
                 } else {
@@ -343,8 +358,9 @@ public class Util {
 
     /**
      * Draw a random value from a HashSet. This method is thread-safe.
+     *
      * @param setToDrawFrom The set from which shall be drawn.
-     * @param <T> Type
+     * @param <T>           Type
      * @return Drawn value of type T.
      */
     public static <T> T randomDrawFromSet(Set<T> setToDrawFrom) {
@@ -358,14 +374,15 @@ public class Util {
 
     /**
      * Helper function to load files in class path that contain spaces.
+     *
      * @param fileName Name of the file.
      * @return File in case of success, else null.
      */
-    public static File loadFile(String fileName){
+    public static File loadFile(String fileName) {
         try {
             URL fileUrl = Util.class.getClassLoader().getResource(fileName);
             File result;
-            if(fileUrl != null){
+            if (fileUrl != null) {
                 result = FileUtils.toFile(fileUrl.toURI().toURL());
                 assertTrue(result.exists(), "Required resource not available.");
                 return result;
@@ -373,7 +390,7 @@ public class Util {
                 fail("FileName URL is null.");
                 return null;
             }
-        } catch (URISyntaxException | MalformedURLException exception){
+        } catch (URISyntaxException | MalformedURLException exception) {
             exception.printStackTrace();
             fail("Could not load file.");
             return null;
@@ -398,13 +415,13 @@ public class Util {
      */
     public static Set<String> readEntitiesFromFile(File entityFile) {
         HashSet<String> result = new HashSet<>();
-        if(!entityFile.exists()){
+        if (!entityFile.exists()) {
             LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
         }
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile), StandardCharsets.UTF_8));
             String readLine = "";
-            while((readLine = reader.readLine()) != null){
+            while ((readLine = reader.readLine()) != null) {
                 result.add(readLine);
             }
         } catch (IOException e) {
