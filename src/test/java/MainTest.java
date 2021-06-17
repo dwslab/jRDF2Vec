@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
@@ -77,6 +78,56 @@ class MainTest {
 
         // assert sample parameter
         assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
+
+        try {
+            FileUtils.forceDelete(walkDirectory);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to clean up after test.", ioe);
+            fail();
+        }
+    }
+
+    /**
+     * Test classic run with vector text file generation.
+     */
+    @Test
+    public void trainNodeEmbeddings() {
+        LOGGER.info("Running test: trainClassic()");
+        String walkPath = "./nodeWalks/";
+        File walkDirectory = new File(walkPath);
+        walkDirectory.mkdir();
+        walkDirectory.deleteOnExit();
+        String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-walkGenerationMode",
+                "EXPERIMENTAL_NODE_WALKS_DUPLICATE_FREE"};
+        Main.main(args);
+
+        assertTrue(Main.getRdf2VecInstance().getClass().equals(RDF2Vec.class), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec.class)");
+        File[] fileArray = walkDirectory.listFiles();
+        assertNotNull(fileArray);
+        assertTrue(fileArray.length > 0);
+        HashSet<String> files = Sets.newHashSet(Objects.requireNonNull(walkDirectory.list()));
+
+        // assert that all files are there
+        assertTrue(files.contains("model.kv"));
+        assertTrue(files.contains("model"));
+        assertTrue(files.contains("walk_file_0.txt.gz"));
+        assertTrue(files.contains("vectors.txt"));
+
+        // assert sample parameter
+        assertEquals(Word2VecConfiguration.SAMPLE_DEFAULT, Main.getRdf2VecInstance().getWord2VecConfiguration().getSample());
+
+        // assert vocab
+
+        // positive assertions
+        for (String concept : new String[]{"A", "B", "C", "W"}) {
+            assertTrue(Gensim.getInstance().isInVocabulary(concept, new File(walkDirectory, "model.kv")));
+        }
+
+        // negative assertions
+        for (String concept : new String[]{"P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"}) {
+            assertFalse(Gensim.getInstance().isInVocabulary(concept, new File(walkDirectory, "model.kv")));
+        }
 
         try {
             FileUtils.forceDelete(walkDirectory);
@@ -1359,6 +1410,7 @@ class MainTest {
         deleteDirectory("./midEdgeWalksDuplicateFreeDirectory");
         deleteDirectory("./midTypeWalksDuplicateFreeDirectory");
         deleteDirectory("./midTypeWalksDuplicateFreeDirectory2");
+        deleteDirectory("./nodeWalks");
         deleteFile("./reduced_vocab.txt");
     }
 
@@ -1397,7 +1449,7 @@ class MainTest {
             File file = Paths.get(res.toURI()).toFile();
             return file.getCanonicalPath();
         } catch (URISyntaxException | IOException ex) {
-            LOGGER.info("Cannot create path of resource", ex);
+            LOGGER.info("Cannot create path of resource.", ex);
             return null;
         }
     }
