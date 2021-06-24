@@ -5,6 +5,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.WalkMerger;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
@@ -145,6 +146,11 @@ public class Main {
     private static int port = Gensim.DEFAULT_PORT;
 
     /**
+     * The default merge file.
+     */
+    private static final String DEFAULT_MERGE_FILE = "./mergedWalks.txt";
+
+    /**
      * The main method that is executed when running the JAR.
      *
      * @param args All the options for walk generation and training. Run with -help in order to get an overview.
@@ -160,8 +166,30 @@ public class Main {
         }
 
         // check for help
-        if (containsIgnoreCase("-help", args) || containsIgnoreCase("--help", args) || containsIgnoreCase("-h", args)) {
+        if (containsIgnoreCase("-help", args) || containsIgnoreCase("--help", args) ||
+                containsIgnoreCase("-h", args)) {
             System.out.println(getHelp());
+            return;
+        }
+
+        if (containsIgnoreCase("-merge", args) ||containsIgnoreCase("--merge", args) ||
+            containsIgnoreCase("-mergeWalks", args) || containsIgnoreCase("--mergeWalks", args)
+        ) {
+            String walkDirectory = null;
+            if(containsIgnoreCase("-walkDirectory", args) || containsIgnoreCase("-walkDir", args)){
+                walkDirectory = getValue("-walkDirectory", args);
+                walkDirectory = (walkDirectory == null) ? getValue("-walkDir", args) : null;
+            }
+            if(walkDirectory == null){
+                System.out.println("Please provide a walkDirectory if you use -mergeWalks");
+                return;
+            }
+            String fileToWrite = getValue("-o", args);
+            if(fileToWrite == null){
+                System.out.println("Writing file: " + DEFAULT_MERGE_FILE);
+                fileToWrite = DEFAULT_MERGE_FILE;
+            }
+            WalkMerger.mergeWalks(walkDirectory, fileToWrite);
             return;
         }
 
@@ -217,7 +245,8 @@ public class Main {
                 // try again with a different writing
                 walksPath = getValue("-walkDir", args);
                 if (walksPath == null) {
-                    System.out.println("Required parameter -walkDirectory <path to walk directory or file> missing. Aborting program. Call '-help' to learn more about the CLI.");
+                    System.out.println("Required parameter -walkDirectory <path to walk directory or file> missing.\n" +
+                            "Aborting program. Call '-help' to learn more about the CLI.");
                     return;
                 }
             }
@@ -233,7 +262,8 @@ public class Main {
                 Gensim.setPort(intPort);
                 port = intPort;
             } catch (NumberFormatException nfe) {
-                System.out.println("A problem occurred while trying to parse the following port number: " + portString + "\nUsing default port: " + Gensim.DEFAULT_PORT);
+                System.out.println("A problem occurred while trying to parse the following port number: " + portString
+                        + "\nUsing default port: " + Gensim.DEFAULT_PORT);
             }
         }
         System.out.println("Using server port: " + port);
@@ -320,7 +350,8 @@ public class Main {
             try {
                 dimensions = Integer.parseInt(dimensionText);
             } catch (NumberFormatException nfe) {
-                System.out.println("Could not parse the number of dimensions. Using default (" + Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT + ").");
+                System.out.println("Could not parse the number of dimensions. Using default (" +
+                        Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT + ").");
                 dimensions = Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT;
             }
         } else dimensions = Word2VecConfiguration.VECTOR_DIMENSION_DEFAULT;
@@ -970,7 +1001,11 @@ public class Main {
                 "       where <training_file|entity_file>\n" +
                 "          refers either to the NT/TTL etc. file that has been used to train the model or to a text file.\n" +
                 "          containing the concepts you  want to check (one concept per line in the text file, make sure\n" +
-                "          the file ending is .txt).";
+                "          the file ending is .txt).\n\n" +
+                "D) Merge of All Walk Files Into One\n" +
+                "   By default, jRDF2vec serializes walks in different gzipped files. If you require one\n" +
+                "   uncompressed, file, you can use the `-mergeWalks` keyword. You need to provide a\n" +
+                "   `-walkDirectory <dir>` and you can optionally specify the output file using `-o <file_path>`\n";
     }
 
     /**

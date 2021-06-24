@@ -27,7 +27,7 @@ Alternatively, you can download the packaged JAR of the latest successful: commi
 - Python 3 with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.
 
 You can check if you set up the environment (Python 3 + dependencies) correctly by running:
-```
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -checkInstallation
 ```
 The command line output will list missing requirements or print `Installation is ok ✔`.
@@ -107,7 +107,7 @@ framework for KG embeddings (GEval)</a>.
 The latter framework requires the vectors to be present in a text file. If you have a gensim model or vector file, 
 you can use the following command to generate this file:
 
-```
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file
 ```
 You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
@@ -118,7 +118,7 @@ If you want to write a `vectors.txt` file that contains only a subset of the voc
 specify the entities of interest using the `-light <entity_file>` option (The `<entity_file>` should contain one entity 
 (full URI) per line.):
 
-```
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model-or-vector-file -light ./path-to-entity-file
 ```
 You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
@@ -131,7 +131,7 @@ One word of the vocabulary will be printed per line to a file named `vocabulary.
 The model or vector file needs to be specified. If you have a gensim model or vector file, you can
 use the following command to generate this file:
 
-```
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateVocabularyFile ./path-to-your-model-or-vector-file
 ```
 
@@ -142,7 +142,7 @@ In addition, the word2vec configuration parameters may filter out infrequent wor
 `-minCount` above, for example). To analyze such rather seldom cases, you can use the `-analyzeVocab` function specified
 as follows:
 
-```
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -analyzeVocab <model> <training_file|entity_file>
 ```
 - `<model>` refers to any model representation such as gensim model file, `.kv` file, or `.txt` file. Just make sure
@@ -153,6 +153,16 @@ text file containing the concepts you want to check (one concept per line in the
 `.txt`).
   
 A report will be printed. For large models, you may want to redirect that into a file (`[...] &> somefile.txt)`.
+
+#### Merge of All Walk Files Into One
+By default, jRDF2vec serializes walks in different gzipped files. If you require one
+uncompressed, file, you can use the `-mergeWalks` keyword. You need to provide a
+`-walkDirectory <dir>` and you can optionally specify the output file using `-o <file_path>`. 
+
+```bash
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -mergeWalks -walkDirectory <dir> -o <file_to_write>
+```
+
 
 ## How to use the jRDF2Vec as library in Java projects?
 Stable releases are available through the maven central repository:
