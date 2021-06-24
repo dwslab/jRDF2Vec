@@ -1,15 +1,11 @@
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.LightEntitySelector;
-import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators.HdtWalkGenerator;
-import org.apache.commons.io.FileUtils;
+package de.uni_mannheim.informatik.dws.jrdf2vec.util;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -153,6 +149,12 @@ class UtilTest {
         assertTrue(result.contains("http://dbpedia.org/resource/Grupa_Lotos"));
         assertTrue(result.contains("http://dbpedia.org/resource/State_Bank_of_India"));
         assertFalse(result.contains("http://dbpedia.org/resource/War"));
+    }
+
+    @Test
+    void getPathOfResource(){
+        assertNotNull(Util.getPathOfResource("dummyGraph.nt"));
+        assertNull(Util.getPathOfResource("_THIS_FILE_DOES_NOT_EXIST_.not_exist"));
     }
 
     /**

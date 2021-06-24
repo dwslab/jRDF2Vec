@@ -2,7 +2,6 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.TripleDataSetMemory;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import org.rdfhdt.hdt.exceptions.NotFoundException;
@@ -14,12 +13,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.loadFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NxMemoryWalkGeneratorTest {
@@ -97,9 +96,7 @@ class NxMemoryWalkGeneratorTest {
                                 + "\nSentence:\n" + walk);
                     }
                 }
-            } catch (IOException e) {
-                fail("No exception should occur.", e);
-            } catch (NotFoundException e) {
+            } catch (IOException | NotFoundException e) {
                 fail("No exception should occur.", e);
             }
 
@@ -150,9 +147,7 @@ class NxMemoryWalkGeneratorTest {
                                 + walkArray[i - 2] + " " + walkArray[i - 1] + " " + walkArray[i]
                                 + "\nSentence:\n" + walk1);
                     }
-                } catch (NotFoundException e) {
-                    fail("Exception", e);
-                } catch (IOException e) {
+                } catch (NotFoundException | IOException e) {
                     fail("Exception", e);
                 } finally {
                     fileToUse.delete();
@@ -161,23 +156,6 @@ class NxMemoryWalkGeneratorTest {
         } catch (IOException ioe) {
             LOGGER.error("HDT Init error.");
             fail("Init should not fail.");
-        }
-    }
-
-    /**
-     * Helper function to load files in class path that contain spaces.
-     * @param fileName Name of the file.
-     * @return File in case of success, else null.
-     */
-    private File loadFile(String fileName){
-        try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
-            assertTrue(result.exists(), "Required resource not available.");
-            return result;
-        } catch (URISyntaxException | MalformedURLException | NullPointerException exception){
-            exception.printStackTrace();
-            fail("Could not load file.");
-            return null;
         }
     }
 

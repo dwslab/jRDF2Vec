@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.loadFile;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode.RANDOM_WALKS_DUPLICATE_FREE;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -100,7 +101,6 @@ class WalkGeneratorDefaultTest {
     @Test
     void generateTextWalks(){
         File pizzaOntology = loadFile("pizza.ttl");
-
         File walkDirectory = new File("./test_walks3");
         walkDirectory.deleteOnExit();
         walkDirectory.deleteOnExit();
@@ -132,22 +132,5 @@ class WalkGeneratorDefaultTest {
         System.out.println("Scheme: " + myURI.getScheme());
         */
         assertEquals("file", myURI.getScheme());
-    }
-
-    /**
-     * Helper function to load files in class path that contain spaces.
-     * @param fileName Name of the file.
-     * @return File in case of success, else null.
-     */
-    private File loadFile(String fileName){
-        try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
-            assertTrue(result.exists(), "Required resource not available.");
-            return result;
-        } catch (URISyntaxException | MalformedURLException exception){
-            exception.printStackTrace();
-            fail("Could not load file.");
-            return null;
-        }
     }
 }

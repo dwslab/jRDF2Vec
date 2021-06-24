@@ -22,6 +22,7 @@ import java.util.Set;
  */
 public class VocabularyAnalyzer {
 
+
     private static Logger LOGGER = LoggerFactory.getLogger(VocabularyAnalyzer.class);
 
     /**

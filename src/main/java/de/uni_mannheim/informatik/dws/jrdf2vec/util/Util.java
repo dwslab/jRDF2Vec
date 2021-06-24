@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -429,5 +430,23 @@ public class Util {
         }
         LOGGER.info("Number of read entities: " + result.size());
         return result;
+    }
+
+    /**
+     * Helper method to obtain the canonical path of a (test) resource.
+     *
+     * @param resourceName File/directory name.
+     * @return Canonical path of resource.
+     */
+    public static String getPathOfResource(String resourceName) {
+        try {
+            URL res = Util.class.getClassLoader().getResource(resourceName);
+            if (res == null) throw new IOException();
+            File file = Paths.get(res.toURI()).toFile();
+            return file.getCanonicalPath();
+        } catch (URISyntaxException | IOException ex) {
+            LOGGER.info("Cannot create path of resource.", ex);
+            return null;
+        }
     }
 }

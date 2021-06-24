@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TextProcessorTest {
 
+
     @Test
     void apply(){
        TextProcessor tp = new TextProcessor();
@@ -14,5 +15,4 @@ class TextProcessorTest {
        assertEquals("151", tp.apply("\"1.51\"^^<something> . "));
        assertEquals("gedichte", tp.apply("\"Gedichte\"@de ."));
     }
-
 }

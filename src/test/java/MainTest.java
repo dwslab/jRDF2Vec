@@ -25,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +33,7 @@ import java.util.zip.GZIPInputStream;
 
 
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getPathOfResource;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -1433,24 +1433,6 @@ class MainTest {
             FileUtils.deleteDirectory(new File(directoryPath));
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory '" + directoryPath + "'.", e);
-        }
-    }
-
-    /**
-     * Helper method to obtain the canonical path of a (test) resource.
-     *
-     * @param resourceName File/directory name.
-     * @return Canonical path of resource.
-     */
-    public String getPathOfResource(String resourceName) {
-        try {
-            URL res = getClass().getClassLoader().getResource(resourceName);
-            if (res == null) throw new IOException();
-            File file = Paths.get(res.toURI()).toFile();
-            return file.getCanonicalPath();
-        } catch (URISyntaxException | IOException ex) {
-            LOGGER.info("Cannot create path of resource.", ex);
-            return null;
         }
     }
 }

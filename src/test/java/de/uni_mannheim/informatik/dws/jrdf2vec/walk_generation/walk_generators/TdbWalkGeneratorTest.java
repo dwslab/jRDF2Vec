@@ -1,17 +1,14 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.walk_generators;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.loadFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TdbWalkGeneratorTest {
@@ -102,23 +99,5 @@ class TdbWalkGeneratorTest {
 
         // test error case
         assertNotNull(walkGenerator.getForwardTriples("ERROR_URL"));
-    }
-
-    /**
-     * Helper function to load files in class path that contain spaces.
-     *
-     * @param fileName Name of the file.
-     * @return File in case of success, else null.
-     */
-    private static File loadFile(String fileName) {
-        try {
-            File result =
-                    FileUtils.toFile(TdbWalkGeneratorTest.class.getClassLoader().getResource(fileName).toURI().toURL());
-            assertTrue(result.exists(), "Required resource not available.");
-            return result;
-        } catch (URISyntaxException | MalformedURLException exception) {
-            fail("Could not load file.", exception);
-            return null;
-        }
     }
 }

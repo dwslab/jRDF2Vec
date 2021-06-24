@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class JenaOntModelMemoryWalkGeneratorTest {
 
+
     @Test
     void readDataFromFile() {
         File ontologyTestFile = loadFile("pizza.owl.xml");

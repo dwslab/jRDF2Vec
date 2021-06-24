@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.loadFile;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RDF2VecTest {
@@ -189,23 +190,6 @@ class RDF2VecTest {
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory ./ontModelTest/).");
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Helper function to load files in class path that contain spaces.
-     * @param fileName Name of the file.
-     * @return File in case of success, else null.
-     */
-    private File loadFile(String fileName){
-        try {
-            File result =  FileUtils.toFile(this.getClass().getClassLoader().getResource(fileName).toURI().toURL());
-            assertTrue(result.exists(), "Required resource not available.");
-            return result;
-        } catch (URISyntaxException | MalformedURLException exception){
-            exception.printStackTrace();
-            fail("Could not load file.");
-            return null;
         }
     }
 }

@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class NxParserTest {
 
+
     @Test
     public void testNxParserBehavior() {
         testExecutionNx(loadFile("pizza.owl.nt").getAbsolutePath());
@@ -30,7 +31,6 @@ public class NxParserTest {
     public void testTtlParserBehavior(){
         testExecutionTtl(loadFile("pizza.ttl").getAbsolutePath());
     }
-
 
     /**
      * For repeated NX tests.
@@ -57,8 +57,6 @@ public class NxParserTest {
         }
     }
 
-
-
     /**
      * For repeated NX tests.
      * @param filePath The file path to the file to be tested.
@@ -83,7 +81,6 @@ public class NxParserTest {
             fail("Exception was thrown.");
         }
     }
-
 
     /**
      * For repeated NX tests.
@@ -110,7 +107,6 @@ public class NxParserTest {
         }
     }
 
-
     /**
      * Helper function to load files in class path that contain spaces.
      * @param fileName Name of the file.
@@ -127,6 +123,4 @@ public class NxParserTest {
             return null;
         }
     }
-
-
 }
