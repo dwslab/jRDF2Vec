@@ -32,8 +32,7 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 
-import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
-import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getPathOfResource;
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -1335,7 +1334,7 @@ class MainTest {
     }
 
     @Test
-    void generateTextVectorFile(){
+    void generateTextVectorFile() {
         String fileToWritePath = "./reduced_vocab.txt";
         String vectorTxtFilePath = getPathOfResource("txtVectorFile.txt");
         String entityFilePath = getPathOfResource("txtVectorFileEntities.txt");
@@ -1347,7 +1346,7 @@ class MainTest {
         File fileToWrite1 = new File(fileToWritePath);
         assertFalse(fileToWrite1.exists());
         String parent = (new File(vectorTxtFilePath)).getParent();
-        File fileToWrite2 = new File(parent,"reduced_vectors.txt");
+        File fileToWrite2 = new File(parent, "reduced_vectors.txt");
         assertFalse(fileToWrite2.exists());
 
         // auto naming
@@ -1357,7 +1356,7 @@ class MainTest {
         assertTrue(getNumberOfLines(fileToWrite2) <= 3);
 
         String[] mainCommand3 = {"-generateTxtVectorFile", vectorTxtFilePath, "-light", entityFilePath, "-newFile",
-        fileToWritePath};
+                fileToWritePath};
         Main.main(mainCommand3);
         assertTrue(fileToWrite1.exists());
         assertTrue(getNumberOfLines(fileToWrite1) <= 3);
@@ -1366,28 +1365,34 @@ class MainTest {
         fileToWrite2.delete();
     }
 
-    /**
-     * Helper function to load files in class path that contain spaces.
-     * @param fileName Name of the file.
-     * @return File in case of success, else null.
-     */
-    public static File loadFile(String fileName){
-        try {
-            URL fileUrl = Util.class.getClassLoader().getResource(fileName);
-            File result;
-            if(fileUrl != null){
-                result = FileUtils.toFile(fileUrl.toURI().toURL());
-                assertTrue(result.exists(), "Required resource not available.");
-                return result;
-            } else {
-                fail("FileName URL is null.");
-                return null;
-            }
-        } catch (URISyntaxException | MalformedURLException exception){
-            exception.printStackTrace();
-            fail("Could not load file.");
-            return null;
-        }
+    @Test
+    void mergeFiles() {
+        String walkDirectoryPath = getPathOfResource("walk_merge");
+        String fileToWritePath = "./mergedWalksTest.txt";
+        File fileToWrite = new File(fileToWritePath);
+        fileToWrite.deleteOnExit();
+
+        // error case
+        Main.main(new String[]{"-mergeWalks", "-o", fileToWritePath});
+        assertFalse(fileToWrite.exists());
+
+        // correct case
+        Main.main(new String[]{"-mergeWalks", "-walkDirectory", walkDirectoryPath, "-o", fileToWritePath});
+        assertTrue(fileToWrite.exists());
+
+        // default file case
+        Main.main(new String[]{"-mergeWalks", "-walkDirectory", walkDirectoryPath});
+        File defaultFile = new File(Main.DEFAULT_MERGE_FILE);
+        defaultFile.deleteOnExit();
+        assertTrue(defaultFile.exists());
+
+        // re-using the file reader here...
+        Set<String> result = Util.readEntitiesFromFile(defaultFile);
+        assertTrue(result.size() > 4);
+        assertTrue(result.contains("Ä Ö Ü"));
+        assertTrue(result.contains("A B C"));
+        assertTrue(result.contains("G H I"));
+        assertTrue(result.contains("? = %"));
     }
 
     @AfterAll
@@ -1412,27 +1417,7 @@ class MainTest {
         deleteDirectory("./midTypeWalksDuplicateFreeDirectory2");
         deleteDirectory("./nodeWalks");
         deleteFile("./reduced_vocab.txt");
-    }
-
-    private static void deleteFile(String filePath){
-        File file = new File(filePath);
-        if(file.exists()){
-            boolean isSuccess = file.delete();
-            if(!isSuccess){
-                System.out.println("Could not delete file: " + filePath);
-            }
-        }
-    }
-
-    private static void deleteDirectory(File directory) {
-        deleteDirectory(directory.getAbsolutePath());
-    }
-
-    private static void deleteDirectory(String directoryPath) {
-        try {
-            FileUtils.deleteDirectory(new File(directoryPath));
-        } catch (IOException e) {
-            LOGGER.info("Cleanup failed (directory '" + directoryPath + "'.", e);
-        }
+        deleteFile(Main.DEFAULT_MERGE_FILE);
+        deleteFile("./mergedWalksTest.txt");
     }
 }

@@ -399,6 +399,20 @@ public class Util {
     }
 
     /**
+     * Delete the specified file.
+     * @param filePath The path of the file to be deleted.
+     */
+    public static void deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            boolean isSuccess = file.delete();
+            if (!isSuccess) {
+                System.out.println("Could not delete file: " + filePath);
+            }
+        }
+    }
+
+    /**
      * Reads the entities in the specified file into a HashSet.
      *
      * @param pathToEntityFile The file to be read from. The file must be UTF-8 encoded.
@@ -447,6 +461,22 @@ public class Util {
         } catch (URISyntaxException | IOException ex) {
             LOGGER.info("Cannot create path of resource.", ex);
             return null;
+        }
+    }
+
+    /**
+     * Deletes the stated directory.
+     * @param directory Directory that shall be deleted.
+     */
+    public static void deleteDirectory(File directory) {
+        deleteDirectory(directory.getAbsolutePath());
+    }
+
+    public static void deleteDirectory(String directoryPath) {
+        try {
+            FileUtils.deleteDirectory(new File(directoryPath));
+        } catch (IOException e) {
+            LOGGER.info("Cleanup failed (directory '" + directoryPath + "'.", e);
         }
     }
 }

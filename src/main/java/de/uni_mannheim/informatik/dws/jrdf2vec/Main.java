@@ -148,7 +148,7 @@ public class Main {
     /**
      * The default merge file.
      */
-    private static final String DEFAULT_MERGE_FILE = "./mergedWalks.txt";
+    public static final String DEFAULT_MERGE_FILE = "./mergedWalks.txt";
 
     /**
      * The main method that is executed when running the JAR.
@@ -178,7 +178,9 @@ public class Main {
             String walkDirectory = null;
             if(containsIgnoreCase("-walkDirectory", args) || containsIgnoreCase("-walkDir", args)){
                 walkDirectory = getValue("-walkDirectory", args);
-                walkDirectory = (walkDirectory == null) ? getValue("-walkDir", args) : null;
+                if(walkDirectory == null) {
+                    walkDirectory = (walkDirectory == null) ? getValue("-walkDir", args) : null;
+                }
             }
             if(walkDirectory == null){
                 System.out.println("Please provide a walkDirectory if you use -mergeWalks");
