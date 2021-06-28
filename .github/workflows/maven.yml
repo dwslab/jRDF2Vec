@@ -19,7 +19,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-4
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-5
           #restore-keys: ${{ runner.os }}-m2
       - name: Setup Python 🐍
         uses: actions/setup-python@v1
