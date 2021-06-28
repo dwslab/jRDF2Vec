@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.deleteFile;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfLines;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -177,7 +178,7 @@ class GensimTest {
 
         Double[] unitedVector = gensim.getVector("united", pathToVectorFile);
 
-        double similarityJava = (gensim.cosineSimilarity(europeVector, unitedVector));
+        double similarityJava = (Gensim.cosineSimilarity(europeVector, unitedVector));
         double similarityPython = (gensim.getSimilarity("Europe", "united", pathToVectorFile));
         assertEquals(similarityJava, similarityPython, 0.0001);
 
@@ -206,7 +207,7 @@ class GensimTest {
 
         Double[] unitedVector = gensim.getVector("united", pathToVectorFile);
 
-        double similarityJava = (gensim.cosineSimilarity(europeVector, unitedVector));
+        double similarityJava = (Gensim.cosineSimilarity(europeVector, unitedVector));
         double similarityPython = (gensim.getSimilarity("Europe", "united", pathToVectorFile));
         assertEquals(similarityJava, similarityPython, 0.0001);
 
@@ -241,10 +242,10 @@ class GensimTest {
         assertTrue(getNumberOfLines(writtenFile2) <= 2);
 
         // cleaning up
-        writtenFile2.delete();
-        writtenFile.delete();
-        modelFile.delete();
-        vectorFile.delete();
+        deleteFile(writtenFile2);
+        deleteFile(writtenFile);
+        deleteFile(modelFile);
+        deleteFile(vectorFile);
     }
 
     @Test
@@ -270,8 +271,8 @@ class GensimTest {
         assertTrue(gensim.isInVocabulary("Europen", vectorFilePath));
 
         // cleaning up
-        modelFile.delete();
-        vectorFile.delete();
+        deleteFile(modelFile);
+        deleteFile(vectorFile);
     }
 
     @Test
@@ -300,8 +301,8 @@ class GensimTest {
         assertTrue(vocabularySize > 100);
 
         // cleaning up
-        modelFile.delete();
-        vectorFile.delete();
+        deleteFile(modelFile);
+        deleteFile(vectorFile);
     }
 
     @Test
@@ -319,14 +320,14 @@ class GensimTest {
         assertTrue(similarity > -1.0, "Problem with the simliarity. Similarity: " + similarity);
 
         // cleaning up
-        modelFile.delete();
-        vectorFile.delete();
+        deleteFile(modelFile);
+        deleteFile(vectorFile);
     }
 
     @Test
     void externalResourcesDirectory(){
         // shut down
-        gensim.shutDown();
+        Gensim.shutDown();
 
         // reinitialize
         File externalResourcesDirectory = new File("./ext/");
@@ -385,7 +386,7 @@ class GensimTest {
     void setGetPort(){
         int testPort = 41194;
         Gensim.setPort(testPort);
-        assertFalse(Gensim.getPort() == testPort);
+        assertNotEquals(Gensim.getPort(), testPort);
         Gensim.shutDown();
         Gensim.setPort(testPort);
         gensim = Gensim.getInstance();
@@ -413,7 +414,7 @@ class GensimTest {
         assertTrue(fileToWrite.exists());
         assertTrue(getNumberOfLines(fileToWrite) <= 3);
 
-        fileToWrite.delete();
+        deleteFile(fileToWrite);
     }
 
     /**

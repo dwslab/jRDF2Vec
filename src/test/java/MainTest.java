@@ -21,9 +21,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
@@ -178,9 +175,9 @@ class MainTest {
         assertEquals(80, Util.getDimensionalityFromVectorTextFile(vectorsFile));
 
         // clean-up
-        modelkvFile.delete();
-        modelFile.delete();
-        vectorsFile.delete();
+        deleteFile(modelkvFile);
+        deleteFile(modelFile);
+        deleteFile(vectorsFile);
     }
 
     /**
@@ -479,7 +476,7 @@ class MainTest {
         File vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
         assertTrue(vectorFile.exists());
         assertTrue(getNumberOfLines(vectorFile) > 5);
-        vectorFile.delete();
+        deleteFile(vectorFile);
     }
 
     /**
@@ -1126,8 +1123,8 @@ class MainTest {
         }
 
         // clean up
-        graphFileToUse.delete();
-        walkDirectory.delete();
+        deleteFile(graphFileToUse);
+        deleteFile(walkDirectory);
     }
 
     @Test
@@ -1337,6 +1334,7 @@ class MainTest {
     void generateTextVectorFile() {
         String fileToWritePath = "./reduced_vocab.txt";
         String vectorTxtFilePath = getPathOfResource("txtVectorFile.txt");
+        assertNotNull(vectorTxtFilePath);
         String entityFilePath = getPathOfResource("txtVectorFileEntities.txt");
 
         // try error cases first
@@ -1361,8 +1359,8 @@ class MainTest {
         assertTrue(fileToWrite1.exists());
         assertTrue(getNumberOfLines(fileToWrite1) <= 3);
 
-        fileToWrite1.delete();
-        fileToWrite2.delete();
+        deleteFile(fileToWrite1);
+        deleteFile(fileToWrite2);
     }
 
     @Test

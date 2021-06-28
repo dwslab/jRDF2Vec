@@ -403,11 +403,23 @@ public class Util {
      * @param filePath The path of the file to be deleted.
      */
     public static void deleteFile(String filePath) {
-        File file = new File(filePath);
+        deleteFile(new File(filePath));
+
+    }
+
+    /**
+     * Delete the specified file. Print to console in case of issues.
+     * @param file The file to be deleted.
+     */
+    public static void deleteFile(File file){
+        if(file == null){
+            LOGGER.error("The file is null. Cannot delete file.");
+            return;
+        }
         if (file.exists()) {
             boolean isSuccess = file.delete();
             if (!isSuccess) {
-                System.out.println("Could not delete file: " + filePath);
+                LOGGER.warn("Could not delete file: " + file.getAbsolutePath());
             }
         }
     }
@@ -434,7 +446,8 @@ public class Util {
             LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
         }
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile), StandardCharsets.UTF_8));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile),
+                    StandardCharsets.UTF_8));
             String readLine = "";
             while ((readLine = reader.readLine()) != null) {
                 result.add(readLine);
