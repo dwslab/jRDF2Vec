@@ -220,18 +220,45 @@ The most recent JavaDoc sites generated from the latest commit can be found <a h
 The following steps are necessary to obtain ordered RDF2vec embeddings (see publication [Putting RDF2vec in Order](https://arxiv.org/pdf/2108.05280.pdf) for conceptional details).
 
 **Step 1: Generate Walks**<br/>
-Run jRDF2Vec to generate only walks (option [`-onlyWalks`](#optional-parameters)).
+Run jRDF2Vec to generate only walks (option [`-onlyWalks`](#optional-parameters)) on your desired dataset.
 
-**Step 2: Merge the Walks in a single file**<br/>
+**Step 2: Merge the Walks in a single, uncompressed file**<br/>
+By default, jRDF2Vec serialized the walks in multiple gzipped files. For this application, however, we need a single,
+uncompressed walk file.
+
 You can use the [corresponding jRDF2Vec command line service](#merge-of-all-walk-files-into-one) to do so.
 
-**Step 3: Compile wang2vec**
+**Step 3: Compile wang2vec**<br/>
 Download the C implementation of [wang2vec from GitHub](https://github.com/wlin12/wang2vec).
 Compile the files with `make`.
 
-**Step 4: Run and have fun**
+**Step 4: Run and have fun**<br/>
 Run the compiled wang2vec implementation on the merged walk file from step 2. In case you receive a `segfault` error,
 set the capping parameter to 1 (`-cap`1).
+
+*Call Syntax*<br/>
+```bash
+./word2vec -train <your walk file> -output <desired file to be written> - type <2 (cwindow) or 3 (structured 
+skipgram>) -size <vector size> -threads <number of threads> -min-count 0 -cap 1  
+```
+
+*Exemplary Call*<br/>
+```bash
+./word2vec -train walks.txt -output v100.txt - type 3 -size 100 -threads 4 -min-count 0 -cap 1  
+```
+
+**Not working? Contact us or open an issue.**
+
+Please do not forget to cite the corresponding papers:
+
+```
+(1)  Portisch, Jan; Paulheim, Heiko. Putting RDF2vec in Order. In: Proceedings of the International Semantic Web 
+Conference - Posters and Demos, ISWC 2021. 2021. 
+
+(2) Ling, Wang; Dyer, Chris; Black, Alan; Trancoso, Isabel. Two/too simple adaptations of word2vec for syntax 
+problems. In: NAACL HLT 2015. pp. 1299–1304. ACL (2015)
+```
+
 
 ## Frequently Asked Questions (FAQs)
 **I have Python installed, but it is not accessible via command `python`. How to resolve this?**<br/>
