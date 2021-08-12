@@ -223,7 +223,7 @@ The following steps are necessary to obtain ordered RDF2vec embeddings (see publ
 Run jRDF2Vec to generate only walks (option [`-onlyWalks`](#optional-parameters)) on your desired dataset.
 
 **Step 2: Merge the Walks in a single, uncompressed file**<br/>
-By default, jRDF2Vec serialized the walks in multiple gzipped files. For this application, however, we need a single,
+By default, jRDF2Vec serializes the walks in multiple gzipped files. For this application, however, we need a single,
 uncompressed walk file.
 
 You can use the [corresponding jRDF2Vec command line service](#merge-of-all-walk-files-into-one) to do so.
@@ -234,7 +234,7 @@ Compile the files with `make`.
 
 **Step 4: Run and have fun**<br/>
 Run the compiled wang2vec implementation on the merged walk file from step 2. In case you receive a `segfault` error,
-set the capping parameter to 1 (`-cap`1).
+set the capping parameter to 1 (`-cap 1`).
 
 *Call Syntax*<br/>
 ```bash
