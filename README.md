@@ -214,6 +214,25 @@ docker build -t jrdf2vec .
 ## Developer Documentation
 The most recent JavaDoc sites generated from the latest commit can be found <a href="https://dwslab.github.io/jRDF2Vec/">here</a>.<br/>
 
+## Special Applications
+
+### Ordered RDF2Vec ("Putting RDF2vec in Order")
+The following steps are necessary to obtain ordered RDF2vec embeddings (see publication [Putting RDF2vec in Order](https://arxiv.org/pdf/2108.05280.pdf) for conceptional details).
+
+**Step 1: Generate Walks**<br/>
+Run jRDF2Vec to generate only walks (option [`-onlyWalks`](#optional-parameters)).
+
+**Step 2: Merge the Walks in a single file**<br/>
+You can use the [corresponding jRDF2Vec command line service](#merge-of-all-walk-files-into-one) to do so.
+
+**Step 3: Compile wang2vec**
+Download the C implementation of [wang2vec from GitHub](https://github.com/wlin12/wang2vec).
+Compile the files with `make`.
+
+**Step 4: Run and have fun**
+Run the compiled wang2vec implementation on the merged walk file from step 2. In case you receive a `segfault` error,
+set the capping parameter to 1 (`-cap`1).
+
 ## Frequently Asked Questions (FAQs)
 **I have Python installed, but it is not accessible via command `python`. How to resolve this?**<br/>
 Create a file `python_command.txt` in directory `./python_server` (created when first running the jar). Write the command
