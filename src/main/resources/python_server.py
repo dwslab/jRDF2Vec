@@ -653,6 +653,8 @@ def write_vectors_as_text_file():
             number_of_vectors_as_str = str(len(vectors.vocab))
             logging.info("Processing " + number_of_vectors_as_str + " vectors...")
             for concept in vectors.vocab:
+                if concept.strip() == "":
+                    continue
                 line_to_write = ""
                 count += 1
                 vector = vectors.get_vector(concept)

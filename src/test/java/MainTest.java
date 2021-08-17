@@ -285,7 +285,7 @@ class MainTest {
         walkDirectory.deleteOnExit();
         walkDirectory.mkdir();
         String graphFilePath = loadFile("pizza.owl.xml").getAbsolutePath();
-        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "5"};
+        String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-sample", "0.01", "-embedText", "-window", "5"};
         Main.main(args);
 
         assertEquals(RDF2Vec.class, Main.getRdf2VecInstance().getClass(), "Wrong class: " + Main.getRdf2VecInstance().getClass() + " (expected: RDF2Vec.class)");
@@ -297,7 +297,7 @@ class MainTest {
         assertTrue(files.contains("model.kv"));
         assertTrue(files.contains("model"));
         assertTrue(files.contains("walk_file_0.txt.gz"));
-        assertFalse(files.contains("vectors.txt"));
+        assertTrue(files.contains("vectors.txt"));
 
         // assert that a text walk has been written
         List<String> lines = Util.readLinesFromGzippedFile(new File(walkDirectory, "walk_file_0.txt.gz"));
