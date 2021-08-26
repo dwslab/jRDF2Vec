@@ -441,6 +441,17 @@ public class Util {
      * @return A HashSet of entities.
      */
     public static Set<String> readEntitiesFromFile(File entityFile) {
+        return readEntitiesFromFile(entityFile, false);
+    }
+
+    /**
+     * Reads the entities in the specified file into a HashSet.
+     *
+     * @param entityFile The file to be read from. The file must be UTF-8 encoded.
+     * @param isRemoveTags If true, surrounding tags are removed when reading the file.
+     * @return A HashSet of entities.
+     */
+    public static Set<String> readEntitiesFromFile(File entityFile, boolean isRemoveTags) {
         HashSet<String> result = new HashSet<>();
         if (!entityFile.exists()) {
             LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
@@ -449,8 +460,20 @@ public class Util {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile),
                     StandardCharsets.UTF_8));
             String readLine = "";
-            while ((readLine = reader.readLine()) != null) {
-                result.add(readLine);
+            if(isRemoveTags){
+                while ((readLine = reader.readLine()) != null) {
+
+                    if(readLine.startsWith("<") && readLine.endsWith(">")){
+                        readLine = readLine.substring(1, readLine.length()-1);
+                        result.add(readLine);
+                    } else {
+                        result.add(readLine);
+                    }
+                }
+            } else {
+                while ((readLine = reader.readLine()) != null) {
+                    result.add(readLine);
+                }
             }
         } catch (IOException e) {
             LOGGER.error("Failed to read file.", e);
@@ -491,5 +514,16 @@ public class Util {
         } catch (IOException e) {
             LOGGER.info("Cleanup failed (directory '" + directoryPath + "'.", e);
         }
+    }
+
+    /**
+     * This method will remove a leading less-than and a trailing greater-than sign (tags).
+     * @param stringToBeEdited The string that is to be edited.
+     * @return String without tags.
+     */
+    public static String removeTags(String stringToBeEdited){
+        if(stringToBeEdited.startsWith("<")) stringToBeEdited = stringToBeEdited.substring(1);
+        if(stringToBeEdited.endsWith(">")) stringToBeEdited = stringToBeEdited.substring(0, stringToBeEdited.length() - 1);
+        return stringToBeEdited;
     }
 }

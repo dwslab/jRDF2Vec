@@ -62,11 +62,11 @@ public class VectorFileReducer {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textVectorFile),
                         StandardCharsets.UTF_8))
         ) {
-            Set<String> entities = Util.readEntitiesFromFile(entityFile);
+            Set<String> entities = Util.readEntitiesFromFile(entityFile, isRemoveTags);
             String readLine;
             if (isRemoveTags) {
                 while ((readLine = reader.readLine()) != null) {
-                    String concept = readLine.split(" ")[0];
+                    String concept = Util.removeTags(readLine.split(" ")[0]);
                     if (entities.contains(concept)) {
                         writer.write(TagRemover.removeTagsFromVectorLine(readLine));
                     }

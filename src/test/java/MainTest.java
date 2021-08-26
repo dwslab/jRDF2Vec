@@ -1393,10 +1393,11 @@ class MainTest {
         assertTrue(result.contains("? = %"));
     }
 
-    @Test
-    void removeTagsAndReduceFile(){
+    @ParameterizedTest
+    @ValueSource(strings = {"txtVectorFileTagsEntities.txt", "txtVectorFileTagsEntitiesNoTags.txt"})
+    void removeTagsAndReduceFile(String entityFilePath){
         File tagTxtFile = loadFile("txtVectorFileTags.txt");
-        File entityFile = loadFile("txtVectorFileTagsEntities.txt");
+        File entityFile = loadFile(entityFilePath);
 
         File fileToWrite = new File("./txtVectorFileNoTagsLight.txt");
         fileToWrite.deleteOnExit();

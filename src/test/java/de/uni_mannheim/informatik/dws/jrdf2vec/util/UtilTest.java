@@ -165,4 +165,14 @@ class UtilTest {
     public static File loadFile(String fileName){
         return Util.loadFile(fileName);
     }
+
+    @Test
+    void removeTags() {
+        assertEquals("http://www.w3.org/ns/lemon/ontolex#LexicalEntry", Util.removeTags("<http://www.w3" +
+                ".org/ns/lemon/ontolex#LexicalEntry>"));
+        assertEquals("http://www.w3.org/ns/lemon/ontolex#LexicalEntry", Util.removeTags("http://www.w3" +
+                ".org/ns/lemon/ontolex#LexicalEntry>"));
+        assertEquals("http://www.w3.org/ns/lemon/ontolex#LexicalEntry", Util.removeTags("http://www.w3" +
+                ".org/ns/lemon/ontolex#LexicalEntry"));
+    }
 }
