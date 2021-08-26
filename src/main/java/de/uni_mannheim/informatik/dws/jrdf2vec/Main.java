@@ -4,7 +4,9 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.debugging.VocabularyAnalyzer;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.TagRemover;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorFileReducer;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.WalkMerger;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
@@ -172,22 +174,22 @@ public class Main {
             return;
         }
 
-        if (containsIgnoreCase("-merge", args) ||containsIgnoreCase("--merge", args) ||
-            containsIgnoreCase("-mergeWalks", args) || containsIgnoreCase("--mergeWalks", args)
+        if (containsIgnoreCase("-merge", args) || containsIgnoreCase("--merge", args) ||
+                containsIgnoreCase("-mergeWalks", args) || containsIgnoreCase("--mergeWalks", args)
         ) {
             String walkDirectory = null;
-            if(containsIgnoreCase("-walkDirectory", args) || containsIgnoreCase("-walkDir", args)){
+            if (containsIgnoreCase("-walkDirectory", args) || containsIgnoreCase("-walkDir", args)) {
                 walkDirectory = getValue("-walkDirectory", args);
-                if(walkDirectory == null) {
+                if (walkDirectory == null) {
                     walkDirectory = (walkDirectory == null) ? getValue("-walkDir", args) : null;
                 }
             }
-            if(walkDirectory == null){
+            if (walkDirectory == null) {
                 System.out.println("Please provide a walkDirectory if you use -mergeWalks");
                 return;
             }
             String fileToWrite = getValue("-o", args);
-            if(fileToWrite == null){
+            if (fileToWrite == null) {
                 System.out.println("Writing file: " + DEFAULT_MERGE_FILE);
                 fileToWrite = DEFAULT_MERGE_FILE;
             }
@@ -645,6 +647,7 @@ public class Main {
 
     /**
      * Text vector file generation was triggered and will be further executed in this method.
+     *
      * @param args The args.
      */
     private static void cliTextFileGeneration(String[] args) {
@@ -652,8 +655,14 @@ public class Main {
         if (transformationSource != null) {
             String entityFile = getValue("-light", args);
             String fileToWritePath = getValueMultiOption(args, "-file", "-newFile");
+            boolean isNoTags = false;
+            if (containsIgnoreCase("-noTags", args)) {
+                isNoTags = true;
+            }
             printIfIgnoredOptionsExist();
-            generateTextVectorFile(transformationSource, entityFile, fileToWritePath);
+            generateTextVectorFile(transformationSource, entityFile, fileToWritePath, isNoTags);
+        } else {
+            System.out.println("Please specify which vector file shall be used.");
         }
     }
 
@@ -661,13 +670,16 @@ public class Main {
      * Given a model or vector file, a text file is generated containing all the vectors.
      *
      * @param transformationSource File path to the model or vector file.
-     * @param entityFilePath The entity file path pointing to a file containing the entities that shall be added
-     *                       to the text vector file. The file must contain one entity per line. The file
-     *                       must be UTF-8 encoded.
-     * @param filePathToBeWritten File path to be written.
+     * @param entityFilePath       The entity file path pointing to a file containing the entities that shall be added
+     *                             to the text vector file. The file must contain one entity per line. The file
+     *                             must be UTF-8 encoded.
+     * @param filePathToBeWritten  File path to be written.
+     * @param isNoTags             Indicates whether surrounding concept tags shall be removed.
+     *                             For example {@code <http://www.example.com/myConcept>} will be changed to
+     *                             {@code http://www.example.com/myConcept}. Concepts without surrounding tags are not affected.
      */
     private static void generateTextVectorFile(String transformationSource, String entityFilePath,
-                                               String filePathToBeWritten) {
+                                               String filePathToBeWritten, boolean isNoTags) {
         File sourceFile = new File(transformationSource);
         if (!sourceFile.exists()) {
             System.out.println("The given file does not exist. Cannot generate text vector file.");
@@ -681,25 +693,44 @@ public class Main {
         File fileToGenerate;
 
         // check text vector reduction
-        if(transformationSource.endsWith(".txt")){
-            if(entityFilePath == null){
+        if (transformationSource.endsWith(".txt")) {
+            // sanity check
+            if (entityFilePath == null && !isNoTags) {
                 System.out.println("You already have a vector txt file. You must specify an entity file (-light) to " +
-                        "reduce it. Doing nothing.");
+                        "reduce it or declare that tags shall be removed (-noTags). Doing nothing.");
                 return;
             }
-            if(filePathToBeWritten == null) {
-                // auto-assign name:
-                System.out.println("A file with the name: reduced_vectors.txt will be written (in the directory of " +
-                        "the txt vector source file.)");
-                fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "reduced_vectors.txt");
+
+            if (entityFilePath != null) {
+                // light option / reduce file option
+
+                if (filePathToBeWritten == null) {
+                    // auto-assign name:
+                    System.out.println("A file with the name: reduced_vectors.txt will be written (in the directory of " +
+                            "the txt vector source file.)");
+                    fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "reduced_vectors.txt");
+
+                } else {
+                    fileToGenerate = new File(filePathToBeWritten);
+                }
+                VectorFileReducer.writeReducedTextVectorFile(transformationSource, fileToGenerate.getAbsolutePath(),
+                        entityFilePath, isNoTags);
+                return;
             } else {
-                fileToGenerate = new File(filePathToBeWritten);
+                // simply remove tags
+
+                if (filePathToBeWritten == null) {
+                    System.out.println("A file with the name: vectors_no_tags.txt will be written (in the directory of " +
+                            "the txt vector source file.)");
+                    fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors_no_tags.txt");
+                } else {
+                    fileToGenerate = new File(filePathToBeWritten);
+                }
+                TagRemover.removeTagsWriteNewFile(transformationSource, fileToGenerate.getAbsolutePath());
             }
-            Gensim.writeReducedTextVectorFile(transformationSource, fileToGenerate.getAbsolutePath(), entityFilePath);
-            return;
         }
 
-        if(filePathToBeWritten == null) {
+        if (filePathToBeWritten == null) {
             fileToGenerate = new File(sourceFile.getParentFile().getAbsolutePath(), "vectors.txt");
         } else {
             fileToGenerate = new File(filePathToBeWritten);
@@ -752,7 +783,7 @@ public class Main {
             }
         }
         if (positionSet != -1 && arguments.length > positionSet + 1) {
-            if(ignoredArguments != null) {
+            if (ignoredArguments != null) {
                 ignoredArguments.remove(key);
                 ignoredArguments.remove(arguments[positionSet + 1]);
             }
@@ -762,17 +793,18 @@ public class Main {
 
     /**
      * Helper method. Obtains the value following the first key found in {@code keys}.
+     *
      * @param args Args array.
      * @param keys Keys for which the array shall be checked.
      * @return First value that is found.
      */
-    public static String getValueMultiOption(String[] args, String... keys){
-        if(args == null || keys == null){
+    public static String getValueMultiOption(String[] args, String... keys) {
+        if (args == null || keys == null) {
             return null;
         }
-        for(String key : keys){
+        for (String key : keys) {
             String result = getValue(key, args);
-            if(result != null){
+            if (result != null) {
                 return result;
             }
         }

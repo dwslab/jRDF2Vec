@@ -45,15 +45,21 @@ class TagRemoverTest {
 
                 i++;
             }
-
             assertTrue(i > 2);
         } catch (IOException ioe){
             LOGGER.error("An exception occurred. Test will fail.", ioe);
             fail(ioe);
         }
-
-        fileToWrite.delete();
+        Util.deleteFile(fileToWrite);
     }
 
+    @Test
+    void removeTagsFromVectorLine(){
+        assertEquals("concept 1 2 3\n", TagRemover.removeTagsFromVectorLine("<concept> 1 2 3"));;
+        assertEquals("concept 1 2 3\n", TagRemover.removeTagsFromVectorLine("<concept> 1 2 3\n"));;
+        assertEquals("concept 1 2 3\n", TagRemover.removeTagsFromVectorLine("concept 1 2 3\n"));;
+        assertEquals("\n", TagRemover.removeTagsFromVectorLine(""));
+        assertEquals("hello\n", TagRemover.removeTagsFromVectorLine("hello"));
+    }
 
 }

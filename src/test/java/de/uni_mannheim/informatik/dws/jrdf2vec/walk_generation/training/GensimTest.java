@@ -394,29 +394,6 @@ class GensimTest {
         assertTrue(Gensim.getServerUrl().contains("41194"));
     }
 
-    @Test
-    void writeReducedTextVectorFile(){
-        String fileToWritePath = "./reduced_vocab.txt";
-        String vectorTxtFilePath = getPathOfResource("txtVectorFile.txt");
-        String entityFilePath = getPathOfResource("txtVectorFileEntities.txt");
-
-        // try error cases first
-        Gensim.writeReducedTextVectorFile(null, null, null);
-        Gensim.writeReducedTextVectorFile(null, fileToWritePath, entityFilePath);
-        Gensim.writeReducedTextVectorFile(vectorTxtFilePath, null, entityFilePath);
-        Gensim.writeReducedTextVectorFile(vectorTxtFilePath, fileToWritePath, null);
-
-        File fileToWrite = new File(fileToWritePath);
-        assertFalse(fileToWrite.exists());
-
-        // now try the real thing:
-        Gensim.writeReducedTextVectorFile(vectorTxtFilePath, fileToWritePath, entityFilePath);
-        assertTrue(fileToWrite.exists());
-        assertTrue(getNumberOfLines(fileToWrite) <= 3);
-
-        deleteFile(fileToWrite);
-    }
-
     /**
      * Helper method to obtain the canonical path of a (test) resource.
      * @param resourceName File/directory name.

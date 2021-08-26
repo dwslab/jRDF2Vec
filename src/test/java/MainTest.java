@@ -1393,6 +1393,95 @@ class MainTest {
         assertTrue(result.contains("? = %"));
     }
 
+    @Test
+    void removeTagsAndReduceFile(){
+        File tagTxtFile = loadFile("txtVectorFileTags.txt");
+        File entityFile = loadFile("txtVectorFileTagsEntities.txt");
+
+        File fileToWrite = new File("./txtVectorFileNoTagsLight.txt");
+        fileToWrite.deleteOnExit();
+        assertFalse(fileToWrite.exists());
+
+        // now the actual execution
+        Main.main(new String[]{"-generateTextVectorFile", tagTxtFile.getAbsolutePath(), "-noTags",
+                "-newFile", fileToWrite.getAbsolutePath(), "-light", entityFile.getAbsolutePath()});
+
+        // test
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileToWrite),
+                StandardCharsets.UTF_8))) {
+
+            String line;
+            int i = 0;
+            assertTrue(fileToWrite.exists());
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(" ");
+
+                if (i == 0) {
+                    assertEquals("Götterfunken", tokens[0]);
+                    assertEquals("-1.0", tokens[1]);
+                    assertEquals("-3", tokens[2]);
+                    assertEquals("-4", tokens[3]);
+                }
+                if (i == 1) {
+                    assertEquals("Elysium", tokens[0]);
+                    assertEquals("100", tokens[1]);
+                    assertEquals("100", tokens[2]);
+                    assertEquals("100", tokens[3]);
+                }
+
+                i++;
+            }
+            assertEquals(i, 2);
+        } catch (IOException ioe) {
+            LOGGER.error("An exception occurred. Test will fail.", ioe);
+            fail(ioe);
+        }
+        Util.deleteFile(fileToWrite);
+    }
+
+    @Test
+    void removeTags() {
+        File tagTxtFile = loadFile("txtVectorFileTags.txt");
+        File fileToWrite = new File("./txtVectorFileNoTags.txt");
+        fileToWrite.deleteOnExit();
+        assertFalse(fileToWrite.exists());
+
+        // now the actual execution
+        Main.main(new String[]{"-generateTextVectorFile", tagTxtFile.getAbsolutePath(), "-noTags",
+                "-newFile", fileToWrite.getAbsolutePath()});
+
+        assertTrue(fileToWrite.exists());
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileToWrite),
+                StandardCharsets.UTF_8))) {
+
+            String line;
+            int i = 0;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(" ");
+
+                if (i == 0) {
+                    assertEquals("Freude", tokens[0]);
+                    assertEquals("1.0", tokens[1]);
+                    assertEquals("-5", tokens[2]);
+                    assertEquals("3", tokens[3]);
+                }
+                if (i == 1) {
+                    assertEquals("schöner", tokens[0]);
+                    assertEquals("5.0", tokens[1]);
+                    assertEquals("-3.4", tokens[2]);
+                    assertEquals("5.3", tokens[3]);
+                }
+
+                i++;
+            }
+            assertTrue(i > 2);
+        } catch (IOException ioe) {
+            LOGGER.error("An exception occurred. Test will fail.", ioe);
+            fail(ioe);
+        }
+        Util.deleteFile(fileToWrite);
+    }
+
     @AfterAll
     static void cleanUp() {
         Gensim.shutDown();
@@ -1417,5 +1506,6 @@ class MainTest {
         deleteFile("./reduced_vocab.txt");
         deleteFile(Main.DEFAULT_MERGE_FILE);
         deleteFile("./mergedWalksTest.txt");
+        deleteFile("./txtVectorFileNoTags.txt");
     }
 }

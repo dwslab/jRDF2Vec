@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.training;
 
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.TagRemover;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -280,20 +281,22 @@ public class Gensim {
 
     /**
      * Writes the vocabulary of the given gensim model to a text file (UTF-8 encoded).
+     *
      * @param modelOrVectorPath The model of which the vocabulary shall be obtained.
-     * @param fileToWritePath The file path of the file that shall be written.
+     * @param fileToWritePath   The file path of the file that shall be written.
      */
-    public void writeVocabularyToFile(String modelOrVectorPath, String fileToWritePath){
+    public void writeVocabularyToFile(String modelOrVectorPath, String fileToWritePath) {
         Set<String> vocab = getVocabularyTerms(modelOrVectorPath);
         writeSetToFile(new File(fileToWritePath), vocab);
     }
 
     /**
      * Writes the vocabulary of the given gensim model to a text file (UTF-8 encoded).
+     *
      * @param modelOrVectorPath The model of which the vocabulary shall be obtained.
-     * @param fileToWrite The file that shall be written.
+     * @param fileToWrite       The file that shall be written.
      */
-    public void writeVocabularyToFile(String modelOrVectorPath, File fileToWrite){
+    public void writeVocabularyToFile(String modelOrVectorPath, File fileToWrite) {
         Set<String> vocab = getVocabularyTerms(modelOrVectorPath);
         writeSetToFile(fileToWrite, vocab);
     }
@@ -303,8 +306,8 @@ public class Gensim {
      *
      * @param fileToWrite File which will be created and in which the data will
      *                    be written.
-     * @param setToWrite Set whose content will be written into fileToWrite.
-     * @param <T> Type of the Set.
+     * @param setToWrite  Set whose content will be written into fileToWrite.
+     * @param <T>         Type of the Set.
      */
     private static <T> void writeSetToFile(File fileToWrite, Set<T> setToWrite) {
         LOGGER.info("Start writing Set to file '" + fileToWrite.getName() + "'");
@@ -400,7 +403,7 @@ public class Gensim {
      *                          order to be recognized as vector file.
      * @return True if exists, else false.
      */
-    public boolean isInVocabulary(String concept, File modelOrVectorPath){
+    public boolean isInVocabulary(String concept, File modelOrVectorPath) {
         return isInVocabulary(concept, modelOrVectorPath.getAbsolutePath());
     }
 
@@ -556,13 +559,14 @@ public class Gensim {
 
     /**
      * Checks whether all Python requirements are installed and whether the server is functional.
+     *
      * @return True if the server is fully functional, else false.
      */
-    public static boolean checkRequirements(){
+    public static boolean checkRequirements() {
         Gensim gensim = Gensim.getInstance();
         HttpGet request = new HttpGet(serverUrl + "/check-requirements");
         File requirementsFile = new File(DEFAULT_RESOURCES_DIRECTORY + "requirements.txt");
-        if(!requirementsFile.exists()){
+        if (!requirementsFile.exists()) {
             LOGGER.error("Could not find requirements file.");
             return false;
         }
@@ -571,7 +575,7 @@ public class Gensim {
             HttpEntity entity = response.getEntity();
             String resultMessage = EntityUtils.toString(entity);
             System.out.println(resultMessage);
-            if(resultMessage.contains("good to go")) {
+            if (resultMessage.contains("good to go")) {
                 return true;
             } else {
                 return false;
@@ -810,55 +814,6 @@ public class Gensim {
      */
     public void writeModelAsTextFile(String modelOrVectorPath, String fileToWrite) {
         writeModelAsTextFile(modelOrVectorPath, fileToWrite, null);
-    }
-
-    /**
-     * Given a text vector file, only the vectors for the entities in {@code entityFile} are transferred
-     * @param textVectorPath Path to a text vector file.
-     * @param fileToWritePath The file that will be written.
-     * @param entityPath The vocabulary that shall appear in the text file.
-     *                   The file must contain one word per line. The contents must be a subset of the vocabulary.
-     */
-    @NotNull
-    public static void writeReducedTextVectorFile(String textVectorPath, String fileToWritePath, String entityPath){
-        if(entityPath == null){
-            LOGGER.error("You must provide an entityFile. Aborting program.");
-            return;
-        }
-        if(textVectorPath == null){
-            LOGGER.error("You must provide a textVectorPath. Aborting program.");
-            return;
-        }
-        if(fileToWritePath == null){
-            LOGGER.error("You must provide a fileToWritePath. Aborting program.");
-            return;
-        }
-        File textVectorFile = new File(textVectorPath);
-        File entityFile = new File(entityPath);
-        if(!textVectorFile.exists() || !textVectorFile.isFile() || !entityFile.exists() || !entityFile.isFile()){
-            LOGGER.error("Either the text vector file or the entity file do not exist or are no files. Aborting " +
-                    "program.");
-            return;
-        }
-        File fileToWrite = new File(fileToWritePath);
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite),
-                    StandardCharsets.UTF_8));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(textVectorFile),
-                    StandardCharsets.UTF_8));
-            Set<String> entities = Util.readEntitiesFromFile(entityFile);
-            String readLine;
-            while((readLine = reader.readLine()) != null){
-                String concept = readLine.split(" ")[0];
-                if(entities.contains(concept)){
-                    writer.write(readLine + "\n");
-                }
-            }
-            reader.close();
-            writer.close();
-        } catch (IOException e) {
-            LOGGER.error("An error occurred while trying to write the file.", e);
-        }
     }
 
     /**
