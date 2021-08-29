@@ -1,6 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +13,12 @@ import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfNonBl
  * Converts a vector.txt file as written by this framework (in the format of GloVe vectors) to the classic word2vec
  * format where the first line contains the number of elements and the dimension.
  */
-public class VectorTxtToW2v {
+public class VectorTxtToW2vConverter {
 
 
-    private static Logger LOGGER = LoggerFactory.getLogger(VectorTxtToW2v.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VectorTxtToW2vConverter.class);
 
-    public static void vectorTxtFileToW2vFormat(File vectorFile, File fileToWrite) {
+    public static void convert(File vectorFile, File fileToWrite) {
         if(vectorFile == null || fileToWrite == null){
             LOGGER.error("Parameters 'vectorFile' and 'fileToWrite' must never be null. ABORTING program.");
             return;

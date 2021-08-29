@@ -10,18 +10,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VectorTxtToW2vTest {
 
+    private final static String TXT_VECTOR_FILE_PATH = "./txtVectorFile.w2v";
+
     @Test
     void vectorTxtFileToW2vFormat() {
         File vectorFile = loadFile("txtVectorFile.txt");
-        File fileToWrite = new File("./txtVectorFile.w2v");
+        File fileToWrite = new File(TXT_VECTOR_FILE_PATH);
         fileToWrite.deleteOnExit();
-        VectorTxtToW2v.vectorTxtFileToW2vFormat(vectorFile, fileToWrite);
+        VectorTxtToW2vConverter.convert(vectorFile, fileToWrite);
         assertTrue(fileToWrite.exists());
         assertEquals(getNumberOfLines(vectorFile) + 1, getNumberOfLines(fileToWrite));
+        deleteFile(TXT_VECTOR_FILE_PATH);
+
+        // testing some error cases
+        assertFalse(fileToWrite.exists());
+        VectorTxtToW2vConverter.convert(null, fileToWrite);
+        assertFalse(fileToWrite.exists());
     }
 
     @AfterAll
     static void cleanUp(){
-        deleteFile("./txtVectorFile.w2v");
+        deleteFile(TXT_VECTOR_FILE_PATH);
     }
 }

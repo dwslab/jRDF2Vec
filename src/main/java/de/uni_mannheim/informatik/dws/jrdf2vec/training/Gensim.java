@@ -817,6 +817,30 @@ public class Gensim {
     }
 
     /**
+     *
+     * @param w2vPath w2v formatted file to be written as kv file.
+     * @param fileToWrite The file to be written.
+     */
+    public void convertW2vToKv(String w2vPath, String fileToWrite){
+        HttpGet request = new HttpGet(serverUrl + "/w2v-to-kv");
+        request.addHeader("w2v_path", w2vPath);
+        request.addHeader("new_file", fileToWrite);
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                LOGGER.error("No server response.");
+            } else {
+                String resultString = EntityUtils.toString(entity);
+                if (resultString.startsWith("False") || resultString.contains("500 Internal Server Error")) {
+                    LOGGER.error("An error occurred. Server returned: " + resultString);
+                }
+            }
+        } catch (IOException ioe) {
+            LOGGER.error("Problem with http request.", ioe);
+        }
+    }
+
+    /**
      * Writes the vectors to a human-readable text file.
      *
      * @param modelOrVectorPath The path to the model or vector file. Note that the vector file MUST end with .kv in

@@ -140,14 +140,38 @@ class MySentences(object):
             logging.exception("Stack Trace:")
 
 
+@app.route("/w2v-to-kv", methods=["GET"])
+def w2v_to_kv() -> str:
+    """Method will convert the provided w2v file to a kv file.
+
+    Returns
+    -------
+    str (representing a boolean)
+        'True' as string if operation was successful, else 'False' (as string).
+    """
+    from gensim.models import KeyedVectors
+
+    try:
+        w2v_path = request.headers.get("w2v_path")
+        new_file = request.headers.get("new_file")
+        result = KeyedVectors.load_word2vec_format(w2v_path)
+        result.save(new_file)
+        active_models[os.path.realpath(new_file)] = result
+        active_vectors[os.path.realpath(new_file)] = result.wv
+        return "True"
+    except Exception as exception:
+        logging.exception("An exception occurred.")
+        return "False"
+
+
 @app.route("/train-word2vec", methods=["GET"])
-def train_word_2_vec():
+def train_word_2_vec() -> str:
     """Method to train a word2vec model given one file to be used for training. Parameters are expected in the request
     header.
 
     Returns
     -------
-        boolean
+        str (representing a boolean)
         'True' as string if operation was successful, else 'False' (as string).
     """
     try:

@@ -42,7 +42,6 @@ class TagRemoverTest {
                     assertEquals("-3.4", tokens[2]);
                     assertEquals("5.3", tokens[3]);
                 }
-
                 i++;
             }
             assertTrue(i > 2);
