@@ -3,7 +3,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorTxtToW2vConverter;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

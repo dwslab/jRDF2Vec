@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VectorTxtToW2vTest {
 
+
     private final static String TXT_VECTOR_FILE_PATH = "./txtVectorFile.w2v";
 
     @Test
