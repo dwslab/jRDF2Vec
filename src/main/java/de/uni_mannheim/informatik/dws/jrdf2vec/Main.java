@@ -791,6 +791,34 @@ public class Main {
         } else return null;
     }
 
+    public static String[] getValues(String key, int valuesNumber, String[] arguments) {
+        if (arguments == null) return null;
+        if (valuesNumber <= 0) return null;
+        if (key == null) return null;
+        String[] result = new String[valuesNumber];
+        int positionSet = -1;
+        for (int i = 0; i < arguments.length; i++) {
+            if (arguments[i].equalsIgnoreCase(key)) {
+                positionSet = i;
+                break;
+            }
+        }
+        if (positionSet == -1) {
+            return null;
+        }
+        for (int i = 0; i < valuesNumber; i++) {
+            if (arguments.length > positionSet + i + 1) {
+                ignoredArguments = getIgnoredArguments();
+                if (i == 0) {
+                    ignoredArguments.remove(key);
+                }
+                ignoredArguments.remove(arguments[positionSet + 1 + i]);
+                result[i] = arguments[positionSet + 1 + i];
+            } else return null;
+        }
+        return result;
+    }
+
     /**
      * Helper method. Obtains the value following the first key found in {@code keys}.
      *
@@ -871,6 +899,9 @@ public class Main {
      * @return Set of arguments that are not (yet) parsed.
      */
     public static HashSet<String> getIgnoredArguments() {
+        if (ignoredArguments == null) {
+            ignoredArguments = new HashSet<>();
+        }
         return ignoredArguments;
     }
 

@@ -1301,6 +1301,22 @@ class MainTest {
     }
 
     @Test
+    void getValues() {
+        assertNull(Main.getValues("hello", 1, null));
+        assertNull(Main.getValues(null, 1, null));
+        assertNull(Main.getValues(null, -1, null));
+        assertNull(Main.getValues("-hello", 1, new String[]{"european", "union"}));
+        assertNull(Main.getValues("-european", 2, new String[]{"-european", "union"}));
+
+        // 1 case
+        assertEquals("union", Main.getValues("-european", 1, new String[]{"-european", "union"})[0]);
+
+        // 2 case
+        assertEquals("union", Main.getValues("-european", 2, new String[]{"-european", "union" , "pax"})[0]);
+        assertEquals("pax", Main.getValues("-european", 2, new String[]{"-european", "union" , "pax"})[1]);
+    }
+
+    @Test
     void getValueMultiOption() {
         assertNull(Main.getValueMultiOption(null, null));
         assertNull(Main.getValueMultiOption(null, new String[]{"european", "union"}));

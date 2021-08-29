@@ -136,6 +136,21 @@ use the following command to generate this file:
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateVocabularyFile ./path-to-your-model-or-vector-file
 ```
 
+#### Converting a Test Vector File
+jRDF2vec generates a `vectors.txt` file. In some cases, however, other file formats are required.
+
+*(1) Converting to w2v Format*
+```
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -convertToW2V <txt_file_path> <new_file.w2v>
+```
+
+*(2) Converting to kv Format*
+```
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -convertToKv <txt_file_path> <new_file.kv>
+```
+
+
+
 #### Analyzing the Embedding Vocabulary
 For RDF2Vec, it is not always guaranteed that all concepts in the graph appear in the embedding space. For example,
 some concepts may only appear in the object position of statements and may never be reached by random walks.
