@@ -3,6 +3,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorTxtToW2vConverter;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -1499,6 +1500,62 @@ class MainTest {
         Util.deleteFile(fileToWrite);
     }
 
+
+    private static final String VECTORS_KV_FILE = "./freude_vectors.kv";
+    private static final String VECTORS_W2V_FILE = "./freude_vectors.w2v";
+
+    @Test
+    void convertToKv(){
+        File txtFile = loadFile("freude_vectors.txt");
+        assertNotNull(txtFile);
+        File fileToWrite = new File(VECTORS_KV_FILE);
+        Main.main(new String[]{"-convertToKv", txtFile.getAbsolutePath(), fileToWrite.getAbsolutePath()});
+
+        File w2vFile = new File(VECTORS_W2V_FILE);
+        w2vFile.deleteOnExit();
+        assertTrue(w2vFile.exists());
+
+        // checking vocabulary
+        assertTrue(Gensim.getInstance().isInVocabulary("schöner", fileToWrite.getAbsoluteFile()));
+
+        // checking dimension
+        Double[] vector = Gensim.getInstance().getVector("schöner", fileToWrite.getAbsolutePath());
+
+        // checking values
+        assertEquals(3, vector.length);
+        assertEquals(-0.0016543772, vector[0]);
+        assertEquals(-0.0009240248, vector[1]);
+        assertEquals(-0.0007398839, vector[2]);
+
+        assertTrue(fileToWrite.exists());
+        deleteFile(w2vFile);
+        deleteFile(fileToWrite);
+
+        // error case
+        Main.main(new String[]{"-convertToKv", "WRONG"});
+        assertFalse(fileToWrite.exists());
+        assertFalse(w2vFile.exists());
+    }
+
+    private final static String TXT_VECTOR_FILE_PATH = "./txtVectorFile.w2v";
+
+    @Test
+    void convertToW2v (){
+        File vectorFile = loadFile("txtVectorFile.txt");
+        assertNotNull(vectorFile);
+        File fileToWrite = new File(TXT_VECTOR_FILE_PATH);
+        fileToWrite.deleteOnExit();
+        Main.main(new String[]{"-convertToW2v", vectorFile.getAbsolutePath(), fileToWrite.getAbsolutePath()});
+        assertTrue(fileToWrite.exists());
+        assertEquals(getNumberOfLines(vectorFile) + 1, getNumberOfLines(fileToWrite));
+        deleteFile(TXT_VECTOR_FILE_PATH);
+
+        // testing some error cases
+        assertFalse(fileToWrite.exists());
+        Main.main(new String[]{"-convertToW2v", "WRONG"});
+        assertFalse(fileToWrite.exists());
+    }
+
     @AfterAll
     static void cleanUp() {
         Gensim.shutDown();
@@ -1524,5 +1581,7 @@ class MainTest {
         deleteFile(Main.DEFAULT_MERGE_FILE);
         deleteFile("./mergedWalksTest.txt");
         deleteFile("./txtVectorFileNoTags.txt");
+        deleteFile(VECTORS_KV_FILE);
+        deleteFile(VECTORS_W2V_FILE);
     }
 }

@@ -15,6 +15,7 @@ class VectorTxtToW2vTest {
     @Test
     void vectorTxtFileToW2vFormat() {
         File vectorFile = loadFile("txtVectorFile.txt");
+        assertNotNull(vectorFile);
         File fileToWrite = new File(TXT_VECTOR_FILE_PATH);
         fileToWrite.deleteOnExit();
         VectorTxtToW2vConverter.convert(vectorFile, fileToWrite);

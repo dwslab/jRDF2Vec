@@ -4,10 +4,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.debugging.VocabularyAnalyzer;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecConfiguration;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Word2VecType;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.TagRemover;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorFileReducer;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.WalkMerger;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.*;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationMode;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.base.WalkGenerationManager;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.light.WalkGenerationManagerLight;
@@ -208,6 +205,17 @@ public class Main {
                         "missing" +
                         " dependencies.");
             }
+            return;
+        }
+
+        // conversion to kv
+        if(containsIgnoreCase("-convertToW2V", args)){
+            convertToW2v(args);
+            return;
+        }
+
+        if(containsIgnoreCase("-convertToKv", args)){
+            convertToKv(args);
             return;
         }
 
@@ -626,6 +634,26 @@ public class Main {
         System.out.println(rdf2VecInstance.getRequiredTimeForLastTrainingString());
     }
 
+    private static void convertToW2v(String[] args){
+        String[] parameters = getValues("-convertToW2V", 2, args);
+        if(parameters == null){
+            System.out.println("Your input is not correct.\n" +
+                    "The syntax is: -convertToW2V <txt_file_path> <new_file.w2v>");
+            return;
+        }
+        VectorTxtToW2vConverter.convert(new File(parameters[0]), new File(parameters[1]));
+    }
+
+    private static void convertToKv(String[] args){
+        String[] parameters = getValues("-convertToKv", 2, args);
+        if(parameters == null){
+            System.out.println("Your input is not correct.\n" +
+                    "The syntax is: -convertToKv <txt_file_path> <new_file.kv>");
+            return;
+        }
+        KvConverter.convert(new File(parameters[0]), new File(parameters[1]));
+    }
+
     /**
      * Write a UTF-8 encoded file containing the specified model's vocabulary.
      *
@@ -791,6 +819,13 @@ public class Main {
         } else return null;
     }
 
+    /**
+     * Obtain more than one value given a key and an args array.
+     * @param key The key preceding the values.
+     * @param valuesNumber The number of values to obtain.
+     * @param arguments The arguments which shall be parsed.
+     * @return The values in a String array. Null if there were any issues.
+     */
     public static String[] getValues(String key, int valuesNumber, String[] arguments) {
         if (arguments == null) return null;
         if (valuesNumber <= 0) return null;

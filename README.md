@@ -136,16 +136,24 @@ use the following command to generate this file:
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateVocabularyFile ./path-to-your-model-or-vector-file
 ```
 
-#### Converting a Test Vector File
-jRDF2vec generates a `vectors.txt` file. In some cases, however, other file formats are required.
+#### Converting a Text Vector File
+jRDF2vec generates a `vectors.txt` file where one line represents a vector. This is the format also used by 
+[GloVe]()https://github.com/stanfordnlp/GloVe. 
+In some cases, however, other file formats are required. You can use jRDF2vec to convert text vector files to other
+common formats. The vectors do not have to be trained with jRDF2vec.
 
 *(1) Converting to w2v Format*
-```
+To create a word2vec formatted file from the text file, you can use the following command:
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -convertToW2V <txt_file_path> <new_file.w2v>
 ```
 
 *(2) Converting to kv Format*
-```
+The provided txt file (first parameter) can be either in `txt` format or in `w2v` format. Make sure you use the 
+correct file ending (`.txt`/`.w2v`).
+
+You can run the command as follows:
+```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -convertToKv <txt_file_path> <new_file.kv>
 ```
 
