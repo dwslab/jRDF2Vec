@@ -78,19 +78,50 @@ public class Util {
      */
     public static int getNumberOfLines(File file) {
         if (file == null) {
-            return 0;
+            LOGGER.error("The file is null. Cannot count lines.");
+            return -1;
         }
         int linesRead = 0;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
+        try (BufferedReader br = new BufferedReader(new FileReader(file))){
             while (br.readLine() != null) {
                 linesRead++;
             }
-            br.close();
         } catch (IOException fnfe) {
             LOGGER.error("Could not get number of lines for file " + file.getAbsolutePath(), fnfe);
         }
         return linesRead;
+    }
+
+    /**
+     * Obtains the number of lines in a file that are not blanc.
+     * @param file The file to be read.
+     * @return The number of lines which contain some text (white space and line breaks do not count).
+     */
+    public static int getNumberOfNonBlancLines(File file){
+        if (file == null) {
+            LOGGER.error("The file is null. Cannot count lines.");
+            return -1;
+        }
+        try (
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+                        StandardCharsets.UTF_8))
+        ){
+            int lineNumber = 0;
+            String line;
+            while((line = reader.readLine()) != null){
+                line = line.trim();
+                if(!line.equals("")){
+                    lineNumber++;
+                }
+            }
+            return lineNumber;
+        } catch (FileNotFoundException e) {
+            LOGGER.error("FileNotFoundException. Could not complete program.", e);
+            return -1;
+        } catch (IOException e) {
+            LOGGER.error("IOException occurred. Could not complete program.", e);
+            return -1;
+        }
     }
 
     /**

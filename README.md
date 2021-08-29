@@ -123,6 +123,7 @@ java -jar jrdf2vec-1.1-SNAPSHOT.jar -generateTextVectorFile ./path-to-your-model
 ```
 You can find the file (named `vectors.txt`) in the directory where the model/vector file is located.
 If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`.
+If the vector concepts contain surrounding tags that you want to remove in the process, use option `-noTags`.
 This command also works if `./path-to-your-model-or-vector-file` is an existing vector text file that shall be reduced.
 
 #### Generating a Vocabulary Text File

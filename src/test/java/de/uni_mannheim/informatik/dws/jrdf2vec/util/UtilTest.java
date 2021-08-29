@@ -139,6 +139,13 @@ class UtilTest {
     @Test
     void getNumberOfLines(){
         assertEquals(2, Util.getNumberOfLines(loadFile("./subset_concepts.txt")));
+        assertEquals(-1, Util.getNumberOfLines(null));
+    }
+
+    @Test
+    void getNumberOfNonBlancLines(){
+        assertEquals(2, Util.getNumberOfNonBlancLines(loadFile("./subset_concepts.txt")));
+        assertEquals(-1, Util.getNumberOfNonBlancLines(null));
     }
 
     @Test
