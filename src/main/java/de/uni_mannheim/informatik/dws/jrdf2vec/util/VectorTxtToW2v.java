@@ -12,11 +12,13 @@ import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getNumberOfNonBl
 /**
  * Converts a vector.txt file as written by this framework (in the format of GloVe vectors) to the classic word2vec
  * format where the first line contains the number of elements and the dimension.
+ *
+ * The w2v file will be in UTF_8.
  */
-public class VectorTxtToW2vConverter {
+public class VectorTxtToW2v {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VectorTxtToW2vConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VectorTxtToW2v.class);
 
     public static void convert(File vectorFile, File fileToWrite) {
         if(vectorFile == null || fileToWrite == null){
@@ -38,7 +40,7 @@ public class VectorTxtToW2vConverter {
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite),
                         StandardCharsets.UTF_8))
         ){
-            String line = null;
+            String line;
             boolean isFirstLine = true;
             int lines = getNumberOfNonBlancLines(vectorFile);
             int dimension = getDimensionalityFromVectorTextFile(vectorFile);

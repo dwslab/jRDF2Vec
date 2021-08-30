@@ -17,7 +17,7 @@ class KvConverterTest {
     private static final String VECTORS_W2V_FILE = "./freude_vectors.w2v";
 
     /**
-     * This is also a detailed test of class {@link VectorTxtToW2vConverter}.
+     * This is also a detailed test of class {@link VectorTxtToW2v}.
      */
     @Test
     void convertTxt(){

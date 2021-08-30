@@ -154,7 +154,7 @@ def w2v_to_kv() -> str:
     try:
         w2v_path = request.headers.get("w2v_path")
         new_file = request.headers.get("new_file")
-        result = KeyedVectors.load_word2vec_format(w2v_path)
+        result = KeyedVectors.load_word2vec_format(w2v_path, unicode_errors='ignore')
         result.save(new_file)
         active_models[os.path.realpath(new_file)] = result
         active_vectors[os.path.realpath(new_file)] = result.wv

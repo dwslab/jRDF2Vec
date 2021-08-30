@@ -3,6 +3,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorTxtToTfProjectorTsv;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -1312,8 +1313,8 @@ class MainTest {
         assertEquals("union", Main.getValues("-european", 1, new String[]{"-european", "union"})[0]);
 
         // 2 case
-        assertEquals("union", Main.getValues("-european", 2, new String[]{"-european", "union" , "pax"})[0]);
-        assertEquals("pax", Main.getValues("-european", 2, new String[]{"-european", "union" , "pax"})[1]);
+        assertEquals("union", Main.getValues("-european", 2, new String[]{"-european", "union", "pax"})[0]);
+        assertEquals("pax", Main.getValues("-european", 2, new String[]{"-european", "union", "pax"})[1]);
     }
 
     @Test
@@ -1411,7 +1412,7 @@ class MainTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"txtVectorFileTagsEntities.txt", "txtVectorFileTagsEntitiesNoTags.txt"})
-    void removeTagsAndReduceFile(String entityFilePath){
+    void removeTagsAndReduceFile(String entityFilePath) {
         File tagTxtFile = loadFile("txtVectorFileTags.txt");
         File entityFile = loadFile(entityFilePath);
 
@@ -1504,7 +1505,7 @@ class MainTest {
     private static final String VECTORS_W2V_FILE = "./freude_vectors.w2v";
 
     @Test
-    void convertToKv(){
+    void convertToKv() {
         File txtFile = loadFile("freude_vectors.txt");
         assertNotNull(txtFile);
         File fileToWrite = new File(VECTORS_KV_FILE);
@@ -1536,10 +1537,96 @@ class MainTest {
         assertFalse(w2vFile.exists());
     }
 
+    private static final String METADTA_TSV_FILE = "./freude_metadata.tsv";
+    private static final String VECTOR_TSV_FILE = "./freude_vectors.tsv";
+
+    @Test
+    void convertToTfTsv() {
+        File vectorsTxtFile = loadFile("freude_vectors.txt");
+        assertNotNull(vectorsTxtFile);
+        File metadataFile = new File(METADTA_TSV_FILE);
+        metadataFile.deleteOnExit();
+        File vectorFile = new File(VECTOR_TSV_FILE);
+        vectorFile.deleteOnExit();
+        Main.main(new String[]{
+                "-convertToTfProjector",
+                vectorsTxtFile.getAbsolutePath(),
+                vectorFile.getAbsolutePath(),
+                metadataFile.getAbsolutePath()});
+        assertTrue(metadataFile.exists());
+        assertTrue(vectorFile.exists());
+
+        // check vector file
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(vectorFile),
+                StandardCharsets.UTF_8))) {
+            String line = reader.readLine();
+            String[] tokens = line.split("\t");
+            assertEquals(3, tokens.length);
+            assertEquals("0.00177156", tokens[0]);
+            assertEquals("-0.0019879746", tokens[1]);
+            assertEquals("-0.001207912", tokens[2]);
+
+        } catch (Exception e) {
+            fail(e);
+        }
+
+        // check labels file
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(metadataFile),
+                StandardCharsets.UTF_8))) {
+            String line = reader.readLine();
+            //assertEquals("Labels", line);
+            //line = reader.readLine();
+            assertEquals("Freude,", line);
+        } catch (Exception e) {
+            fail(e);
+        }
+    }
+
+    @Test
+    void convertToTfTsvOneParameter() {
+        File vectorsTxtFile = loadFile("freude_vectors.txt");
+        assertNotNull(vectorsTxtFile);
+        File metadataFile = VectorTxtToTfProjectorTsv.getDerivedMetadataFile(vectorsTxtFile);
+        metadataFile.deleteOnExit();
+        File vectorFile = VectorTxtToTfProjectorTsv.getDerivedVectorsFile(vectorsTxtFile);
+        vectorFile.deleteOnExit();
+        Main.main(new String[]{
+                "-convertToTfProjector",
+                vectorsTxtFile.getAbsolutePath()
+        });
+        assertTrue(metadataFile.exists());
+        assertTrue(vectorFile.exists());
+
+        // check vector file
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(vectorFile),
+                StandardCharsets.UTF_8))) {
+            String line = reader.readLine();
+            String[] tokens = line.split("\t");
+            assertEquals(3, tokens.length);
+            assertEquals("0.00177156", tokens[0]);
+            assertEquals("-0.0019879746", tokens[1]);
+            assertEquals("-0.001207912", tokens[2]);
+
+        } catch (Exception e) {
+            fail(e);
+        }
+
+        // check labels file
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(metadataFile),
+                StandardCharsets.UTF_8))) {
+            String line = reader.readLine();
+            //assertEquals("Labels", line);
+            //line = reader.readLine();
+            assertEquals("Freude,", line);
+        } catch (Exception e) {
+            fail(e);
+        }
+    }
+
     private final static String TXT_VECTOR_FILE_PATH = "./txtVectorFile.w2v";
 
     @Test
-    void convertToW2v (){
+    void convertToW2v() {
         File vectorFile = loadFile("txtVectorFile.txt");
         assertNotNull(vectorFile);
         File fileToWrite = new File(TXT_VECTOR_FILE_PATH);
@@ -1582,5 +1669,7 @@ class MainTest {
         deleteFile("./txtVectorFileNoTags.txt");
         deleteFile(VECTORS_KV_FILE);
         deleteFile(VECTORS_W2V_FILE);
+        deleteFile(METADTA_TSV_FILE);
+        deleteFile(VECTOR_TSV_FILE);
     }
 }

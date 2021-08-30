@@ -19,14 +19,14 @@ class VectorTxtToW2vTest {
         assertNotNull(vectorFile);
         File fileToWrite = new File(TXT_VECTOR_FILE_PATH);
         fileToWrite.deleteOnExit();
-        VectorTxtToW2vConverter.convert(vectorFile, fileToWrite);
+        VectorTxtToW2v.convert(vectorFile, fileToWrite);
         assertTrue(fileToWrite.exists());
         assertEquals(getNumberOfLines(vectorFile) + 1, getNumberOfLines(fileToWrite));
         deleteFile(TXT_VECTOR_FILE_PATH);
 
         // testing some error cases
         assertFalse(fileToWrite.exists());
-        VectorTxtToW2vConverter.convert(null, fileToWrite);
+        VectorTxtToW2v.convert(null, fileToWrite);
         assertFalse(fileToWrite.exists());
     }
 

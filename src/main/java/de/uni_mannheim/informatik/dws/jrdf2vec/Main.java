@@ -202,20 +202,24 @@ public class Main {
                 System.out.println("Installation is ok! [✔︎]");
             } else {
                 System.out.println("Installation is not ok! [❌]\nIs Python 3 installed? Please check the log for " +
-                        "missing" +
-                        " dependencies.");
+                        "missing dependencies.");
             }
             return;
         }
 
         // conversion to kv
-        if(containsIgnoreCase("-convertToW2V", args)){
+        if (containsIgnoreCase("-convertToW2V", args)) {
             convertToW2v(args);
             return;
         }
 
-        if(containsIgnoreCase("-convertToKv", args)){
+        if (containsIgnoreCase("-convertToKv", args)) {
             convertToKv(args);
+            return;
+        }
+
+        if (containsIgnoreCase("-convertToTfProjector", args)){
+            convertToTfTsv(args);
             return;
         }
 
@@ -634,19 +638,38 @@ public class Main {
         System.out.println(rdf2VecInstance.getRequiredTimeForLastTrainingString());
     }
 
-    private static void convertToW2v(String[] args){
+    private static void convertToTfTsv(String[] args) {
+        String[] parameters = getValues("-convertToTfProjector", 3, args);
+        if (parameters == null) {
+            String txtFile = getValue("-convertToTfProjector", args);
+            if (txtFile == null) {
+                System.out.println("Your input is not correct.\n" +
+                        "The syntax is: -convertToTfProjector <txt_file.txt> [<vectors.tsv> <metadata.tsv>]");
+                return;
+            }
+            VectorTxtToTfProjectorTsv.convert(new File(txtFile));
+        } else {
+            VectorTxtToTfProjectorTsv.convert(
+                    new File(parameters[0]),
+                    new File(parameters[1]),
+                    new File(parameters[2])
+            );
+        }
+    }
+
+    private static void convertToW2v(String[] args) {
         String[] parameters = getValues("-convertToW2V", 2, args);
-        if(parameters == null){
+        if (parameters == null) {
             System.out.println("Your input is not correct.\n" +
                     "The syntax is: -convertToW2V <txt_file_path> <new_file.w2v>");
             return;
         }
-        VectorTxtToW2vConverter.convert(new File(parameters[0]), new File(parameters[1]));
+        VectorTxtToW2v.convert(new File(parameters[0]), new File(parameters[1]));
     }
 
-    private static void convertToKv(String[] args){
+    private static void convertToKv(String[] args) {
         String[] parameters = getValues("-convertToKv", 2, args);
-        if(parameters == null){
+        if (parameters == null) {
             System.out.println("Your input is not correct.\n" +
                     "The syntax is: -convertToKv <txt_file_path> <new_file.kv>");
             return;
@@ -683,10 +706,7 @@ public class Main {
         if (transformationSource != null) {
             String entityFile = getValue("-light", args);
             String fileToWritePath = getValueMultiOption(args, "-file", "-newFile");
-            boolean isNoTags = false;
-            if (containsIgnoreCase("-noTags", args)) {
-                isNoTags = true;
-            }
+            boolean isNoTags = containsIgnoreCase("-noTags", args);
             printIfIgnoredOptionsExist();
             generateTextVectorFile(transformationSource, entityFile, fileToWritePath, isNoTags);
         } else {
@@ -821,9 +841,10 @@ public class Main {
 
     /**
      * Obtain more than one value given a key and an args array.
-     * @param key The key preceding the values.
+     *
+     * @param key          The key preceding the values.
      * @param valuesNumber The number of values to obtain.
-     * @param arguments The arguments which shall be parsed.
+     * @param arguments    The arguments which shall be parsed.
      * @return The values in a String array. Null if there were any issues.
      */
     public static String[] getValues(String key, int valuesNumber, String[] arguments) {
@@ -1080,7 +1101,11 @@ public class Main {
                 "   (The `<entity_file>` should contain one entity (full URI) per line.).\n" +
                 "   You can find the file (named `vectors.txt`) in the directory where the model/vector file is\n" +
                 "   located.\n" +
-                "   If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`." +
+                "   If you want to specify the file name/path yourself, you can use option `-newFile <file_path>`.\n" +
+                "   If the vector concepts contain surrounding tags that you want to remove in the process, use\n" +
+                "   option `-noTags`.\n" +
+                "   This command also works if <model_or_vector_file> is an existing vector text\n" +
+                "   file that shall be reduced." +
                 "   \n\n" +
                 "B) Generation of Vocabulary Text File\n" +
                 "   jRDF2vec provides functionality to print all concepts for which a vector has been trained:\n\n" +
@@ -1105,7 +1130,31 @@ public class Main {
                 "D) Merge of All Walk Files Into One\n" +
                 "   By default, jRDF2vec serializes walks in different gzipped files. If you require one\n" +
                 "   uncompressed, file, you can use the `-mergeWalks` keyword. You need to provide a\n" +
-                "   `-walkDirectory <dir>` and you can optionally specify the output file using `-o <file_path>`\n";
+                "   `-walkDirectory <dir>` and you can optionally specify the output file using `-o <file_path>`\n\n" +
+                "E) Generation of Tensorflow Projector Files\n" +
+                "   If you want to visualize your embedding space by using the Tensorflow Projector, you can do so\n" +
+                "   by converting your vectors.txt file to the two files required by the tool.\n" +
+                "   Use the following command:\n\n" +
+                "       -convertToTfProjector <txt_file_path> [<vectors.tsv> <metadata.tsv>]\n" +
+                "       where <txt_file_path>\n" +
+                "           refers to the vector text file as generated by jRDF2vec.\n" +
+                "       where <vectors.tsv>\n" +
+                "           refers to the vector tsv file path that will be written. If you specify a vectors.tsv\n" +
+                "           path, you must also specify a metadata.tsv path (see below).\n" +
+                "       where <metadata.tsv>\n" +
+                "           refers to the metadata tsv file path that will be written.\n\n" +
+                "F) Converting a txt Vector File to w2v Format\n" +
+                "   To create a word2vec formatted file from the text file, you can use the following command:\n\n" +
+                "       -convertToW2V <txt_file_path> <new_file.w2v>\n\n" +
+                "G) Converting a txt/w2v Vector File to Gensim kv Format\n" +
+                "   You can convert any txt or w2v vector file, generated by jRDF2vec or any other tool, to a\n" +
+                "   gensim keyed vectors file (.kv). Use the following command:\n\n" +
+                "       -convertToKv <txt_file_path> <new_file.kv>\n" +
+                "       where <txt_file_path>\n" +
+                "           is the file you want to convert. Make sure you use the correct file endings to indicate\n" +
+                "           the format (.txt/.w2v).\n" +
+                "       where <new_file.kv>\n" +
+                "           is the new file that is to be written. It is recommend to use file suffix '.kv'.\n";
     }
 
     /**

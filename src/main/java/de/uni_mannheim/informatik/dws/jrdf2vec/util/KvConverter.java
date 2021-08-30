@@ -20,7 +20,7 @@ public class KvConverter {
             LOGGER.info("Recognized txt format. Will convert to w2v and then to kv.");
             w2vFile = new File(fileToWrite.getParentFile(), txtOrw2vFile.getName().substring(0,
                     (int) (txtOrw2vFile.getName().length()) - 4) + ".w2v");
-            VectorTxtToW2vConverter.convert(txtOrw2vFile, w2vFile);
+            VectorTxtToW2v.convert(txtOrw2vFile, w2vFile);
         } else {
             LOGGER.error("Neither .txt nor .w2v file provided (make sure you use correct file endings). ABORTING " +
                     "program.");
