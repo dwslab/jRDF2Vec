@@ -98,7 +98,7 @@ Playground.java
 Main_IDE.java
 
 # logging
-log4j.properties
+!log4j.properties
 
 # allow specific jrdf2vec binaries
 !src/main/bin
