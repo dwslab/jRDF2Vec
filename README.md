@@ -188,9 +188,10 @@ text file containing the concepts you want to check (one concept per line in the
 A report will be printed. For large models, you may want to redirect that into a file (`[...] &> somefile.txt)`.
 
 #### Merge of All Walk Files Into One
-By default, jRDF2vec serializes walks in different gzipped files. If you require one
-uncompressed, file, you can use the `-mergeWalks` keyword. You need to provide a
-`-walkDirectory <dir>` and you can optionally specify the output file using `-o <file_path>`. 
+By default, jRDF2vec serializes walks in different gzipped files. If you require a single,
+uncompressed file, you can use the `-mergeWalks` keyword. You need to provide a
+`-walkDirectory <dir>` and you can optionally specify the output file using `-o <file_path>`.
+(Files not ending with `.gz` in `<dir>` will be skipped.)
 
 ```bash
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -mergeWalks -walkDirectory <dir> -o <file_to_write>
