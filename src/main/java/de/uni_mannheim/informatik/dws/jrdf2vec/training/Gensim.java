@@ -562,8 +562,7 @@ public class Gensim {
      *
      * @return True if the server is fully functional, else false.
      */
-    public static boolean checkRequirements() {
-        Gensim gensim = Gensim.getInstance();
+    public boolean checkRequirements() {
         HttpGet request = new HttpGet(serverUrl + "/check-requirements");
         File requirementsFile = new File(DEFAULT_RESOURCES_DIRECTORY + "requirements.txt");
         if (!requirementsFile.exists()) {
@@ -575,11 +574,7 @@ public class Gensim {
             HttpEntity entity = response.getEntity();
             String resultMessage = EntityUtils.toString(entity);
             System.out.println(resultMessage);
-            if (resultMessage.contains("good to go")) {
-                return true;
-            } else {
-                return false;
-            }
+            return resultMessage.contains("good to go");
         } catch (IOException ioe) {
             LOGGER.error("Problem with http request.", ioe);
             return false;
@@ -592,6 +587,7 @@ public class Gensim {
     public static void shutDown() {
         isShutDown = true;
         instance = null;
+        port = DEFAULT_PORT;
         try {
             if (httpClient != null)
                 httpClient.close();
@@ -679,7 +675,7 @@ public class Gensim {
         //pb.environment().put("PATH", "{FOLDER CONTAINING PYTHON EXE}" + File.pathSeparator + pb.environment().get("PATH"));
         try {
             pb.inheritIO();
-            this.serverProcess = pb.start();
+            serverProcess = pb.start();
             final int maxTrials = 8;
             for (int i = 0; i < maxTrials; i++) {
                 HttpGet request = new HttpGet(serverUrl + "/melt_ml.html");
@@ -720,6 +716,7 @@ public class Gensim {
             }));
             isHookStarted = true;
         }
+        LOGGER.info("Server started.\nServer URL: " + getServerUrl() + "\nServer port: " + getPort());
         return true;
     }
 
@@ -939,6 +936,10 @@ public class Gensim {
         return port;
     }
 
+    /**
+     * Set the port, must be performed before the server is started.
+     * @param port The port to be set.
+     */
     public static void setPort(int port) {
         if (instance != null) {
             LOGGER.error("Server is already running. The port cannot be changed.");

@@ -144,6 +144,7 @@ public class RDF2VecLight implements IRDF2Vec {
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
+        LOGGER.info("Walks successfully generated. Starting training now...");
 
         before = Instant.now();
         Gensim gensim;

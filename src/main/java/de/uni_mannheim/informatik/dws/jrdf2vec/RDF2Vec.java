@@ -189,19 +189,20 @@ public class RDF2Vec implements IRDF2Vec {
 
         Instant before = Instant.now();
 
-        WalkGenerationManager classicGenerator;
+        WalkGenerationManager walkGenerationManager;
         if (useFile) {
-            classicGenerator = new WalkGenerationManager(getFile(this.knowledgeGraphUri).toURI(), isEmbedText(),
+            walkGenerationManager = new WalkGenerationManager(getFile(this.knowledgeGraphUri).toURI(), isEmbedText(),
                     true, existingWalkDirectory, this.walkDirectory);
         } else {
-            classicGenerator = new WalkGenerationManager(this.ontModel, isEmbedText());
+            walkGenerationManager = new WalkGenerationManager(this.ontModel, isEmbedText());
         }
 
-        classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth,
+        walkGenerationManager.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth,
                 configuration.getWindowSize(), getWalkDirectory());
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);
+        LOGGER.info("Walks successfully generated. Starting training now...");
 
         before = Instant.now();
         Gensim gensim;

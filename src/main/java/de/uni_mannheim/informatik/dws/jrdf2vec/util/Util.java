@@ -539,6 +539,10 @@ public class Util {
         deleteDirectory(directory.getAbsolutePath());
     }
 
+    /**
+     * Deletes the directory stated as string path.
+     * @param directoryPath The path to the directory which shall be deleted.
+     */
     public static void deleteDirectory(String directoryPath) {
         try {
             FileUtils.deleteDirectory(new File(directoryPath));

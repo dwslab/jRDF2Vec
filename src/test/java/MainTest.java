@@ -284,7 +284,7 @@ class MainTest {
         String walkPath = "." + File.separator + "mainWalksOwlText" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
-        walkDirectory.mkdir();
+        assertTrue(walkDirectory.mkdir());
         String graphFilePath = loadFile("pizza.owl.xml").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-sample", "0.01", "-embedText", "-window", "5"};
         Main.main(args);
@@ -325,7 +325,7 @@ class MainTest {
         String walkPath = "." + File.separator + "mainWalksNtText" + File.separator;
         File walkDirectory = new File(walkPath);
         walkDirectory.deleteOnExit();
-        walkDirectory.mkdir();
+        assertTrue(walkDirectory.mkdir());
         String graphFilePath = loadFile("dummyGraph_with_labels.nt").getAbsolutePath();
         String[] args = {"-graph", graphFilePath, "-walkDir", walkPath, "-noVectorTextFileGeneration", "-sample", "0.01", "-embedText", "-window", "8"};
         Main.main(args);
@@ -497,7 +497,7 @@ class MainTest {
         File vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
         assertTrue(vectorFile.exists());
         assertEquals(2, getNumberOfLines(vectorFile));
-        vectorFile.delete();
+        deleteFile(vectorFile);
         assertEquals(0, Main.getIgnoredArguments().size());
 
         // error case 1: directory
@@ -506,7 +506,7 @@ class MainTest {
         Main.main(args);
         assertTrue(newVectorFile.exists());
         assertTrue(getNumberOfLines(newVectorFile) > 5);
-        newVectorFile.delete();
+        deleteFile(newVectorFile);
 
         // error case 2: non-existing file
         args = new String[]{"-generateTxtVectorFile", modelFilePath, "-light", "./this_file_does_not_exist.txt"};
@@ -514,7 +514,7 @@ class MainTest {
         vectorFile = new File(modelFile.getParentFile().getAbsolutePath(), "vectors.txt");
         assertTrue(vectorFile.exists());
         assertTrue(getNumberOfLines(vectorFile) > 5);
-        vectorFile.delete();
+        deleteFile(vectorFile);
     }
 
     @Test
@@ -709,7 +709,7 @@ class MainTest {
     @Test
     public void trainLightNoVectorTextFile() {
         File lightWalks = new File("./mainLightWalks/");
-        lightWalks.mkdir();
+        assertTrue(lightWalks.mkdir());;
         lightWalks.deleteOnExit();
         String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
@@ -718,9 +718,13 @@ class MainTest {
         Main.main(args);
 
         assertEquals(RDF2VecLight.class, Main.getRdf2VecInstance().getClass());
-        assertTrue(lightWalks.listFiles().length > 0);
+        File[] lightWalksFiles = lightWalks.listFiles();
+        assertNotNull(lightWalksFiles);
+        assertTrue(lightWalksFiles.length > 0);
         assertEquals(RDF2VecLight.DEFAULT_WALK_GENERATION_MODE, Main.getWalkGenerationMode());
-        HashSet<String> files = Sets.newHashSet(lightWalks.list());
+        String[] lightWalksFilesString = lightWalks.list();
+        assertNotNull(lightWalksFilesString);
+        HashSet<String> files = Sets.newHashSet(lightWalksFilesString);
 
         // assert that all files are there
         assertTrue(files.contains("model.kv"));
@@ -756,11 +760,24 @@ class MainTest {
     @Test
     void checkRequirements() {
         Main.main(new String[]{"-checkInstallation"});
+        assertEquals(Gensim.DEFAULT_PORT, Gensim.getPort());
+        assertEquals("http://127.0.0.1:" + Gensim.DEFAULT_PORT, Gensim.getServerUrl());
+        assertTrue(Main.isIsServerOk());
+    }
+
+    @Test
+    void checkRequirementsWithDifferentPort() {
+        Main.main(new String[]{"-checkInstallation", "-port", "2025"});
+        assertEquals("http://127.0.0.1:2025", Gensim.getServerUrl());
+        assertEquals(2025, Gensim.getPort());
+        assertTrue(Main.isIsServerOk());
     }
 
     @Test
     void writeVocabularyToFile() {
-        File modelFile = new File(getPathOfResource("test_model_vectors.kv"));
+        String resourcePath = getPathOfResource("test_model_vectors.kv");
+        assertNotNull(resourcePath);
+        File modelFile = new File(resourcePath);
         Main.main(new String[]{"-generateVocabularyFile", modelFile.getAbsolutePath()});
         File vocabFile = new File(modelFile.getParentFile().getAbsolutePath(), "vocabulary.txt");
         vocabFile.deleteOnExit();
@@ -832,12 +849,13 @@ class MainTest {
         File graphFileToUse = loadFile("swdf-2012-11-28.hdt");
 
         // prepare directory
-        File walkDirectory = new File("./walksOnly/");
-        walkDirectory.mkdir();
+        File walkDirectory = new File("./walksOnlyHdt/");
+        assertTrue(walkDirectory.mkdir());
         walkDirectory.deleteOnExit();
 
         String lightFilePath = loadFile("./swdf_light_entities.txt").getAbsolutePath();
-        Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light", lightFilePath, "-onlyWalks", "-walkDir", "./walksOnly/"});
+        Main.main(new String[]{"-graph", graphFileToUse.getAbsolutePath(), "-numberOfWalks", "100", "-light",
+                lightFilePath, "-onlyWalks", "-walkDir", "./walksOnlyHdt/"});
 
         // check ignored arguments
         assertEquals(0, Main.getIgnoredArguments().size());
@@ -883,7 +901,7 @@ class MainTest {
         }
 
         // clean up
-        walkDirectory.delete();
+        deleteDirectory(walkDirectory);
     }
 
     @Test
@@ -1163,7 +1181,7 @@ class MainTest {
 
         // prepare directory
         File walkDirectory = new File("./walksOnly/");
-        walkDirectory.mkdir();
+        assertTrue(walkDirectory.mkdir());
         walkDirectory.deleteOnExit();
 
 
@@ -1214,8 +1232,8 @@ class MainTest {
         }
 
         // clean up
-        graphFileToUse.delete();
-        walkDirectory.delete();
+        deleteFile(graphFileToUse);
+        deleteFile(walkDirectory);
     }
 
     /**
@@ -1238,7 +1256,7 @@ class MainTest {
         // prepare directory
         String walkDirectoryName = "./walksOnly2/";
         File walkDirectory = new File(walkDirectoryName);
-        walkDirectory.mkdir();
+        assertTrue(walkDirectory.mkdir());
         walkDirectory.deleteOnExit();
 
         String lightFilePath = loadFile("swdf_light_entities.txt").getAbsolutePath();
@@ -1288,8 +1306,8 @@ class MainTest {
         }
 
         // clean up
-        graphFileToUse.delete();
-        walkDirectory.delete();
+        deleteFile(graphFileToUse);
+        deleteFile(walkDirectory);
     }
 
     @Test
@@ -1654,6 +1672,7 @@ class MainTest {
         deleteDirectory("./extClassic");
         deleteDirectory("./extLight");
         deleteDirectory("./walksOnly");
+        deleteDirectory("./walksOnlyHdt");
         deleteDirectory("./walksOnly2");
         deleteDirectory("./classicWalks/");
         deleteDirectory("./mainWalks/");

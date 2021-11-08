@@ -45,7 +45,7 @@ class GensimTest {
 
     @Test
     void checkRequirements(){
-        assertTrue(Gensim.checkRequirements());
+        assertTrue(Gensim.getInstance().checkRequirements());
     }
 
     /**

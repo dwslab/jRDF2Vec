@@ -150,6 +150,11 @@ public class Main {
     public static final String DEFAULT_MERGE_FILE = "./mergedWalks.txt";
 
     /**
+     * This variable is static merely for testing
+     */
+    private static boolean isServerOk;
+
+    /**
      * The main method that is executed when running the JAR.
      *
      * @param args All the options for walk generation and training. Run with -help in order to get an overview.
@@ -194,11 +199,27 @@ public class Main {
             return;
         }
 
+        String portString = getValue("-port", args);
+        if (portString != null) {
+            try {
+                int intPort = Integer.parseInt(portString);
+                Gensim.setPort(intPort);
+                port = intPort;
+            } catch (NumberFormatException nfe) {
+                System.out.println("A problem occurred while trying to parse the following port number: " + portString
+                        + "\nUsing default port: " + Gensim.DEFAULT_PORT);
+            }
+        }
+        System.out.println("Using server port: " + port);
+
         // check install
-        if (containsIgnoreCase("-checkInstall", args) || containsIgnoreCase("-check", args) || containsIgnoreCase(
-                "-checkRequirements", args) || containsIgnoreCase("-checkInstallation", args)) {
-            boolean isOk = Gensim.checkRequirements();
-            if (isOk) {
+        if (containsIgnoreCase("-checkInstall", args) ||
+                containsIgnoreCase("-check", args) ||
+                containsIgnoreCase("-checkRequirements", args) ||
+                containsIgnoreCase("-checkInstallation", args)) {
+
+            isServerOk = Gensim.getInstance().checkRequirements();
+            if (isServerOk) {
                 System.out.println("Installation is ok! [✔︎]");
             } else {
                 System.out.println("Installation is not ok! [❌]\nIs Python 3 installed? Please check the log for " +
@@ -254,6 +275,8 @@ public class Main {
             isEmbedText = true;
         }
 
+
+
         if (containsIgnoreCase("-onlyTraining", args)) {
             isOnlyTraining = true;
             String walksPath = getValue("-walkDirectory", args);
@@ -270,19 +293,6 @@ public class Main {
 
         String knowledgeGraphFilePath = getValue("-graph", args);
         if (knowledgeGraphFilePath == null) knowledgeGraphFilePath = getValue("-g", args);
-
-        String portString = getValue("-port", args);
-        if (portString != null) {
-            try {
-                int intPort = Integer.parseInt(portString);
-                Gensim.setPort(intPort);
-                port = intPort;
-            } catch (NumberFormatException nfe) {
-                System.out.println("A problem occurred while trying to parse the following port number: " + portString
-                        + "\nUsing default port: " + Gensim.DEFAULT_PORT);
-            }
-        }
-        System.out.println("Using server port: " + port);
 
         isOnlyWalks = containsIgnoreCase("-onlyWalks", args);
         // allowing a bit more...
@@ -947,6 +957,10 @@ public class Main {
      */
     public static int getDepth() {
         return depth;
+    }
+
+    public static boolean isIsServerOk() {
+        return isServerOk;
     }
 
     /**
