@@ -51,26 +51,24 @@ Found a bug? Don't hesitate to <a href="https://github.com/dwslab/jRDF2Vec/issue
 
 ## Run using Docker
 
-[![Run tests](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml) 
-
-A new docker image is built and published by a GitHub Actions workflow: the `latest` image tag is updated everytime a commit is pushed to the `master` branch, and a new image tag is created everytime a new release is published following the scheme `v0.0.0`
+[![Publish Docker image](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml) 
 
 ### Run
 
-The image is pulled from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
+The Docker image can be used with the same arguments as the Jar file, refer to the documentation above for more details on the different arguments.
 
 Test run to get help message:
 
 ```bash
-docker run -it --rm ghcr.io/dwslab/jrdf2vec
+docker run -it --rm ghcr.io/dwslab/jrdf2vec -help
 ```
 
-Mount a folder on `/data` in the container to provide input files and generate embeddings:
+The best way to mount your local files in the docker container is to mount a folder on `/data` in the container:
 
-* `$(pwd)` to use current working directory on Linux and MacOS
-* `${PWD}` to use current working directory on Windows (also make the command a one-line)
+* On Linux and MacOS: use `$(pwd)` to mount the current working directory
+* On Windows:  use `${PWD}` to mount the current working directory (and make the command in one line)
 
-Here is an example generating embeddings using sample config files for DBpedia in [`src/test/resources`](https://github.com/dwslab/jRDF2Vec/tree/master/src/test/resources):
+Here is an example generating embeddings using sample config files for DBpedia found in [`src/test/resources`](https://github.com/dwslab/jRDF2Vec/tree/master/src/test/resources) (to run from the root folder of this repository, on Linux or MacOS, change the `$(pwd)` for Windows):
 
 ```bash
 docker run -it --rm \
@@ -80,9 +78,14 @@ docker run -it --rm \
   -graph /data/src/test/resources/sample_dbpedia_nt_file.nt
 ```
 
-> Embeddings will be generated in the folder from where you ran the command.
+> Embeddings will be generated in the folders `walks` and `python_server` from where you ran the command.
 
 ### Build
+
+A new docker image is automatically built and published to the GitHub Container Registry by a [GitHub Actions workflow](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml): 
+
+* The `latest` image tag is updated everytime a commit is pushed to the `master` branch
+* A new image tag is created for every new release published following the scheme `v0.0.0`
 
 From source code:
 

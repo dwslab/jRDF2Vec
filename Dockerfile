@@ -1,5 +1,6 @@
 FROM condaforge/mambaforge:4.10.3-7
 # Alternativa mamba image with python 3.8: 4.9.2-5
+LABEL org.opencontainers.image.source="https://github.com/dwslab/jRDF2Vec"
 
 # Install in /app
 WORKDIR /app
@@ -12,7 +13,6 @@ RUN mamba env create -f src/main/resources/environment.yml
 # Make RUN commands use the new environment:
 SHELL ["conda", "run", "-n", "jrdf2vec_env", "/bin/bash", "-c"]
 ENV PATH /opt/conda/envs/jrdf2vec_env/bin:$PATH
-
 
 # Install Java and maven with conda
 RUN mamba install -y openjdk=8 maven
@@ -31,6 +31,7 @@ COPY ./src ./src
 # Build jRDF2Vec, skip tests
 RUN mvn -Dmaven.test.skip=true package && \
     mv ./target/jrdf2vec-*-SNAPSHOT.jar /app/jrdf2vec.jar
+
 
 # Use /data folder to mount input files when running the container
 WORKDIR /data
