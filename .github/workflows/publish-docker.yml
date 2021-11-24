@@ -1,0 +1,65 @@
+name: Publish Docker image
+# To dwslab GitHub Container Registry
+# https://github.com/orgs/dwslab/packages
+on:
+  workflow_dispatch:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+env:
+  IMAGE_NAME: jrdf2vec
+
+jobs:
+
+  build-and-publish:
+    # permissions:
+    #   packages: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      ## If getting error due to missing permissions:
+      # Create an access token with `read:packages` and `write:packages` scopes 
+      #   -> https://github.com/settings/tokens
+      # Add the token as a secret `CONTAINER_REGISTRY_GITHUB_TOKEN` 
+      #   -> https://github.com/dwslab/jRDF2Vec/settings/secrets/actions
+      # Then replace secrets.GITHUB_TOKEN by secrets.CONTAINER_REGISTRY_GITHUB_TOKEN here:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+
+      - name: Push image to GitHub Container Registry
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION

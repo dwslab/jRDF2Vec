@@ -91,10 +91,10 @@ The port that shall be used for the server.
 
 **Advanced Parameters**
 - `-continue <existing_walk_directory>`<br/>
-In some cases, old walks need to be re-used (e.g. if the program was interrupted after 48h). 
-With the `-continue` option, the walk generation can be continued; this means that old walks will be re-used and only
-missing walks are generated. This does not work for MID_WALKS (and flavors). If you do not need to generate additional 
-walks use `-onlyTraining` instead.
+  In some cases, old walks need to be re-used (e.g. if the program was interrupted after 48h). 
+  With the `-continue` option, the walk generation can be continued; this means that old walks will be re-used and only
+  missing walks are generated. This does not work for MID_WALKS (and flavors). If you do not need to generate additional 
+  walks use `-onlyTraining` instead.
   
 
 ### Command-Line Interface (jRDF2Vec CLI) - Additional Services
@@ -180,12 +180,13 @@ as follows:
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -analyzeVocab <model> <training_file|entity_file>
 ```
 - `<model>` refers to any model representation such as gensim model file, `.kv` file, or `.txt` file. Just make sure
-you use the correct file endings.
+  you use the correct file endings.
   
 - `<training_file|entity_file>` refers either to the NT/TTL etc. file that has been used to train the model *or* to a 
-text file containing the concepts you want to check (one concept per line in the text file, make sure the file ending is 
-`.txt`).
+  text file containing the concepts you want to check (one concept per line in the text file, make sure the file ending is 
+  `.txt`).
   
+
 A report will be printed. For large models, you may want to redirect that into a file (`[...] &> somefile.txt)`.
 
 #### Merge of All Walk Files Into One
@@ -209,41 +210,50 @@ Stable releases are available through the maven central repository:
 </dependency>
 ```
 
-
 ## Run jRDF2Vec using Docker
+
+[![Publish Docker image](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml) 
+
 Optionally, Docker can be used to run jRDF2Vec. This functionality has been added by <a href="https://github.com/vemonet">Vincent Emonet</a>.
 
 ### Run
 
-The image can be pulled from [DockerHub 🐳](https://hub.docker.com/repository/docker/vemonet/jrdf2vec)
+The Docker image can be used with the same arguments as the Jar file, refer to the documentation above for more details on the different jRDF2Vec arguments.
 
-Test run to get help message:
+Test run to get the help message:
 
 ```bash
-docker run -it --rm vemonet/jrdf2vec
+docker run -it --rm ghcr.io/dwslab/jrdf2vec -help
 ```
 
-Mount volumes on `/data` in the container to provide input files and generate embeddings:
+The best way to mount your local files in the docker container is to mount a folder on `/data` in the container:
 
-* `$(pwd)` to use current working directory on Linux and MacOS
-* `${PWD}` to use current working directory on Windows (also make the command a one-line)
+* On Linux and MacOS: use `$(pwd)` to mount the current working directory
+* On Windows:  use `${PWD}` to mount the current working directory (and make the command in one line)
+
+Here is an example generating embeddings using sample config files for DBpedia found in [`src/test/resources`](https://github.com/dwslab/jRDF2Vec/tree/master/src/test/resources) in this repository. Use this command from the root folder of this repository on Linux or MacOS, change the `$(pwd)` to `${PWD}` for Windows:
 
 ```bash
 docker run -it --rm \
-  -v $(pwd)/src/test/resources:/data \
-  vemonet/jrdf2vec \
-  -light /data/sample_dbpedia_entity_file.txt \
-  -graph /data/sample_dbpedia_nt_file.nt
+  -v $(pwd):/data \
+  ghcr.io/dwslab/jrdf2vec \
+  -light /data/src/test/resources/sample_dbpedia_entity_file.txt \
+  -graph /data/src/test/resources/sample_dbpedia_nt_file.nt
 ```
 
-> Embeddings will be generated in the shared volume (`/data` in the container).
+> Embeddings will be generated in the folders `walks` and `python_server` from where you ran the command.
 
 ### Build
 
-From source code:
+A new docker image is automatically built and published to the GitHub Container Registry by a [GitHub Actions workflow](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml): 
+
+* The `latest` image tag is updated everytime a commit is pushed to the `master` branch
+* A new image tag is created for every new release published following the scheme `v0.0.0`
+
+Build from source code:
 
 ```bash
-docker build -t jrdf2vec .
+docker build -t ghcr.io/dwslab/jrdf2vec .
 ```
 
 ## Developer Documentation
