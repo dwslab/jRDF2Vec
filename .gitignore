@@ -93,6 +93,14 @@ bin/
 # mac
 .DS_Store
 
+# Jupyter Notebook Example
+download_log.txt
+embedding_log.txt
+examples/jupyter_notebook/walks
+examples/jupyter_notebook/.ipynb_checkpoints
+examples/jupyter_notebook/python-server
+examples/jupyter_notebook/pizza.owl.nt
+
 # Playground
 Playground.java
 Main_IDE.java
