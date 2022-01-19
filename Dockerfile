@@ -1,16 +1,22 @@
-FROM maven:3-jdk-8
+FROM condaforge/mambaforge:4.10.3-7
+# Alternativa mamba image with python 3.8: 4.9.2-5
+LABEL org.opencontainers.image.source="https://github.com/dwslab/jRDF2Vec"
 
 # Install in /app
 WORKDIR /app
 
-RUN apt-get update -y && \
-    apt-get install -y python3 python3-pip && \
-    rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
-# Use Python3 by default instead of 2.7
+COPY ./src/main/resources/environment.yml ./src/main/resources/environment.yml
 
-# Install Python requirements
-COPY ./src/main/resources/requirements.txt ./src/main/resources/requirements.txt
-RUN pip3 install -r ./src/main/resources/requirements.txt
+# Create the conda environment with mamba (faster than conda)
+RUN mamba env create -f src/main/resources/environment.yml
+
+# Make RUN commands use the new environment:
+SHELL ["conda", "run", "-n", "jrdf2vec_env", "/bin/bash", "-c"]
+ENV PATH /opt/conda/envs/jrdf2vec_env/bin:$PATH
+
+# Install Java and maven with conda
+RUN mamba install -y openjdk=8 maven
+
 
 # Install HDT dependencies
 RUN git clone https://github.com/rdfhdt/hdt-java.git && \
@@ -26,10 +32,12 @@ COPY ./src ./src
 RUN mvn -Dmaven.test.skip=true package && \
     mv ./target/jrdf2vec-*-SNAPSHOT.jar /app/jrdf2vec.jar
 
+
 # Use /data folder to mount input files when running the container
 WORKDIR /data
 VOLUME /data
 
-ENTRYPOINT [ "java", "-jar", "/app/jrdf2vec.jar" ]
-CMD [ "-help" ]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "jrdf2vec_env", "java", "-jar", "/app/jrdf2vec.jar"]
+
 # Default args if no args passed to docker run
+CMD [ "-help" ]
