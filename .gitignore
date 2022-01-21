@@ -105,6 +105,9 @@ examples/jupyter_notebook/pizza.owl.nt
 Playground.java
 Main_IDE.java
 
+# python command
+python_command.txt
+
 # logging
 !log4j.properties
 
@@ -116,3 +119,5 @@ Main_IDE.java
 !src/test/resources/existing_walk_directory/walk_file.txt
 !src/test/resources/nt_directory_type_walks/*
 !src/test/resources/walk_merge/*
+src/main/resources/test/__pycache__
+src/main/resources/__pycache__

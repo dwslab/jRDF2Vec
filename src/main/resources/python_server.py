@@ -19,6 +19,7 @@ logging.basicConfig(
 
 # default boilerplate code
 app = Flask(__name__)
+app.use_reloader=False
 
 # set of active gensim models (learning/relearning possible)
 active_models = {}
@@ -348,12 +349,12 @@ def get_vector_given_model():
         return 0.0
 
     if concept is None:
-        message = "ERROR! concept not found in header. " "Vector cannot be retrieved."
+        message = "ERROR! 'concept' not found in header. " "Vector cannot be retrieved."
         print(message)
         logging.error(message)
         return message
 
-    if concept not in vectors.vocab:
+    if concept not in vectors.key_to_index:
         message = "ERROR! Concept '" + str(concept) + "' not in the vocabulary."
         print(message)
         logging.error(message)
@@ -747,8 +748,11 @@ def hello_demo():
     print(name_to_greet)
     return "Hello " + str(name_to_greet) + "!"
 
+@app.route("/shutdown", methods=["GET"])
+def shutdown():
+    request.environ.get('werkzeug.server.shutdown')()
 
-if __name__ == "__main__":
+def main():
     # determine the port
     try:
         if len(sys.argv) == 2:
@@ -764,3 +768,6 @@ if __name__ == "__main__":
         logging.error(e)
     logging.info(f"Starting server using port {port}")
     app.run(debug=False, port=port)
+
+if __name__ == "__main__":
+    main()
