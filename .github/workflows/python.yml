@@ -9,7 +9,10 @@ jobs:
         python-version: [3.8]
     steps:
       - name: Go to python directory
-        run: cd ./src/main/resources
+        run: |
+          pwd
+          ls
+          cd ./src/main/resources
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
