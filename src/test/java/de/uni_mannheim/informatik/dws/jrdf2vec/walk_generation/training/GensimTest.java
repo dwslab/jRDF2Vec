@@ -108,7 +108,6 @@ class GensimTest {
         assertTrue(similarity > 0);
     }
 
-
     @Test
     void getSimilarityNoCaching() {
         gensim.setVectorCaching(false);
@@ -122,7 +121,6 @@ class GensimTest {
         similarity = gensim.getSimilarity("Europe", "united", pathToVectorFile);
         assertTrue(similarity > 0);
     }
-
 
     @Test
     void testMultipleShutdownCallsAndRestarts() {

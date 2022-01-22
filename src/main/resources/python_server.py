@@ -19,7 +19,7 @@ logging.basicConfig(
 
 # default boilerplate code
 app = Flask(__name__)
-app.use_reloader=False
+app.use_reloader = False
 
 # set of active gensim models (learning/relearning possible)
 active_models = {}
@@ -155,7 +155,7 @@ def w2v_to_kv() -> str:
     try:
         w2v_path = request.headers.get("w2v_path")
         new_file = request.headers.get("new_file")
-        result = KeyedVectors.load_word2vec_format(w2v_path, unicode_errors='ignore')
+        result = KeyedVectors.load_word2vec_format(w2v_path, unicode_errors="ignore")
         result.save(new_file)
         active_models[os.path.realpath(new_file)] = result
         active_vectors[os.path.realpath(new_file)] = result.wv
@@ -198,31 +198,31 @@ def train_word_2_vec() -> str:
             model = models.Word2Vec(
                 sample=float(sample),
                 min_count=int(min_count),
-                size=int(vector_dimension),
+                vector_size=int(vector_dimension),
                 workers=int(number_of_threads),
                 window=int(window_size),
                 sg=1,
                 negative=int(negatives),
-                iter=int(iterations),
+                epochs=int(iterations),
             )
         else:
             model = models.Word2Vec(
                 sample=float(sample),
                 min_count=int(min_count),
-                size=int(vector_dimension),
+                vector_size=int(vector_dimension),
                 workers=int(number_of_threads),
                 window=int(window_size),
                 sg=0,
                 cbow_mean=1,
                 negative=int(negatives),
-                iter=int(iterations),
+                epochs=int(iterations),
             )
 
         logging.info("Model object initialized. Building Vocabulary...")
-        model.build_vocab(sentences)
+        model.build_vocab(corpus_iterable=sentences)
         logging.info("Vocabulary built. Training now...")
         model.train(
-            sentences=sentences, total_examples=model.corpus_count, epochs=int(epochs)
+            corpus_iterable=sentences, total_examples=model.corpus_count, epochs=int(epochs)
         )
         logging.info("Model trained.")
 
@@ -252,7 +252,7 @@ def is_in_vocabulary():
     model_path = request.headers.get("model_path")
     vector_path = request.headers.get("vector_path")
     vectors = get_vectors(model_path, vector_path)
-    return str(concept in vectors.vocab)
+    return str(concept in vectors.key_to_index)
 
 
 @app.route("/get-vocabulary-size", methods=["GET"])
@@ -260,7 +260,7 @@ def get_vocab_size():
     model_path = request.headers.get("model_path")
     vector_path = request.headers.get("vector_path")
     vectors = get_vectors(model_path, vector_path)
-    return str(len(vectors.vocab))
+    return str(len(vectors.key_to_index))
 
 
 def get_vectors(model_path, vector_path):
@@ -312,12 +312,12 @@ def get_similarity_given_model():
         logging.error(message)
         return message
 
-    if concept_1 not in vectors.vocab:
+    if concept_1 not in vectors.key_to_index:
         message = "ERROR! concept_1 not in the vocabulary."
         print(message)
         logging.error(message)
         return message
-    if concept_2 not in vectors.vocab:
+    if concept_2 not in vectors.key_to_index:
         message = "ERROR! concept_2 not in the vocabulary."
         print(message)
         logging.error(message)
@@ -332,7 +332,7 @@ def get_vocabulary_terms():
     vector_path = request.headers.get("vector_path")
     vectors = get_vectors(model_path, vector_path)
     result = ""
-    for word in vectors.vocab:
+    for word in vectors.key_to_index:
         result += word + "\n"
     return result
 
@@ -675,9 +675,9 @@ def write_vectors_as_text_file():
         count = 0
         if entity_file is None:
             logging.info("Classic mode: Writing the full vocabulary.")
-            number_of_vectors_as_str = str(len(vectors.vocab))
+            number_of_vectors_as_str = str(len(vectors.key_to_index))
             logging.info("Processing " + number_of_vectors_as_str + " vectors...")
-            for concept in vectors.vocab:
+            for concept in vectors.key_to_index:
                 if concept.strip() == "":
                     continue
                 line_to_write = ""
@@ -703,7 +703,7 @@ def write_vectors_as_text_file():
             for concept in concepts:
                 count += 1
                 line_to_write = ""
-                if concept in vectors.vocab:
+                if concept in vectors.key_to_index:
                     vector = vectors.get_vector(concept)
                     line_to_write += concept + " "
                     for element in np.nditer(vector):
@@ -748,9 +748,11 @@ def hello_demo():
     print(name_to_greet)
     return "Hello " + str(name_to_greet) + "!"
 
+
 @app.route("/shutdown", methods=["GET"])
 def shutdown():
-    request.environ.get('werkzeug.server.shutdown')()
+    request.environ.get("werkzeug.server.shutdown")()
+
 
 def main():
     # determine the port
@@ -768,6 +770,7 @@ def main():
         logging.error(e)
     logging.info(f"Starting server using port {port}")
     app.run(debug=False, port=port)
+
 
 if __name__ == "__main__":
     main()

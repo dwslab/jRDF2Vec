@@ -121,3 +121,4 @@ python_command.txt
 !src/test/resources/walk_merge/*
 src/main/resources/test/__pycache__
 src/main/resources/__pycache__
+settings.json
