@@ -26,7 +26,7 @@ Alternatively, you can download the packaged JAR of the latest successful: commi
 
 ### System Requirements
 - Java 8 or later.
-- Python 3.8 with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.<br> 
+- Python 3.8 or later with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.<br> 
   (Conda users can directly use the [environment.yml](/src/main/resources/environment.yml) file.)
 
 You can check if you set up the environment (Python 3 + dependencies) correctly by running:
