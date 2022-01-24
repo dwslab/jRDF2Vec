@@ -361,7 +361,7 @@ def get_vector_given_model():
         return message
 
     result = ""
-    for element in vectors.word_vec(concept):
+    for element in vectors.get_vector(concept):
         result += " " + str(element)
     return result[1:]
 
