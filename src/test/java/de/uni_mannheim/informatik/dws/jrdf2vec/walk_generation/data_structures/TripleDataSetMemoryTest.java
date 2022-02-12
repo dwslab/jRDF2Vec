@@ -14,11 +14,15 @@ class TripleDataSetMemoryTest {
      void addDatatypeTriple(){
         TripleDataSetMemory ds = new TripleDataSetMemory();
         ds.addDatatypeTriple("A", "B", "My String");
+        assertEquals(1, ds.getNumberOfObjectNodes());
+        assertTrue(ds.getObjectNodes().contains("A"));
+
         assertEquals(0, ds.getObjectTripleSize());
         ds.addDatatypeTriple("A", "C", "My String");
         assertEquals(0, ds.getObjectTripleSize());
         ds.addDatatypeTriple("A", "C", "My String 2");
         assertEquals(0, ds.getObjectTripleSize());
+        assertEquals(1, ds.getNumberOfObjectNodes());
 
         Map<String, Set<String>> datatypeTuples = ds.getDatatypeTuplesForSubject("A");
         assertEquals(2, datatypeTuples.size());
@@ -38,14 +42,17 @@ class TripleDataSetMemoryTest {
     void addObjectPropertyTriple() {
         TripleDataSetMemory ds = new TripleDataSetMemory();
         ds.addObjectTriple("A", "B", "C");
-        assertTrue(ds.getObjectTriplesInvolvingObject("C").get(0).subject.equals("A"));
-        assertTrue(ds.getObjectTriplesInvolvingPredicate("B").get(0).subject.equals("A"));
-        assertTrue(ds.getObjectTriplesInvolvingSubject("A").get(0).object.equals("C"));
+        assertEquals("A", ds.getObjectTriplesInvolvingObject("C").get(0).subject);
+        assertEquals("A", ds.getObjectTriplesInvolvingPredicate("B").get(0).subject);
+        assertEquals("C", ds.getObjectTriplesInvolvingSubject("A").get(0).object);
+        assertEquals(2, ds.getNumberOfObjectNodes());
+        assertTrue(ds.getObjectNodes().contains("A"));
+        assertTrue(ds.getObjectNodes().contains("C"));
 
         // reference checks
         Triple t1 = new Triple("A", "B", "C");
         Triple t2 = new Triple("A", "B", "C");
-        assertFalse(t1 == t2);
+        assertNotSame(t1, t2);
 
         Triple a = ds.getObjectTriplesInvolvingSubject("A").get(0);
         Triple b = ds.getObjectTriplesInvolvingPredicate("B").get(0);
@@ -68,21 +75,24 @@ class TripleDataSetMemoryTest {
         TripleDataSetMemory ds = new TripleDataSetMemory();
         ds.addObjectTriple("A", "B", "C");
         ds.addObjectTriple("D", "E", "F");
+        assertEquals(4, ds.getNumberOfObjectNodes());
 
         TripleDataSetMemory ds2 = new TripleDataSetMemory();
         ds2.addObjectTriple("A", "B", "C");
         ds2.addObjectTriple("D", "E", "G");
+        assertEquals(ds2.getNumberOfObjectNodes(), 4);
 
         ds.addAllObjectTriples(ds2);
+        assertEquals(5, ds.getNumberOfObjectNodes());
         assertEquals(1, ds.getObjectTriplesInvolvingSubject("A").size());
         assertEquals("B", ds.getObjectTriplesInvolvingSubject("A").get(0).predicate);
         assertEquals("C", ds.getObjectTriplesInvolvingSubject("A").get(0).object);
 
         assertEquals(2, ds.getObjectTriplesInvolvingSubject("D").size());
         assertEquals("E", ds.getObjectTriplesInvolvingSubject("D").get(0).predicate);
-        assertTrue(ds.getObjectTriplesInvolvingSubject("D").get(0).object == "F" || ds.getObjectTriplesInvolvingSubject("D").get(0).object == "G");
-        assertTrue(ds.getObjectTriplesInvolvingSubject("D").get(1).object == "F" || ds.getObjectTriplesInvolvingSubject("D").get(1).object == "G");
-        assertFalse(ds.getObjectTriplesInvolvingSubject("D").get(0).object.equals(ds.getObjectTriplesInvolvingSubject("D").get(1).object));
+        assertTrue(ds.getObjectTriplesInvolvingSubject("D").get(0).object.equals("F") || ds.getObjectTriplesInvolvingSubject("D").get(0).object.equals("G"));
+        assertTrue(ds.getObjectTriplesInvolvingSubject("D").get(1).object.equals("F") || ds.getObjectTriplesInvolvingSubject("D").get(1).object.equals("G"));
+        assertNotEquals(ds.getObjectTriplesInvolvingSubject("D").get(0).object, ds.getObjectTriplesInvolvingSubject("D").get(1).object);
     }
 
     @Test

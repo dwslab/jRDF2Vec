@@ -1,7 +1,5 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
 /**
@@ -24,12 +22,18 @@ public class TripleDataSetMemory {
         objectToObjectTriples = new HashMap<>();
         subjectToDatatypeTuples = new HashMap<>();
         objectTriples = new HashSet<>();
+        objectNodes = new HashSet<>();
     }
 
     Map<String, Map<String, Set<Triple>>> subjectToObjectTriples;
     Map<String, ArrayList<Triple>> predicateToObjectTriples;
     Map<String, ArrayList<Triple>> objectToObjectTriples;
     Set<Triple> objectTriples;
+
+    /**
+     * Node URIs (no string values).
+     */
+    Set<String> objectNodes;
 
     /**
      * Map key: subject URI.
@@ -56,7 +60,12 @@ public class TripleDataSetMemory {
         addDatatypeTriple(new Triple(subject, predicate, stringObject));
     }
 
+    /**
+     * Add a triple where the object is a string.
+     * @param tripleToAdd Triple where the object is a string.
+     */
     public synchronized void addDatatypeTriple(Triple tripleToAdd){
+        this.objectNodes.add(tripleToAdd.subject);
         if(this.subjectToDatatypeTuples.containsKey(tripleToAdd.subject)){
             Map<String, Set<String>> propertyMap = this.subjectToDatatypeTuples.get(tripleToAdd.subject);
 
@@ -92,6 +101,8 @@ public class TripleDataSetMemory {
         if(this.objectTriples.contains(tripleToAdd)){
             return;
         }
+        this.objectNodes.add(tripleToAdd.subject);
+        this.objectNodes.add(tripleToAdd.object);
         Map<String, Set<Triple>> subjectToTripleMap = subjectToObjectTriples.get(tripleToAdd.subject);
         if(subjectToTripleMap == null){
             Map<String, Set<Triple>> predicateToObjectMap = new HashMap<>();
@@ -167,7 +178,7 @@ public class TripleDataSetMemory {
     }
 
     /**
-     * This method allows to state (S, P, ?) queries for object properties.
+     * This method allows stating (S, P, ?) queries for object properties.
      * It will not return datatype triples.
      * @param subject The desired subject.
      * @param predicate Desired predicate.
@@ -177,8 +188,7 @@ public class TripleDataSetMemory {
         if(subject == null || predicate == null) return null;
         Map<String, Set<Triple>> s = subjectToObjectTriples.get(subject);
         if(s == null) return null;
-        Set<Triple> result = s.get(predicate);
-        return result;
+        return s.get(predicate);
     }
 
     /**
@@ -241,5 +251,13 @@ public class TripleDataSetMemory {
      */
     public Set<String> getUniqueObjectTriplePredicates(){
         return predicateToObjectTriples.keySet();
+    }
+
+    public Set<String> getObjectNodes() {
+        return objectNodes;
+    }
+
+    public int getNumberOfObjectNodes() {
+        return objectNodes.size();
     }
 }
