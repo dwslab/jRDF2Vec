@@ -1,6 +1,7 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * An in-memory storage option for triples. The storage <em>only</em> allows adding triples!
@@ -311,5 +312,32 @@ public class TripleDataSetMemory {
 
     public int getNumberOfObjectNodes() {
         return objectNodes.size();
+    }
+
+    /**
+     * Get a set of subjects given a set of triples.
+     * @param triples A set of triples.
+     * @return The set of all subjects.
+     */
+    public static Set<String> getSubjectsFromTripleSet(Set<Triple> triples){
+        return triples.stream().map(x -> x.subject).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get a set of predicates given a set of triples.
+     * @param triples A set of triples.
+     * @return The set of all predicates.
+     */
+    public static Set<String> getPredicatesFromTripleSet(Set<Triple> triples){
+        return triples.stream().map(x -> x.predicate).collect(Collectors.toSet());
+    }
+
+    /**
+     * Get a set of predicates given a set of triples.
+     * @param triples A set of triples.
+     * @return The set of all predicates.
+     */
+    public static Set<String> getObjectsFromTripleSet(Set<Triple> triples){
+        return triples.stream().map(x -> x.object).collect(Collectors.toSet());
     }
 }

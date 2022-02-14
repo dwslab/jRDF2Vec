@@ -2,6 +2,7 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -125,6 +126,39 @@ class TripleDataSetMemoryTest {
         assertNull(ds.getObjectTriplesWithPredicateObject(null, null));
         assertNull(ds.getObjectTriplesWithPredicateObject("A", "Z"));
         assertNull(ds.getObjectTriplesWithPredicateObject("Z", "A"));
+    }
+
+    @Test
+    void getSubjectsFromTripleSet(){
+        Set<Triple> ds = new HashSet<>();
+        ds.add(new Triple("A", "B", "C"));
+        ds.add(new Triple("D", "E", "F"));
+        Set<String> subjects = TripleDataSetMemory.getSubjectsFromTripleSet(ds);
+        assertEquals(2, subjects.size());
+        assertTrue(subjects.contains("A"));
+        assertTrue(subjects.contains("D"));
+    }
+
+    @Test
+    void getPredicatesFromTripleSet(){
+        Set<Triple> ds = new HashSet<>();
+        ds.add(new Triple("A", "B", "C"));
+        ds.add(new Triple("D", "E", "F"));
+        Set<String> subjects = TripleDataSetMemory.getPredicatesFromTripleSet(ds);
+        assertEquals(2, subjects.size());
+        assertTrue(subjects.contains("B"));
+        assertTrue(subjects.contains("E"));
+    }
+
+    @Test
+    void getObjectsFromTripleSet(){
+        Set<Triple> ds = new HashSet<>();
+        ds.add(new Triple("A", "B", "C"));
+        ds.add(new Triple("D", "E", "F"));
+        Set<String> subjects = TripleDataSetMemory.getObjectsFromTripleSet(ds);
+        assertEquals(2, subjects.size());
+        assertTrue(subjects.contains("C"));
+        assertTrue(subjects.contains("F"));
     }
 
     @Test
