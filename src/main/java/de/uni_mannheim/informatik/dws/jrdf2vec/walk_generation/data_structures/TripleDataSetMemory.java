@@ -3,12 +3,15 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 import java.util.*;
 
 /**
+ * An in-memory storage option for triples. The storage <em>only</em> allows adding triples!
+ * Indices are built and convenience functions are offered to quickly access the triple data.
+ *
  * There is a distinction in (1) object triples where the object is a URI and
  * (2) datatpye triples where the object is a string.
  *
  *
  * Developer remarks:
- * For reasons of performance, deletions are not possible currently.
+ * - Deletions are not possible currently.
  */
 public class TripleDataSetMemory {
 
@@ -25,9 +28,23 @@ public class TripleDataSetMemory {
         objectNodes = new HashSet<>();
     }
 
+    /**
+     * Form:
+     * {@code subject -> (predicate -> triple) }
+     */
     Map<String, Map<String, Set<Triple>>> subjectToObjectTriples;
+
+    /**
+     * Form:
+     * {@code predicate -> List<Triple>}
+     */
     Map<String, ArrayList<Triple>> predicateToObjectTriples;
-    Map<String, ArrayList<Triple>> objectToObjectTriples;
+
+    /**
+     * Form:
+     * {@code object -> (predicate -> triple) }
+     */
+    Map<String, Map<String, Set<Triple>>> objectToObjectTriples;
     Set<Triple> objectTriples;
 
     /**
@@ -103,8 +120,9 @@ public class TripleDataSetMemory {
         }
         this.objectNodes.add(tripleToAdd.subject);
         this.objectNodes.add(tripleToAdd.object);
-        Map<String, Set<Triple>> subjectToTripleMap = subjectToObjectTriples.get(tripleToAdd.subject);
-        if(subjectToTripleMap == null){
+        Map<String, Set<Triple>> subjectPredicateToTripleMap = subjectToObjectTriples.get(tripleToAdd.subject);
+
+        if(subjectPredicateToTripleMap == null){
             Map<String, Set<Triple>> predicateToObjectMap = new HashMap<>();
             Set<Triple> triples = new HashSet<>();
             triples.add(tripleToAdd);
@@ -113,14 +131,14 @@ public class TripleDataSetMemory {
         } else {
             // there is already an entry for the subject
             // check for predicate
-            if (subjectToTripleMap.containsKey(tripleToAdd.predicate)) {
+            if (subjectPredicateToTripleMap.containsKey(tripleToAdd.predicate)) {
                 // predicate contained, add our object
-                subjectToTripleMap.get(tripleToAdd.predicate).add(tripleToAdd);
+                subjectPredicateToTripleMap.get(tripleToAdd.predicate).add(tripleToAdd);
             } else {
                 // predicate not contained, add predicate -> object
                 Set<Triple> triples = new HashSet<>();
                 triples.add(tripleToAdd);
-                subjectToTripleMap.put(tripleToAdd.predicate, triples);
+                subjectPredicateToTripleMap.put(tripleToAdd.predicate, triples);
             }
         }
 
@@ -131,12 +149,27 @@ public class TripleDataSetMemory {
             predicateToObjectTriples.put(tripleToAdd.predicate, newList);
         } else predicateToTripleList.add(tripleToAdd);
 
-        ArrayList<Triple> objectToTripleList = objectToObjectTriples.get(tripleToAdd.object);
-        if(objectToTripleList == null){
-            ArrayList<Triple> newList = new ArrayList<>();
-            newList.add(tripleToAdd);
-            objectToObjectTriples.put(tripleToAdd.object, newList);
-        } else objectToTripleList.add(tripleToAdd);
+        Map<String, Set<Triple>> objectPredicateToTripleMap = objectToObjectTriples.get(tripleToAdd.object);
+        if(objectPredicateToTripleMap == null){
+            Map<String, Set<Triple>> predicateToObjectMap = new HashMap<>();
+            Set<Triple> triples = new HashSet<>();
+            triples.add(tripleToAdd);
+            predicateToObjectMap.put(tripleToAdd.predicate, triples);
+            objectToObjectTriples.put(tripleToAdd.object, predicateToObjectMap);
+        } else {
+            // there is already an entry for the object
+            // check for predicate
+            if (objectPredicateToTripleMap.containsKey(tripleToAdd.predicate)) {
+                // predicate contained, add our object
+                objectPredicateToTripleMap.get(tripleToAdd.predicate).add(tripleToAdd);
+            } else {
+                // predicate not contained, add predicate -> object
+                Set<Triple> triples = new HashSet<>();
+                triples.add(tripleToAdd);
+                objectPredicateToTripleMap.put(tripleToAdd.predicate, triples);
+            }
+
+        }
         objectTriples.add(tripleToAdd);
         objectTripleSize++;
     }
@@ -174,11 +207,15 @@ public class TripleDataSetMemory {
     }
 
     public List<Triple> getObjectTriplesInvolvingObject(String object){
-        return objectToObjectTriples.get(object);
+        Map<String, Set<Triple>> objectPredicates = objectToObjectTriples.get(object);
+        if(objectPredicates == null) return null;
+        List<Triple> result = new ArrayList<>();
+        objectPredicates.forEach((key, value) -> result.addAll(value));
+        return result;
     }
 
     /**
-     * This method allows stating (S, P, ?) queries for object properties.
+     * This method allows stating (S, P, ?) queries for object property triples.
      * It will not return datatype triples.
      * @param subject The desired subject.
      * @param predicate Desired predicate.
@@ -190,6 +227,21 @@ public class TripleDataSetMemory {
         if(s == null) return null;
         return s.get(predicate);
     }
+
+    /**
+     * This method allows stating (?, P, O) queries for object property triples.
+     * It will not return datatype triples.
+     * @param object The desired object.
+     * @param predicate Desired predicate.
+     * @return Set of triples. Null if nothing was found.
+     */
+    public Set<Triple> getObjectTriplesWithPredicateObject(String predicate, String object){
+        if(object == null || predicate == null) return null;
+        Map<String, Set<Triple>> s = objectToObjectTriples.get(object);
+        if(s == null) return null;
+        return s.get(predicate);
+    }
+
 
     /**
      * Returns the number of managed triples.

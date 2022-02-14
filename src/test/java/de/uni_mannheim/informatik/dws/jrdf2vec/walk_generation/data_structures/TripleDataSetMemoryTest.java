@@ -96,6 +96,38 @@ class TripleDataSetMemoryTest {
     }
 
     @Test
+    void getTriplesWithPredicateObject(){
+        TripleDataSetMemory ds = new TripleDataSetMemory();
+        ds.addObjectTriple("A", "B", "C");
+        Set<Triple> result = ds.getObjectTriplesWithPredicateObject("B", "C");
+        assertEquals(1, result.size());
+        assertEquals(1, ds.getObjectTripleSize());
+        assertEquals(new Triple("A", "B", "C"), result.iterator().next());
+
+        // adding another triple
+        ds.addObjectTriple("D", "B", "C");
+        result = ds.getObjectTriplesWithPredicateObject("B", "C");
+        assertEquals(2, result.size());
+        assertEquals(2, ds.getObjectTripleSize());
+        assertTrue(result.contains(new Triple("A", "B", "C")));
+        assertTrue(result.contains(new Triple("D", "B", "C")));
+
+        // adding another triple which does not fit the query
+        ds.addObjectTriple("D", "E", "C");
+        result = ds.getObjectTriplesWithPredicateObject("B", "C");
+        assertEquals(2, result.size());
+        assertEquals(3, ds.getObjectTripleSize());
+        assertTrue(result.contains(new Triple("A", "B", "C")));
+        assertTrue(result.contains(new Triple("D", "B", "C")));
+
+        assertNull(ds.getObjectTriplesWithPredicateObject(null, "B"));
+        assertNull(ds.getObjectTriplesWithPredicateObject("A", null));
+        assertNull(ds.getObjectTriplesWithPredicateObject(null, null));
+        assertNull(ds.getObjectTriplesWithPredicateObject("A", "Z"));
+        assertNull(ds.getObjectTriplesWithPredicateObject("Z", "A"));
+    }
+
+    @Test
     void getTriplesWithSubjectPredicate(){
         TripleDataSetMemory ds = new TripleDataSetMemory();
         ds.addObjectTriple("A", "B", "C");
