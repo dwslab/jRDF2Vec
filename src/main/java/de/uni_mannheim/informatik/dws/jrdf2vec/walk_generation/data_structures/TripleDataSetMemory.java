@@ -320,6 +320,9 @@ public class TripleDataSetMemory {
      * @return The set of all subjects.
      */
     public static Set<String> getSubjectsFromTripleSet(Set<Triple> triples){
+        if(triples == null){
+            return null;
+        }
         return triples.stream().map(x -> x.subject).collect(Collectors.toSet());
     }
 
@@ -329,6 +332,9 @@ public class TripleDataSetMemory {
      * @return The set of all predicates.
      */
     public static Set<String> getPredicatesFromTripleSet(Set<Triple> triples){
+        if(triples == null){
+            return null;
+        }
         return triples.stream().map(x -> x.predicate).collect(Collectors.toSet());
     }
 
@@ -338,6 +344,9 @@ public class TripleDataSetMemory {
      * @return The set of all predicates.
      */
     public static Set<String> getObjectsFromTripleSet(Set<Triple> triples){
+        if(triples == null){
+            return null;
+        }
         return triples.stream().map(x -> x.object).collect(Collectors.toSet());
     }
 }

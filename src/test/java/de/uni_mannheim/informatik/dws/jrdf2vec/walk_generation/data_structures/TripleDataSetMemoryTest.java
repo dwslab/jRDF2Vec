@@ -137,6 +137,7 @@ class TripleDataSetMemoryTest {
         assertEquals(2, subjects.size());
         assertTrue(subjects.contains("A"));
         assertTrue(subjects.contains("D"));
+        assertNull(TripleDataSetMemory.getSubjectsFromTripleSet(null));
     }
 
     @Test
@@ -148,6 +149,7 @@ class TripleDataSetMemoryTest {
         assertEquals(2, subjects.size());
         assertTrue(subjects.contains("B"));
         assertTrue(subjects.contains("E"));
+        assertNull(TripleDataSetMemory.getPredicatesFromTripleSet(null));
     }
 
     @Test
@@ -159,6 +161,7 @@ class TripleDataSetMemoryTest {
         assertEquals(2, subjects.size());
         assertTrue(subjects.contains("C"));
         assertTrue(subjects.contains("F"));
+        assertNull(TripleDataSetMemory.getObjectsFromTripleSet(null));
     }
 
     @Test
