@@ -15,7 +15,7 @@ SHELL ["conda", "run", "-n", "jrdf2vec_env", "/bin/bash", "-c"]
 ENV PATH /opt/conda/envs/jrdf2vec_env/bin:$PATH
 
 # Install Java and maven with conda
-RUN mamba install -y openjdk=8 maven
+RUN mamba install -y openjdk=11 maven
 
 
 # Install HDT dependencies
