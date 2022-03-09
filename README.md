@@ -46,7 +46,7 @@ java -jar jrdf2vec-1.1-SNAPSHOT.jar -graph ./kg_file.hdt
 
 #### Required Parameters
 - `-graph <graph_file>`<br/>
-The file containing the knowledge graph for which you want to generate embeddings.
+The file containing the knowledge graph for which you want to generate embeddings. The `<graph_file>` can be any triple file, HDT file, a directory which contains NT files, or a TDB1 directory.
 
 #### Optional Parameters
 *jRDF2Vec* follows the <a href="https://en.wikipedia.org/wiki/Convention_over_configuration">convention over 
