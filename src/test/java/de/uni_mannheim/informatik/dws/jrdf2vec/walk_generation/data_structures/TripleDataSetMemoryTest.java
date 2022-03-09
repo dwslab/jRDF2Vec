@@ -179,4 +179,25 @@ class TripleDataSetMemoryTest {
         assertNull(ds.getObjectTriplesWithSubjectPredicate("A", "Z"));
         assertNull(ds.getObjectTriplesWithSubjectPredicate("Z", "A"));
     }
+
+    @Test
+    void removeObjectTriple(){
+        TripleDataSetMemory ds = new TripleDataSetMemory();
+        ds.addObjectTriple("A", "B", "C");
+        ds.addObjectTriple("A", "B", "D");
+        assertEquals(2, ds.getObjectTripleSize());
+
+        ds.removeObjectTriple(new Triple("A", "B", "D"));
+        assertEquals(1, ds.getObjectTripleSize());
+        assertNull(ds.getObjectTriplesInvolvingObject("D"));
+        assertTrue(ds.getObjectTriplesInvolvingSubject("A").contains(new Triple("A", "B", "C")) );
+        assertEquals(1, ds.getObjectTriplesInvolvingSubject("A").size() );
+
+        // negative test
+        ds.removeObjectTriple(null);
+
+        // negative test 2
+        ds.removeObjectTriple(new Triple("A1", "B", "C"));
+        assertEquals(1, ds.getObjectTripleSize());
+    }
 }
