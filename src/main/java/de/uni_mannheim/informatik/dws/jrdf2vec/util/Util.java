@@ -138,9 +138,45 @@ public class Util {
         return getDimensionalityFromVectorTextFile(new File(vectorTextFilePath));
     }
 
+
+    /**
+     * A heuristic check whether the {@code fileToCheck} may be in w2v format.
+     * @param fileToCheck The file that shall be checked.
+     * @return True if the file may be w2v. False in other cases.
+     */
+    public static boolean isW2Vformat(File fileToCheck) {
+        try(BufferedReader reader = new BufferedReader(new FileReader(fileToCheck))){
+            int lineNumber = 0;
+            String line = "";
+            int firstLineDimension = 0;
+            while((line = reader.readLine()) != null){
+                if (line.trim().equals("") || line.trim().equals("\n")) {
+                    continue;
+                }
+                if (lineNumber == 0) {
+                    firstLineDimension = line.split(" ").length; // do not subtract one here (no concept)
+                    if(firstLineDimension != 2){
+                        return false;
+                    }
+                } else {
+                    int dim = line.split(" ").length - 1; // here we subtract one (first line position is concept)
+                    if(dim != firstLineDimension){
+                        return true;
+                    }
+                }
+                lineNumber++;
+            }
+        } catch (FileNotFoundException e) {
+           LOGGER.error("File not found exception.", e);
+        } catch (IOException e) {
+            LOGGER.error("IOException.", e);
+        }
+        return false;
+    }
+
     /**
      * Given a vector text file, this method determines the dimensionality within the file based on the first valid line.
-     *
+     * This method can work with the txt and w2v format.
      * @param vectorTextFile Vector text file for which dimensionality of containing vectors shall be determined.
      * @return Dimensionality as int.
      */
@@ -159,12 +195,17 @@ public class Util {
             String readLine;
             int validationLimit = 3;
             int currentValidationRun = 0;
+            boolean isFirstLine = true;
 
             while ((readLine = reader.readLine()) != null) {
                 if (readLine.trim().equals("") || readLine.trim().equals("\n")) {
                     continue;
                 }
-                if (currentValidationRun == 0) {
+                if (isFirstLine) {
+                    // skip first line in case we have a w2v formatted file
+                    isFirstLine = false;
+                    continue;
+                } else {
                     result = readLine.split(" ").length - 1;
                 }
                 int tempResult = readLine.split(" ").length - 1;

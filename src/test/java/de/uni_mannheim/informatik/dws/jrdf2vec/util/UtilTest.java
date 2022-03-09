@@ -28,9 +28,7 @@ class UtilTest {
     @Test
     public void getDeltaTimeString(){
         try {
-
             // simple case
-
             Instant before = Instant.now();
             TimeUnit.SECONDS.sleep(3);
             Instant after = Instant.now();
@@ -58,26 +56,26 @@ class UtilTest {
 
             secondsPattern = Pattern.compile("(?<=Seconds:\\s)[0-9]*"); //(?<=Seconds: )[0-9]*$
             secondsMatcher = secondsPattern.matcher(result);
-            secondsMatcher.find();
+            assertTrue(secondsMatcher.find());
             assertTrue(Integer.parseInt(secondsMatcher.group()) >= 7);
 
             Pattern minutesPattern = Pattern.compile("(?<=Minutes:\\s)[0-9]*");
             Matcher minutesMatcher = minutesPattern.matcher(result);
-            minutesMatcher.find();
+            assertTrue(minutesMatcher.find());
             int actualMinutes = Integer.parseInt(minutesMatcher.group());
-            assertTrue(actualMinutes == 15);
+            assertEquals(15, actualMinutes);
 
             Pattern hoursPattern = Pattern.compile("(?<=Hours:\\s)[0-9]*");
             Matcher hoursMatcher = hoursPattern.matcher(result);
-            hoursMatcher.find();
+            assertTrue(hoursMatcher.find());
             int actualHours = Integer.parseInt(hoursMatcher.group());
-            assertTrue(actualHours == 10);
+            assertEquals(10, actualHours);
 
             Pattern daysPattern = Pattern.compile("(?<=Days:\\s)[0-9]*");
             Matcher daysMatcher = daysPattern.matcher(result);
-            daysMatcher.find();
+            assertTrue(daysMatcher.find());
             int actualDays = Integer.parseInt(daysMatcher.group());
-            assertTrue(actualDays == 2);
+            assertEquals(2, actualDays);
 
         } catch (InterruptedException ie){
             LOGGER.error("Could not perform test.", ie);
@@ -89,6 +87,16 @@ class UtilTest {
         String walkDirectory = loadFile("freude_vectors.txt").getAbsolutePath();
         assertEquals(3, Util.getDimensionalityFromVectorTextFile(walkDirectory));
         assertEquals(3, Util.getDimensionalityFromVectorTextFile(new File(walkDirectory)));
+
+        // w2v
+        String walkDirectory2 = loadFile("freude_vectors_w2v.w2v").getAbsolutePath();
+        assertEquals(3, Util.getDimensionalityFromVectorTextFile(walkDirectory2));
+        assertEquals(3, Util.getDimensionalityFromVectorTextFile(new File(walkDirectory2)));
+
+        // w2v as txt file
+        String walkDirectory3 = loadFile("freude_vectors_w2v_copy.txt").getAbsolutePath();
+        assertEquals(3, Util.getDimensionalityFromVectorTextFile(walkDirectory3));
+        assertEquals(3, Util.getDimensionalityFromVectorTextFile(new File(walkDirectory3)));
     }
 
     @Test

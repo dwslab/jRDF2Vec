@@ -13,10 +13,6 @@ import java.util.stream.Collectors;
  * <p>
  * There is a distinction in (1) object triples where the object is a URI and
  * (2) datatpye triples where the object is a string.
- * <p>
- * <p>
- * Developer remarks:
- * - Deletions are not possible currently.
  */
 public class TripleDataSetMemory {
 
