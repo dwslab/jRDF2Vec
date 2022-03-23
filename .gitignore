@@ -81,7 +81,6 @@ log.txt.5
 /src/main/java/de/de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators/evaluation/*
 /src/test/java/de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators/rdf2vecLight/TestCaseTest.java
 /data
-/documentation
 
 # binaries
 bin/
