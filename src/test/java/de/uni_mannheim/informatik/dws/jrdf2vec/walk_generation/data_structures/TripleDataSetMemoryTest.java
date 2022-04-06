@@ -1,7 +1,9 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -199,5 +201,17 @@ class TripleDataSetMemoryTest {
         // negative test 2
         ds.removeObjectTriple(new Triple("A1", "B", "C"));
         assertEquals(1, ds.getObjectTripleSize());
+    }
+
+    @Test
+    void parseNtFile(){
+        File readFile = Util.loadFile("ntParseExample.nt");
+        assertNotNull(readFile);
+        TripleDataSetMemory tds = TripleDataSetMemory.parseNtFile(readFile);
+        assertEquals(10, tds.getObjectTripleSize());
+        assertEquals(1, tds.getDatatypeTripleSize());
+        assertTrue(tds.getObjectNodes().contains("<O12>"));
+        assertEquals(20, tds.getObjectNodes().size());
+        assertEquals(9, tds.getUniqueObjectTriplePredicates().size());
     }
 }

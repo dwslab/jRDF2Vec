@@ -1,14 +1,16 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * An in-memory storage option for triples. The storage <em>only</em> allows adding triples!
+ * An in-memory storage option for triples.
  * Indices are built and convenience functions are offered to quickly access the triple data.
  * <p>
  * There is a distinction in (1) object triples where the object is a URI and
@@ -24,8 +26,9 @@ public class TripleDataSetMemory {
         subjectToObjectTriples = new HashMap<>();
         predicateToObjectTriples = new HashMap<>();
         objectToObjectTriples = new HashMap<>();
-        subjectToDatatypeTuples = new HashMap<>();
+        subjectToDatatypeTriples = new HashMap<>();
         objectTriples = new HashSet<>();
+        datatypeTriples = new HashSet<>();
         objectNodes = new HashSet<>();
     }
 
@@ -48,6 +51,9 @@ public class TripleDataSetMemory {
     Map<String, Map<String, Set<Triple>>> objectToObjectTriples;
     Set<Triple> objectTriples;
 
+
+    Set<Triple> datatypeTriples;
+
     /**
      * Node URIs (no string values).
      */
@@ -57,7 +63,7 @@ public class TripleDataSetMemory {
      * Map key: subject URI.
      * Map value: predicate values map with key: property URI, value: Set of values
      */
-    Map<String, Map<String, Set<String>>> subjectToDatatypeTuples;
+    Map<String, Map<String, Set<String>>> subjectToDatatypeTriples;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TripleDataSetMemory.class);
 
@@ -83,8 +89,8 @@ public class TripleDataSetMemory {
      */
     public synchronized void addDatatypeTriple(Triple tripleToAdd) {
         this.objectNodes.add(tripleToAdd.subject);
-        if (this.subjectToDatatypeTuples.containsKey(tripleToAdd.subject)) {
-            Map<String, Set<String>> propertyMap = this.subjectToDatatypeTuples.get(tripleToAdd.subject);
+        if (this.subjectToDatatypeTriples.containsKey(tripleToAdd.subject)) {
+            Map<String, Set<String>> propertyMap = this.subjectToDatatypeTriples.get(tripleToAdd.subject);
 
             if (propertyMap.containsKey(tripleToAdd.predicate)) {
                 Set<String> propertyValues = propertyMap.get(tripleToAdd.predicate);
@@ -106,8 +112,9 @@ public class TripleDataSetMemory {
             propertyMap.put(tripleToAdd.predicate, propertyValues);
 
             // add to index:
-            this.subjectToDatatypeTuples.put(tripleToAdd.subject, propertyMap);
+            this.subjectToDatatypeTriples.put(tripleToAdd.subject, propertyMap);
         }
+        datatypeTriples.add(tripleToAdd);
     }
 
     /**
@@ -186,7 +193,7 @@ public class TripleDataSetMemory {
     }
 
     public Map<String, Set<String>> getDatatypeTuplesForSubject(String subject) {
-        return subjectToDatatypeTuples.get(subject);
+        return subjectToDatatypeTriples.get(subject);
     }
 
     public Set<Triple> getAllObjectTriples() {
@@ -246,7 +253,6 @@ public class TripleDataSetMemory {
         return s.get(predicate);
     }
 
-
     /**
      * Returns the number of managed object triples.
      *
@@ -254,6 +260,15 @@ public class TripleDataSetMemory {
      */
     public long getObjectTripleSize() {
         return objectTriples.size();
+    }
+
+    /**
+     * Returns the number of managed datatype triples.
+     *
+     * @return The number of managed datatype triples.
+     */
+    public long getDatatypeTripleSize() {
+        return datatypeTriples.size();
     }
 
     /**
@@ -274,7 +289,7 @@ public class TripleDataSetMemory {
      * @return Set of subjects.
      */
     public Set<String> getUniqueDatatypeTripleSubjects() {
-        return this.subjectToDatatypeTuples.keySet();
+        return this.subjectToDatatypeTriples.keySet();
     }
 
     /**
@@ -300,6 +315,7 @@ public class TripleDataSetMemory {
 
     /**
      * Remove the provided object triple from all indices.
+     *
      * @param tripleToBeRemoved The triple that shall be removed.
      */
     public void removeObjectTriple(Triple tripleToBeRemoved) {
@@ -355,12 +371,13 @@ public class TripleDataSetMemory {
     /**
      * Checks whether the provided {@code nodeId} is used somewhere. If not, it removes the nodeId from the
      * {@link TripleDataSetMemory#objectTriples}.
+     *
      * @param nodeId The nodeId that shall be removed.
      */
-    private void removeFromObjectTriplesIfNotExists(String nodeId){
+    private void removeFromObjectTriplesIfNotExists(String nodeId) {
         if (subjectToObjectTriples.get(nodeId) == null
                 && objectToObjectTriples.get(nodeId) == null
-                && subjectToDatatypeTuples.get(nodeId) == null) {
+                && subjectToDatatypeTriples.get(nodeId) == null) {
             objectTriples.remove(nodeId);
         }
     }
@@ -428,6 +445,47 @@ public class TripleDataSetMemory {
             return null;
         }
         return triples.stream().map(x -> x.object).collect(Collectors.toSet());
+    }
+
+    /**
+     * Parses an UTF-8 encoded NT file and returns a triple dataset memory instance.
+     *
+     * @param ntFile NT file to be parsed.
+     * @return The resulting triple dataset memory instance.
+     */
+    public static TripleDataSetMemory parseNtFile(File ntFile) {
+        return parseNtFile(ntFile, StandardCharsets.UTF_8);
+    }
+
+    public static TripleDataSetMemory parseNtFile(File ntFile, Charset charset) {
+        TripleDataSetMemory result = new TripleDataSetMemory();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(ntFile), charset))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split(" ");
+                if (tokens.length < 3) {
+                    LOGGER.error("Cannot parse line:\n" + line + "\nNot enough tokens!");
+                    continue;
+                }
+                String o = tokens[2];
+                if (o.endsWith(".")) {
+                    o = o.substring(0, o.length() - 1);
+                }
+                if (o.startsWith("\"")) {
+                    result.addDatatypeTriple(new Triple(tokens[0], tokens[1], o));
+                } else {
+                    result.addObjectTriple(new Triple(tokens[0], tokens[1], o));
+                }
+
+            }
+        } catch (
+                FileNotFoundException e) {
+            LOGGER.info("File not found.", e);
+        } catch (
+                IOException e) {
+            LOGGER.info("IOException occurred.", e);
+        }
+        return result;
     }
 
 }
