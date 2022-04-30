@@ -262,7 +262,7 @@
 
         <!-- GPG Signature on release -->
         <profile>
-            <id>release-sign-artifacts</id> <!-- mvn ... -P release-sign-artifacts,default -->
+            <id>jrdf2vec-release</id> <!-- mvn ... -P jrdf2vec-release -->
             <activation>
                 <property>
                     <name>performRelease</name>
