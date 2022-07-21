@@ -3,6 +3,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
+import de.uni_mannheim.informatik.dws.jrdf2vec.util.Rdf2Pajek;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorTxtToTfProjectorTsv;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -709,7 +710,8 @@ class MainTest {
     @Test
     public void trainLightNoVectorTextFile() {
         File lightWalks = new File("./mainLightWalks/");
-        assertTrue(lightWalks.mkdir());;
+        assertTrue(lightWalks.mkdir());
+        ;
         lightWalks.deleteOnExit();
         String entityFilePath = loadFile("dummyEntities.txt").getAbsolutePath();
         String graphFilePath = loadFile("dummyGraph.nt").getAbsolutePath();
@@ -1712,6 +1714,22 @@ class MainTest {
         assertFalse(fileToWrite.exists());
     }
 
+    private final static String PAJEK_FILE_TO_WIRTE = "./pizza_main.net";
+
+    @Test
+    void convertToPajek() {
+        try {
+            File pajekFile = new File(PAJEK_FILE_TO_WIRTE);
+            String pizzaOntology = getPathOfResource("pizza.ttl");
+            Main.main(new String[]{"-convertToPajek", pizzaOntology, pajekFile.getCanonicalPath()});
+            assertTrue(pajekFile.exists());
+            Util.deleteFile(PAJEK_FILE_TO_WIRTE);
+        } catch (Exception e){
+            fail(e);
+        }
+    }
+
+
     @AfterAll
     static void cleanUp() {
         Gensim.shutDown();
@@ -1744,5 +1762,6 @@ class MainTest {
         deleteFile(VECTORS_W2V_FILE);
         deleteFile(METADTA_TSV_FILE);
         deleteFile(VECTOR_TSV_FILE);
+        deleteFile(PAJEK_FILE_TO_WIRTE);
     }
 }
