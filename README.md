@@ -200,6 +200,13 @@ uncompressed file, you can use the `-mergeWalks` keyword. You need to provide a
 java -jar jrdf2vec-1.1-SNAPSHOT.jar -mergeWalks -walkDirectory <dir> -o <file_to_write>
 ```
 
+#### Converting the Graph File
+
+*(1) Converting to PajekNet*<br/>
+To create a graph file in the <a href="https://gephi.org/users/supported-graph-formats/pajek-net-format/">PajekNet format</a> (e.g. for graph analysis), you can use the following command:
+```bash
+java -jar jrdf2vec-1.1-SNAPSHOT.jar -convertToPajek <graph> <file_to_write>
+```
 
 ## How to use the jRDF2Vec as library in Java projects?
 Stable releases are available through the maven central repository:

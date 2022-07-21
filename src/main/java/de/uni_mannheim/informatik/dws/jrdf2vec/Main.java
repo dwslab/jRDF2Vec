@@ -244,6 +244,12 @@ public class Main {
             return;
         }
 
+        // graph conversion
+        if(containsIgnoreCase("-convertToPajek", args)){
+            convertToPajek(args);
+            return;
+        }
+
         // check for analysis request
         if (args[0].equalsIgnoreCase("-analyzevocab") || args[0].equalsIgnoreCase("-analyzevocabulary") ||
                 args[0].equalsIgnoreCase("--analyzevocabulary") || args[0].equalsIgnoreCase("--analyzevocab")) {
@@ -675,6 +681,16 @@ public class Main {
             return;
         }
         VectorTxtToW2v.convert(new File(parameters[0]), new File(parameters[1]));
+    }
+
+    public static void convertToPajek(String[] args) {
+        String[] parameters = getValues("-convertToPajek", 2, args);
+        if (parameters == null) {
+            System.out.println("Your input is not correct.\n" +
+                    "The syntax is: -convertToPajek <graph> <file_to_write>");
+            return;
+        }
+        Rdf2Pajek.convert(new File(parameters[0]), new File(parameters[1]));
     }
 
     private static void convertToKv(String[] args) {

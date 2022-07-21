@@ -2,10 +2,12 @@ package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.Triple;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,6 +216,10 @@ public class Util {
             LOGGER.error("Could not parse: " + file.getAbsolutePath() + "\nin jena.", re);
             return null;
         }
+    }
+
+    public static OntModel readOntology(File file) throws MalformedURLException {
+        return readOntology(file, RDFLanguages.fileExtToLang( FilenameUtils.getExtension(file.getName())));
     }
 
     public static List<String> readLinesFromGzippedFile(String filePath) {
