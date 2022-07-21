@@ -91,10 +91,10 @@ class GensimTest {
         assertFalse(gensim.isInVocabulary("China", pathToVectorFile));
     }
 
-    @Test
     /**
      * Default test with cache.
      */
+    @Test
     void getSimilarity() {
         gensim.setVectorCaching(true);
         // test case 1: model file
@@ -107,7 +107,6 @@ class GensimTest {
         similarity = gensim.getSimilarity("Europe", "united", pathToVectorFile);
         assertTrue(similarity > 0);
     }
-
 
     @Test
     void getSimilarityNoCaching() {
@@ -123,19 +122,18 @@ class GensimTest {
         assertTrue(similarity > 0);
     }
 
-
     @Test
     void testMultipleShutdownCallsAndRestarts() {
         gensim.setVectorCaching(false);
         // test case 1: model file
-        gensim.shutDown();
+        Gensim.shutDown();
         gensim = Gensim.getInstance();
         String pathToModel = getPathOfResource("test_model");
         double similarity = gensim.getSimilarity("Europe", "united", pathToModel);
         assertTrue(similarity > 0);
 
         // test case 2: vector file
-        gensim.shutDown();
+        Gensim.shutDown();
         gensim = Gensim.getInstance();
         String pathToVectorFile = getPathOfResource("test_model_vectors.kv");
         similarity = gensim.getSimilarity("Europe", "united", pathToVectorFile);
@@ -155,7 +153,7 @@ class GensimTest {
 
         Double[] unitedVector = gensim.getVector("united", pathToVectorFile);
 
-        double similarityJava = (gensim.cosineSimilarity(europeVector, unitedVector));
+        double similarityJava = (Gensim.cosineSimilarity(europeVector, unitedVector));
         double similarityPyhton = (gensim.getSimilarity("Europe", "united", pathToVectorFile));
         assertEquals(similarityJava, similarityPyhton, 0.0001);
 

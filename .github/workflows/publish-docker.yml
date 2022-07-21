@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Docker Image
 # To dwslab GitHub Container Registry
 # https://github.com/orgs/dwslab/packages
 on:
@@ -40,7 +40,6 @@ jobs:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
-
 
       - name: Push image to GitHub Container Registry
         run: |

@@ -81,7 +81,6 @@ log.txt.5
 /src/main/java/de/de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators/evaluation/*
 /src/test/java/de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators/rdf2vecLight/TestCaseTest.java
 /data
-/documentation
 
 # binaries
 bin/
@@ -105,6 +104,9 @@ examples/jupyter_notebook/pizza.owl.nt
 Playground.java
 Main_IDE.java
 
+# python command
+python_command.txt
+
 # logging
 !log4j.properties
 
@@ -116,3 +118,6 @@ Main_IDE.java
 !src/test/resources/existing_walk_directory/walk_file.txt
 !src/test/resources/nt_directory_type_walks/*
 !src/test/resources/walk_merge/*
+src/main/resources/test/__pycache__
+src/main/resources/__pycache__
+settings.json

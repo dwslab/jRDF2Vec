@@ -1,8 +1,6 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.training;
 
 
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.TagRemover;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,7 +9,6 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +65,11 @@ public class Gensim {
      * The port that shall be used.
      */
     private static int port = DEFAULT_PORT;
+
+    /**
+     * The time java waits for the python server before re-trying.
+     */
+    private static final int WAIT_FOR_SERVER_SECONDS = 10;
 
     /**
      * Indicator whether vectors shall be cached. This means that vectors are cached locally and similarities are
@@ -670,13 +672,10 @@ public class Gensim {
         command.add("" + Gensim.getPort());
         ProcessBuilder pb = new ProcessBuilder(command);
         updateEnvironmentPath(pb.environment(), pythonCommand);
-        //List<String> command = Arrays.asList("python", "--version");
-        //ProcessBuilder pb = new ProcessBuilder(command);
-        //pb.environment().put("PATH", "{FOLDER CONTAINING PYTHON EXE}" + File.pathSeparator + pb.environment().get("PATH"));
         try {
             pb.inheritIO();
             serverProcess = pb.start();
-            final int maxTrials = 8;
+            final int maxTrials = 10;
             for (int i = 0; i < maxTrials; i++) {
                 HttpGet request = new HttpGet(serverUrl + "/melt_ml.html");
                 CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -687,8 +686,9 @@ public class Gensim {
                         break;
                     }
                 } catch (HttpHostConnectException hce) {
-                    LOGGER.info("Server is not yet running. Waiting 5 seconds. Trial {} / {}", i + 1, maxTrials);
-                    TimeUnit.SECONDS.sleep(5);
+                    LOGGER.info("Server is not yet running. Waiting " + WAIT_FOR_SERVER_SECONDS +" seconds. Trial {} " +
+                            "/ {}", i + 1, maxTrials);
+                    TimeUnit.SECONDS.sleep(WAIT_FOR_SERVER_SECONDS);
                 } catch (IOException ioe) {
                     LOGGER.error("Problem with http request.", ioe);
                 }
@@ -899,11 +899,11 @@ public class Gensim {
         }
 
         // check if python command file exists in default resources directory
-        Path pythonCommandFilePath = Paths.get(DEFAULT_RESOURCES_DIRECTORY, "python_command.txt");
+        Path pythonCommandFilePath = Paths.get(DEFAULT_RESOURCES_DIRECTORY, "python-server/python_command.txt");
         if (Files.exists(pythonCommandFilePath)) {
             LOGGER.info("Python command file detected. Trying to copy file to external resources directory.");
             try {
-                FileUtils.copyFile(pythonCommandFilePath.toFile(), new File(resourcesDirectory, "python_command.txt"));
+                FileUtils.copyFile(pythonCommandFilePath.toFile(), new File(resourcesDirectory, "python-server/python_command.txt"));
             } catch (IOException e) {
                 LOGGER.error("Could not copy python command file.", e);
             }

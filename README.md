@@ -1,5 +1,6 @@
 # jRDF2Vec
 [![Java CI](https://github.com/dwslab/jRDF2Vec/workflows/Java%20CI/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions)
+[![Python Tests](https://github.com/dwslab/jRDF2Vec/actions/workflows/python.yml/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions/workflows/python.yml)
 [![Publish Docker image](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml/badge.svg)](https://github.com/dwslab/jRDF2Vec/actions/workflows/publish-docker.yml)
 [![Coverage Status](https://coveralls.io/repos/github/dwslab/jRDF2Vec/badge.svg?branch=master)](https://coveralls.io/github/dwslab/jRDF2Vec?branch=master)
 [![License](https://img.shields.io/github/license/dwslab/jRDF2Vec)](https://github.com/dwslab/jRDF2Vec/blob/master/LICENSE)
@@ -25,7 +26,7 @@ Alternatively, you can download the packaged JAR of the latest successful: commi
 
 ### System Requirements
 - Java 8 or later.
-- Python 3.8 with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.<br> 
+- Python 3.8 or later with the dependencies described in [requirements.txt](/src/main/resources/requirements.txt) installed.<br> 
   (Conda users can directly use the [environment.yml](/src/main/resources/environment.yml) file.)
 
 You can check if you set up the environment (Python 3 + dependencies) correctly by running:
@@ -45,7 +46,7 @@ java -jar jrdf2vec-1.1-SNAPSHOT.jar -graph ./kg_file.hdt
 
 #### Required Parameters
 - `-graph <graph_file>`<br/>
-The file containing the knowledge graph for which you want to generate embeddings.
+The file containing the knowledge graph for which you want to generate embeddings. The `<graph_file>` can be any triple file, HDT file, a directory which contains NT files, or a TDB1 directory.
 
 #### Optional Parameters
 *jRDF2Vec* follows the <a href="https://en.wikipedia.org/wiki/Convention_over_configuration">convention over 

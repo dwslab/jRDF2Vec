@@ -250,7 +250,8 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
         List<List<String>> result = new ArrayList<>();
         for (List<String> walkWithNodes : walksWithNodes) {
 
-            // determine how often the entity appears
+            // determine how often the entity appears (this is relevant in case there are "loops" in the walk
+            // which involve the entity of interest multiple times!
             int appearances = getNumberOfAppearances(entity, walkWithNodes);
 
             // draw the desired position to keep

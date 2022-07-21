@@ -1,0 +1,282 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcam: <http://purl.org/dc/dcam/> .
+@prefix freq: <http://purl.org/cld/freq/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix accpol: <http://purl.org/cld/accpol/> .
+@prefix cdtype: <http://purl.org/cld/cdtype/> .
+@prefix accmeth: <http://purl.org/cld/accmeth/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@base <http://www.w3.org/2002/07/owl#> .
+
+[ rdf:type owl:Ontology
+ ] .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/dcam/memberOf
+dcam:memberOf rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/creator
+dcterms:creator rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/modified
+dcterms:modified rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/title
+dcterms:title rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#inScheme
+skos:inScheme rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#prefLabel
+skos:prefLabel rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Datatypes
+#################################################################
+
+###  http://purl.org/dc/terms/W3CDTF
+dcterms:W3CDTF rdf:type rdfs:Datatype .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.w3.org/2004/02/skos/core#Concept
+skos:Concept rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://purl.org/cld/freq/annual
+freq:annual rdf:type owl:NamedIndividual ,
+                     skos:Concept ;
+            dcam:memberOf cld:Frequency ;
+            rdfs:comment "The event occurs once a year."@en ;
+            rdfs:isDefinedBy freq: ;
+            rdfs:label "Annual"@en ;
+            rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+            skos:inScheme cld:Frequency ;
+            skos:prefLabel "Annual"@en .
+
+
+###  http://purl.org/cld/freq/biennial
+freq:biennial rdf:type owl:NamedIndividual ,
+                       skos:Concept ;
+              dcam:memberOf cld:Frequency ;
+              rdfs:comment "The event occurs every two years."@en ;
+              rdfs:isDefinedBy freq: ;
+              rdfs:label "Biennial"@en ;
+              rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+              skos:inScheme cld:Frequency ;
+              skos:prefLabel "Biennial"@en .
+
+
+###  http://purl.org/cld/freq/bimonthly
+freq:bimonthly rdf:type owl:NamedIndividual ,
+                        skos:Concept ;
+               dcam:memberOf cld:Frequency ;
+               rdfs:comment "The event occurs every two months."@en ;
+               rdfs:isDefinedBy freq: ;
+               rdfs:label "Bimonthly"@en ;
+               rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+               skos:inScheme cld:Frequency ;
+               skos:prefLabel "Bimonthly"@en .
+
+
+###  http://purl.org/cld/freq/biweekly
+freq:biweekly rdf:type owl:NamedIndividual ,
+                       skos:Concept ;
+              dcam:memberOf cld:Frequency ;
+              rdfs:comment "The event occurs every two weeks."@en ;
+              rdfs:isDefinedBy freq: ;
+              rdfs:label "Biweekly"@en ;
+              rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+              skos:inScheme cld:Frequency ;
+              skos:prefLabel "Biweekly"@en .
+
+
+###  http://purl.org/cld/freq/continuous
+freq:continuous rdf:type owl:NamedIndividual ,
+                         skos:Concept ;
+                dcam:memberOf cld:Frequency ;
+                rdfs:comment "The event repeats without interruption."@en ;
+                rdfs:isDefinedBy freq: ;
+                rdfs:label "Continuous"@en ;
+                rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                skos:inScheme cld:Frequency ;
+                skos:prefLabel "Continuous"@en .
+
+
+###  http://purl.org/cld/freq/daily
+freq:daily rdf:type owl:NamedIndividual ,
+                    skos:Concept ;
+           dcam:memberOf cld:Frequency ;
+           rdfs:comment "The event occurs once a day."@en ;
+           rdfs:isDefinedBy freq: ;
+           rdfs:label "Daily"@en ;
+           rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+           skos:inScheme cld:Frequency ;
+           skos:prefLabel "Daily"@en .
+
+
+###  http://purl.org/cld/freq/irregular
+freq:irregular rdf:type owl:NamedIndividual ,
+                        skos:Concept ;
+               dcam:memberOf cld:Frequency ;
+               rdfs:comment "The event occurs at uneven intervals."@en ;
+               rdfs:isDefinedBy freq: ;
+               rdfs:label "Irregular"@en ;
+               rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+               skos:inScheme cld:Frequency ;
+               skos:prefLabel "Irregular"@en .
+
+
+###  http://purl.org/cld/freq/monthly
+freq:monthly rdf:type owl:NamedIndividual ,
+                      skos:Concept ;
+             dcam:memberOf cld:Frequency ;
+             rdfs:comment "The event occurs once a month."@en ;
+             rdfs:isDefinedBy freq: ;
+             rdfs:label "Monthly"@en ;
+             rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+             skos:inScheme cld:Frequency ;
+             skos:prefLabel "Monthly"@en .
+
+
+###  http://purl.org/cld/freq/quarterly
+freq:quarterly rdf:type owl:NamedIndividual ,
+                        skos:Concept ;
+               dcam:memberOf cld:Frequency ;
+               rdfs:comment "The event occurs every three months."@en ;
+               rdfs:isDefinedBy freq: ;
+               rdfs:label "Quarterly"@en ;
+               rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+               skos:inScheme cld:Frequency ;
+               skos:prefLabel "Quarterly"@en .
+
+
+###  http://purl.org/cld/freq/semiannual
+freq:semiannual rdf:type owl:NamedIndividual ,
+                         skos:Concept ;
+                dcam:memberOf cld:Frequency ;
+                rdfs:comment "The event occurs twice a year."@en ;
+                rdfs:isDefinedBy freq: ;
+                rdfs:label "Semiannual"@en ;
+                rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                skos:inScheme cld:Frequency ;
+                skos:prefLabel "Semiannual"@en .
+
+
+###  http://purl.org/cld/freq/semimonthly
+freq:semimonthly rdf:type owl:NamedIndividual ,
+                          skos:Concept ;
+                 dcam:memberOf cld:Frequency ;
+                 rdfs:comment "The event occurs twice a month."@en ;
+                 rdfs:isDefinedBy freq: ;
+                 rdfs:label "Semimonthly"@en ;
+                 rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                 skos:inScheme cld:Frequency ;
+                 skos:prefLabel "Semimonthly"@en .
+
+
+###  http://purl.org/cld/freq/semiweekly
+freq:semiweekly rdf:type owl:NamedIndividual ,
+                         skos:Concept ;
+                dcam:memberOf cld:Frequency ;
+                rdfs:comment "The event occurs twice a week."@en ;
+                rdfs:isDefinedBy freq: ;
+                rdfs:label "Semiweekly"@en ;
+                rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                skos:inScheme cld:Frequency ;
+                skos:prefLabel "Semiweekly"@en .
+
+
+###  http://purl.org/cld/freq/threeTimesAMonth
+freq:threeTimesAMonth rdf:type owl:NamedIndividual ,
+                               skos:Concept ;
+                      dcam:memberOf cld:Frequency ;
+                      rdfs:comment "The event occurs three times a month."@en ;
+                      rdfs:isDefinedBy freq: ;
+                      rdfs:label "Three times a month"@en ;
+                      rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                      skos:inScheme cld:Frequency ;
+                      skos:prefLabel "Three times a month"@en .
+
+
+###  http://purl.org/cld/freq/threeTimesAWeek
+freq:threeTimesAWeek rdf:type owl:NamedIndividual ,
+                              skos:Concept ;
+                     dcam:memberOf cld:Frequency ;
+                     rdfs:comment "The event occurs three times a week."@en ;
+                     rdfs:isDefinedBy freq: ;
+                     rdfs:label "Three times a week"@en ;
+                     rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                     skos:inScheme cld:Frequency ;
+                     skos:prefLabel "Three times a week"@en .
+
+
+###  http://purl.org/cld/freq/threeTimesAYear
+freq:threeTimesAYear rdf:type owl:NamedIndividual ,
+                              skos:Concept ;
+                     dcam:memberOf cld:Frequency ;
+                     rdfs:comment "The event occurs three times a year."@en ;
+                     rdfs:isDefinedBy freq: ;
+                     rdfs:label "Three times a year"@en ;
+                     rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+                     skos:inScheme cld:Frequency ;
+                     skos:prefLabel "Three times a year"@en .
+
+
+###  http://purl.org/cld/freq/triennial
+freq:triennial rdf:type owl:NamedIndividual ,
+                        skos:Concept ;
+               dcam:memberOf cld:Frequency ;
+               rdfs:comment "The event occurs every three years."@en ;
+               rdfs:isDefinedBy freq: ;
+               rdfs:label "Triennial"@en ;
+               rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+               skos:inScheme cld:Frequency ;
+               skos:prefLabel "Triennial"@en .
+
+
+###  http://purl.org/cld/freq/weekly
+freq:weekly rdf:type owl:NamedIndividual ,
+                     skos:Concept ;
+            dcam:memberOf cld:Frequency ;
+            rdfs:comment "The event occurs once a week."@en ;
+            rdfs:isDefinedBy freq: ;
+            rdfs:label "Weekly"@en ;
+            rdfs:seeAlso <http://www.loc.gov/marc/holdings/echdcapt.html> ;
+            skos:inScheme cld:Frequency ;
+            skos:prefLabel "Weekly"@en .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+freq: dcterms:creator "" ;
+      dcterms:modified "2013-05-10"^^dcterms:W3CDTF ;
+      dcterms:title "The Collection Description Frequency Namespace"@en .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

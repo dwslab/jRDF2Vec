@@ -31,10 +31,11 @@ public enum WalkGenerationMode {
     MID_WALKS_DUPLICATE_FREE,
 
     /**
-     * Weighted mid-walk walk generation: Given an entity, it is randomly decided whether to go backwards or forwards randomly
-     * where the chances are determined by the number of options to go backwards and forwards:
-     * If there are more options to go backwards than forwards, the likelihood of going backwards is larger. The generated
-     * walks are free of duplicates. Due to the implementation this can lead to less generated walks than originally specified.
+     * Weighted mid-walk walk generation: Given an entity, it is randomly decided whether to go backwards or forwards
+     * whereby the chances are determined by the number of options to go backwards and forwards:
+     * If there are more options to go backwards than forwards, the likelihood of going backwards is larger. The
+     * generated walks are free of duplicates. Due to the implementation, this can lead to less generated walks than
+     * originally specified.
      */
     MID_WALKS_WEIGHTED,
 
