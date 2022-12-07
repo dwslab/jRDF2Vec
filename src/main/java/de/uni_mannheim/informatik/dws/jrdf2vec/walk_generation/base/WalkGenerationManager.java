@@ -452,7 +452,6 @@ public class WalkGenerationManager {
     public void close() {
         if (writer == null) return;
         try {
-            writer.flush();
             writer.close();
         } catch (IOException ioe) {
             LOGGER.error("There was an error when closing the writer.", ioe);
