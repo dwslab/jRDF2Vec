@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -84,7 +85,7 @@ public class Util {
             return -1;
         }
         int linesRead = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader(file))){
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             while (br.readLine() != null) {
                 linesRead++;
             }
@@ -96,10 +97,11 @@ public class Util {
 
     /**
      * Obtains the number of lines in a file that are not blanc.
+     *
      * @param file The file to be read.
      * @return The number of lines which contain some text (white space and line breaks do not count).
      */
-    public static int getNumberOfNonBlancLines(File file){
+    public static int getNumberOfNonBlancLines(File file) {
         if (file == null) {
             LOGGER.error("The file is null. Cannot count lines.");
             return -1;
@@ -107,12 +109,12 @@ public class Util {
         try (
                 BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                         StandardCharsets.UTF_8))
-        ){
+        ) {
             int lineNumber = 0;
             String line;
-            while((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                if(!line.equals("")){
+                if (!line.equals("")) {
                     lineNumber++;
                 }
             }
@@ -143,33 +145,34 @@ public class Util {
 
     /**
      * A heuristic check whether the {@code fileToCheck} may be in w2v format.
+     *
      * @param fileToCheck The file that shall be checked.
      * @return True if the file may be w2v. False in other cases.
      */
     public static boolean isW2Vformat(File fileToCheck) {
-        try(BufferedReader reader = new BufferedReader(new FileReader(fileToCheck))){
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileToCheck))) {
             int lineNumber = 0;
             String line = "";
             int firstLineDimension = 0;
-            while((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 if (line.trim().equals("") || line.trim().equals("\n")) {
                     continue;
                 }
                 if (lineNumber == 0) {
                     firstLineDimension = line.split(" ").length; // do not subtract one here (no concept)
-                    if(firstLineDimension != 2){
+                    if (firstLineDimension != 2) {
                         return false;
                     }
                 } else {
                     int dim = line.split(" ").length - 1; // here we subtract one (first line position is concept)
-                    if(dim != firstLineDimension){
+                    if (dim != firstLineDimension) {
                         return true;
                     }
                 }
                 lineNumber++;
             }
         } catch (FileNotFoundException e) {
-           LOGGER.error("File not found exception.", e);
+            LOGGER.error("File not found exception.", e);
         } catch (IOException e) {
             LOGGER.error("IOException.", e);
         }
@@ -179,6 +182,7 @@ public class Util {
     /**
      * Given a vector text file, this method determines the dimensionality within the file based on the first valid line.
      * This method can work with the txt and w2v format.
+     *
      * @param vectorTextFile Vector text file for which dimensionality of containing vectors shall be determined.
      * @return Dimensionality as int.
      */
@@ -260,7 +264,7 @@ public class Util {
     }
 
     public static OntModel readOntology(File file) throws MalformedURLException {
-        return readOntology(file, RDFLanguages.fileExtToLang( FilenameUtils.getExtension(file.getName())));
+        return readOntology(file, RDFLanguages.fileExtToLang(FilenameUtils.getExtension(file.getName())));
     }
 
     public static List<String> readLinesFromGzippedFile(String filePath) {
@@ -279,17 +283,13 @@ public class Util {
             LOGGER.error("The file is null. Cannot read from file.");
             return result;
         }
-        GZIPInputStream gzip = null;
-        try {
-            gzip = new GZIPInputStream(new FileInputStream(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("Input stream to verify file could not be established.");
-        }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(gzip, StandardCharsets.UTF_8));
         String readLine;
-        try {
+        try (
+                GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(file.toPath()));
+                InputStreamReader isr = new InputStreamReader(gzip, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)
+                ){
             while ((readLine = reader.readLine()) != null) {
                 result.add(readLine);
             }
@@ -297,11 +297,7 @@ public class Util {
             e.printStackTrace();
             fail("Could not read gzipped file.");
         }
-        try {
-            reader.close();
-        } catch (IOException e) {
-            LOGGER.error("A problem occurred while trying to close the file reader.", e);
-        }
+
         return result;
     }
 
@@ -405,9 +401,7 @@ public class Util {
      */
     public static boolean isAnonymousNode(String uriString) {
         uriString = uriString.trim();
-        if (uriString.startsWith("_:")) {
-            return true;
-        } else return false;
+        return uriString.startsWith("_:");
     }
 
     /**
@@ -478,6 +472,7 @@ public class Util {
 
     /**
      * Delete the specified file.
+     *
      * @param filePath The path of the file to be deleted.
      */
     public static void deleteFile(String filePath) {
@@ -487,10 +482,11 @@ public class Util {
 
     /**
      * Delete the specified file. Print to console in case of issues.
+     *
      * @param file The file to be deleted.
      */
-    public static void deleteFile(File file){
-        if(file == null){
+    public static void deleteFile(File file) {
+        if (file == null) {
             LOGGER.error("The file is null. Cannot delete file.");
             return;
         }
@@ -525,7 +521,7 @@ public class Util {
     /**
      * Reads the entities in the specified file into a HashSet.
      *
-     * @param entityFile The file to be read from. The file must be UTF-8 encoded.
+     * @param entityFile   The file to be read from. The file must be UTF-8 encoded.
      * @param isRemoveTags If true, surrounding tags are removed when reading the file.
      * @return A HashSet of entities.
      */
@@ -534,15 +530,17 @@ public class Util {
         if (!entityFile.exists()) {
             LOGGER.error("The specified entity file does not exist: " + entityFile.getName() + "\nProgram will fail.");
         }
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(entityFile),
-                    StandardCharsets.UTF_8));
+        try (
+                InputStreamReader isr = new InputStreamReader(Files.newInputStream(entityFile.toPath()),
+                        StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)
+        ) {
             String readLine = "";
-            if(isRemoveTags){
+            if (isRemoveTags) {
                 while ((readLine = reader.readLine()) != null) {
 
-                    if(readLine.startsWith("<") && readLine.endsWith(">")){
-                        readLine = readLine.substring(1, readLine.length()-1);
+                    if (readLine.startsWith("<") && readLine.endsWith(">")) {
+                        readLine = readLine.substring(1, readLine.length() - 1);
                         result.add(readLine);
                     } else {
                         result.add(readLine);
@@ -580,6 +578,7 @@ public class Util {
 
     /**
      * Deletes the stated directory.
+     *
      * @param directory Directory that shall be deleted.
      */
     public static void deleteDirectory(File directory) {
@@ -588,6 +587,7 @@ public class Util {
 
     /**
      * Deletes the directory stated as string path.
+     *
      * @param directoryPath The path to the directory which shall be deleted.
      */
     public static void deleteDirectory(String directoryPath) {
@@ -600,12 +600,14 @@ public class Util {
 
     /**
      * This method will remove a leading less-than and a trailing greater-than sign (tags).
+     *
      * @param stringToBeEdited The string that is to be edited.
      * @return String without tags.
      */
-    public static String removeTags(String stringToBeEdited){
-        if(stringToBeEdited.startsWith("<")) stringToBeEdited = stringToBeEdited.substring(1);
-        if(stringToBeEdited.endsWith(">")) stringToBeEdited = stringToBeEdited.substring(0, stringToBeEdited.length() - 1);
+    public static String removeTags(String stringToBeEdited) {
+        if (stringToBeEdited.startsWith("<")) stringToBeEdited = stringToBeEdited.substring(1);
+        if (stringToBeEdited.endsWith(">"))
+            stringToBeEdited = stringToBeEdited.substring(0, stringToBeEdited.length() - 1);
         return stringToBeEdited;
     }
 }

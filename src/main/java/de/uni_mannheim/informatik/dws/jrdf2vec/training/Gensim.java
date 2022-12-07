@@ -185,6 +185,7 @@ public class Gensim {
         request.addHeader("min_count", "" + configuration.getMinCount());
         request.addHeader("sample", "" + configuration.getSample());
         request.addHeader("epochs", "" + configuration.getEpochs());
+        request.addHeader("hierarchical_softmax", "" + configuration.isUseHierarchicalSoftmax());
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
@@ -314,8 +315,9 @@ public class Gensim {
     private static <T> void writeSetToFile(File fileToWrite, Set<T> setToWrite) {
         LOGGER.info("Start writing Set to file '" + fileToWrite.getName() + "'");
         Iterator<T> iterator = setToWrite.iterator();
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite), StandardCharsets.UTF_8));
+        try (OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(fileToWrite.toPath()), StandardCharsets.UTF_8);
+             BufferedWriter writer = new BufferedWriter(osw)
+        ){
             String line;
             boolean firstLine = true;
             while (iterator.hasNext()) {
@@ -626,7 +628,7 @@ public class Gensim {
             }
             int readBytes;
             byte[] buffer = new byte[4096];
-            try (OutputStream resStreamOut = new FileOutputStream(new File(baseDirectory, resourceName))) {
+            try (OutputStream resStreamOut = Files.newOutputStream(new File(baseDirectory, resourceName).toPath())) {
                 while ((readBytes = stream.read(buffer)) > 0) {
                     resStreamOut.write(buffer, 0, readBytes);
                 }

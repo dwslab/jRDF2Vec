@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -29,8 +30,9 @@ public class WalkMerger {
         File[] files = getFiles(walkDirectory);
         if (files == null) return;
 
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite),
-                StandardCharsets.UTF_8))
+        try (
+                OutputStreamWriter osw = new OutputStreamWriter(Files.newOutputStream(fileToWrite.toPath()), StandardCharsets.UTF_8);
+                BufferedWriter writer = new BufferedWriter(osw);
         ) {
             for (File file : files) {
                 if (!file.getAbsolutePath().endsWith(".gz")) {
@@ -39,13 +41,11 @@ public class WalkMerger {
                 }
 
                 // now let's read the gzipped file and write its contents to our fileToWrite
-                try (BufferedReader reader =
-                             new BufferedReader(
-                                     new InputStreamReader(
-                                             new GZIPInputStream(
-                                                     new FileInputStream(file))
-                                     )
-                             )
+                try (
+                        InputStreamReader ir = new InputStreamReader(
+                                new GZIPInputStream(Files.newInputStream(file.toPath()))
+                        );
+                        BufferedReader reader = new BufferedReader(ir)
                 ) {
                     String line;
                     while((line = reader.readLine()) != null){

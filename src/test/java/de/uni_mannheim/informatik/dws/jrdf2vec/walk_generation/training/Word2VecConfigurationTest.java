@@ -21,6 +21,14 @@ class Word2VecConfigurationTest {
     }
 
     @Test
+    void setUseHierarchicalSoftmax() {
+        Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
+        assertEquals(Word2VecConfiguration.IS_USE_HIERARCHICAL_SOFTMAX_DEFAULT, configuration.isUseHierarchicalSoftmax());
+        configuration.setUseHierarchicalSoftmax(true);
+        assertTrue(configuration.isUseHierarchicalSoftmax());
+    }
+
+    @Test
     void setNegatives() {
         Word2VecConfiguration configuration = new Word2VecConfiguration(Word2VecType.SG);
         configuration.setNegatives(-5);

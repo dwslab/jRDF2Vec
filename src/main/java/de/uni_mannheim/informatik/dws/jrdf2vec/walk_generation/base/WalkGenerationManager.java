@@ -337,8 +337,8 @@ public class WalkGenerationManager {
         isGenerateTextWalks = generateTextWalks;
     }
 
-    private int timeout = 10;
-    private TimeUnit timeoutUnit = TimeUnit.DAYS;
+    private final int timeout = 10;
+    private final TimeUnit timeoutUnit = TimeUnit.DAYS;
 
     /**
      * Generates text walks for the given entities.

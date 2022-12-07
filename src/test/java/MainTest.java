@@ -3,7 +3,6 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.Main;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2Vec;
 import de.uni_mannheim.informatik.dws.jrdf2vec.RDF2VecLight;
 import de.uni_mannheim.informatik.dws.jrdf2vec.training.Gensim;
-import de.uni_mannheim.informatik.dws.jrdf2vec.util.Rdf2Pajek;
 import de.uni_mannheim.informatik.dws.jrdf2vec.util.VectorTxtToTfProjectorTsv;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -1406,7 +1405,7 @@ class MainTest {
     @Test
     void mergeFiles() {
         String walkDirectoryPath = getPathOfResource("walk_merge");
-        String fileToWritePath = "./mergedWalksTest.txt";
+        String fileToWritePath = "./mergedWalksTest2.txt";
         File fileToWrite = new File(fileToWritePath);
         fileToWrite.deleteOnExit();
 
@@ -1755,6 +1754,7 @@ class MainTest {
         deleteFile("./reduced_vocab.txt");
         deleteFile(Main.DEFAULT_MERGE_FILE);
         deleteFile("./mergedWalksTest.txt");
+        deleteFile("./mergedWalksTest2.txt");
         deleteFile("./txtVectorFileNoTags.txt");
         deleteFile(VECTORS_KV_FILE);
         deleteFile(VECTORS_KV_FILE_2);

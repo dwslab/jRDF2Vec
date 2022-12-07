@@ -141,6 +141,7 @@ public class RDF2VecLight implements IRDF2Vec {
         WalkGenerationManagerLight generatorLight = new WalkGenerationManagerLight(knowledgeGraphFile, entitiesFile, isEmbedText());
         generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth,
                 configuration.getWindowSize(), this.walkDirectory);
+        generatorLight.close();
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);

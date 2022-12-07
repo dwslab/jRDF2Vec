@@ -81,6 +81,11 @@ log.txt.5
 /src/main/java/de/de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators/evaluation/*
 /src/test/java/de.uni_mannheim.informatik.dws.jrdf2vec.walkGenerators/rdf2vecLight/TestCaseTest.java
 /data
+src/main/resources/test/__pycache__
+src/main/resources/__pycache__
+settings.json
+mergedWalksTest.txt
+multi-ttl_walk-dir
 
 # binaries
 bin/
@@ -111,13 +116,10 @@ python_command.txt
 !log4j.properties
 
 # allow specific jrdf2vec binaries
-!src/main/bin
+!src/main/scripts/bin
 
 # allow specific files required for tests
 !src/test/resources/existing_walk_directory/walk_file.gz
 !src/test/resources/existing_walk_directory/walk_file.txt
 !src/test/resources/nt_directory_type_walks/*
 !src/test/resources/walk_merge/*
-src/main/resources/test/__pycache__
-src/main/resources/__pycache__
-settings.json

@@ -1,26 +1,31 @@
 package de.uni_mannheim.informatik.dws.jrdf2vec.util;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 import java.io.File;
 import java.util.Set;
 
+import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.deleteFile;
 import static de.uni_mannheim.informatik.dws.jrdf2vec.util.Util.getPathOfResource;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WalkMergerTest {
 
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WalkMergerTest.class);
+    private static final String MERGE_PATH = "./mergedWalksTest.txt";
+
+    @BeforeAll
+    static void setUp(){
+        deleteFile("./reduced_vocab.txt");
+    }
 
     @Test
     void mergeWalks() {
         String walkDirectoryPath = getPathOfResource("walk_merge");
         assertNotNull(walkDirectoryPath);
-        String fileToWritePath = "./mergedWalksTest.txt";
+        String fileToWritePath = MERGE_PATH;
         File fileToWrite = new File(fileToWritePath);
         fileToWrite.deleteOnExit();
         WalkMerger.mergeWalks(walkDirectoryPath, fileToWritePath);

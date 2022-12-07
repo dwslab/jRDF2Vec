@@ -199,6 +199,7 @@ public class RDF2Vec implements IRDF2Vec {
 
         walkGenerationManager.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalksPerEntity, depth,
                 configuration.getWindowSize(), getWalkDirectory());
+        walkGenerationManager.close();
 
         Instant after = Instant.now();
         this.requiredTimeForLastWalkGenerationString = Util.getDeltaTimeString(before, after);

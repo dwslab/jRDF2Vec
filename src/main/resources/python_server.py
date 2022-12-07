@@ -190,9 +190,17 @@ def train_word_2_vec() -> str:
         min_count = request.headers.get("min_count")
         sample = request.headers.get("sample")
         epochs = request.headers.get("epochs")
+        hs_string: str = request.headers.get("hierarchical_softmax")
+
+        hs = 1 if hs_string == "true" else 0
 
         sentences = MySentences(file_path)
         logging.info("Sentences object (" + file_path + ") initialized.")
+
+        # documentation: https://radimrehurek.com/gensim/models/word2vec.html
+
+        logging.info(f"hs: {hs}")
+        logging.info(f"hs: {int(hs)}")
 
         if cbow_or_sg == "sg":
             model = models.Word2Vec(
@@ -204,6 +212,7 @@ def train_word_2_vec() -> str:
                 sg=1,
                 negative=int(negatives),
                 epochs=int(iterations),
+                hs=int(hs),
             )
         else:
             model = models.Word2Vec(
@@ -216,6 +225,7 @@ def train_word_2_vec() -> str:
                 cbow_mean=1,
                 negative=int(negatives),
                 epochs=int(iterations),
+                hs=int(hs),
             )
 
         logging.info("Model object initialized. Building Vocabulary...")

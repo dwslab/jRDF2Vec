@@ -281,8 +281,6 @@ public class Main {
             isEmbedText = true;
         }
 
-
-
         if (containsIgnoreCase("-onlyTraining", args)) {
             isOnlyTraining = true;
             String walksPath = getValue("-walkDirectory", args);
@@ -547,11 +545,13 @@ public class Main {
                         existingWalkDirectory,
                         walkDirectory);
                 generatorLight.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkDirectory);
+                generatorLight.close();
             } else {
                 // classic walk generation
                 WalkGenerationManager classicGenerator = new WalkGenerationManager(knowledgeGraphFile.toURI(),
                         isEmbedText, true, existingWalkDirectory, walkDirectory);
                 classicGenerator.generateWalks(walkGenerationMode, numberOfThreads, numberOfWalks, depth, window, walkDirectory);
+                classicGenerator.close();
             }
 
             after = Instant.now();

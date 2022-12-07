@@ -11,7 +11,7 @@ public class Word2VecConfiguration {
     /**
      * Default logger.
      */
-    private static Logger LOGGER = LoggerFactory.getLogger(Word2VecConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Word2VecConfiguration.class);
 
     /**
      * Model type.
@@ -94,6 +94,17 @@ public class Word2VecConfiguration {
      * Default for {@link Word2VecConfiguration#epochs} parameter.
      */
     public static final int EPOCHS_DEFAULT = 5;
+
+    /**
+     * If true, hierarchical softmax will be used for model training.
+     * If false, and {@link Word2VecConfiguration#negatives} is non-zero, negative sampling will be used.
+     */
+    private boolean isUseHierarchicalSoftmax = IS_USE_HIERARCHICAL_SOFTMAX_DEFAULT;
+
+    /**
+     * Default for {@link Word2VecConfiguration#isUseHierarchicalSoftmax}
+     */
+    public static boolean IS_USE_HIERARCHICAL_SOFTMAX_DEFAULT = false;
 
     /**
      * Default Constructor.
@@ -226,5 +237,17 @@ public class Word2VecConfiguration {
             LOGGER.warn("Epochs must be greater than 1. Using default: " + EPOCHS_DEFAULT + ".");
             this.epochs = EPOCHS_DEFAULT;
         } else this.epochs = epochs;
+    }
+
+    public boolean isUseHierarchicalSoftmax() {
+        return isUseHierarchicalSoftmax;
+    }
+
+    /**
+     * If true, hierarchical softmax will be used for model training.
+     * If false, and {@link Word2VecConfiguration#negatives} is non-zero, negative sampling will be used.
+     */
+    public void setUseHierarchicalSoftmax(boolean useHierarchicalSoftmax) {
+        isUseHierarchicalSoftmax = useHierarchicalSoftmax;
     }
 }
