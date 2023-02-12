@@ -292,7 +292,7 @@ set the capping parameter to 1 (`-cap 1`).
 
 *Call Syntax*<br/>
 ```bash
-./word2vec -train <your walk file> -output <desired file to be written> - type <2 (cwindow) or 3 (structured 
+./word2vec -train <your walk file> -output <desired file to be written> -type <2 (cwindow) or 3 (structured 
 skipgram>) -size <vector size> -threads <number of threads> -min-count 0 -cap 1  
 ```
 
