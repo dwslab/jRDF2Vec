@@ -118,6 +118,10 @@ python_command.txt
 # allow specific jrdf2vec binaries
 !src/main/scripts/bin
 
+# allow specific files for examples
+!examples/jupyter_notebook/bands_labels.csv
+!examples/jupyter_notebook/artists_graph.nt
+
 # allow specific files required for tests
 !src/test/resources/existing_walk_directory/walk_file.gz
 !src/test/resources/existing_walk_directory/walk_file.txt
