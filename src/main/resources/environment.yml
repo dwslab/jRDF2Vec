@@ -6,4 +6,5 @@ dependencies:
   - gensim>=4.0
   - flask>=2.0
   - numpy>=1.17
+  - packaging>=24.1
   - requests>=2.27

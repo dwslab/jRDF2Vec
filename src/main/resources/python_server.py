@@ -6,8 +6,8 @@ import logging
 import os
 import sys
 import gzip
-import pkg_resources
-from pkg_resources import DistributionNotFound
+from packaging.requirements import Requirement
+from importlib.metadata import version, PackageNotFoundError
 import pathlib
 
 
@@ -49,32 +49,39 @@ def check_requirements() -> str:
     str
         A message listing installed and potentially missing requirements.
     """
-    requirements_file = request.headers.get("requirements_file")
+    requirements_file = request.headers.get("requirements-file")
     logging.info(f"received requirements file path: {requirements_file}")
+    
     with pathlib.Path(requirements_file).open() as requirements_txt:
-        requirements = pkg_resources.parse_requirements(requirements_txt)
+        requirements = requirements_txt.read().splitlines()
         ok_requirements = []
         missing_requirements = []
+        
         for requirement in requirements:
-            requirement = str(requirement)
-            print(f"Checking {requirement}")
+            requirement = requirement.split("#")[0].strip()
+            req = Requirement(requirement)
+            print(f"Checking {req}")
             try:
-                pkg_resources.require(requirement)
-                ok_requirements.append(requirement)
-            except Exception as error:
-                missing = str(error)
-                missing_requirements.append(requirement)
+                installed_version = version(req.name)
+                if req.specifier.contains(installed_version):
+                    ok_requirements.append(str(req))
+                else:
+                    missing_requirements.append(f"{req} (installed: {installed_version})")
+            except PackageNotFoundError:
+                missing_requirements.append(str(req))
+        
         message = "Dependency Check"
-        if len(ok_requirements) > 0:
+        if ok_requirements:
             message += "\nInstalled Requirements:"
             for r in ok_requirements:
                 message += "\n\t" + r
-        if len(missing_requirements) > 0:
-            message += "\nMissing Requirements:"
+        if missing_requirements:
+            message += "\nMissing or Incompatible Requirements:"
             for r in missing_requirements:
                 message += "\n\t" + r
         else:
             message += "\n=> Everything is installed. You are good to go!"
+        
         print(message)
         logging.info(message)
         return message
@@ -153,8 +160,8 @@ def w2v_to_kv() -> str:
     from gensim.models import KeyedVectors
 
     try:
-        w2v_path = request.headers.get("w2v_path")
-        new_file = request.headers.get("new_file")
+        w2v_path = request.headers.get("w2v-path")
+        new_file = request.headers.get("new-file")
         result = KeyedVectors.load_word2vec_format(w2v_path, unicode_errors="ignore")
         result.save(new_file)
         active_models[os.path.realpath(new_file)] = result
@@ -176,21 +183,21 @@ def train_word_2_vec() -> str:
         'True' as string if operation was successful, else 'False' (as string).
     """
     try:
-        model_path = request.headers.get("model_path")  # where the model will be stored
+        model_path = request.headers.get("model-path")  # where the model will be stored
         vector_path = request.headers.get(
-            "vector_path"
+            "vector-path"
         )  # where the vector file will be stored
-        file_path = request.headers.get("file_path")
-        vector_dimension = request.headers.get("vector_dimension")
-        number_of_threads = request.headers.get("number_of_threads")
-        window_size = request.headers.get("window_size")
+        file_path = request.headers.get("file-path")
+        vector_dimension = request.headers.get("vector-dimension")
+        number_of_threads = request.headers.get("number-of-threads")
+        window_size = request.headers.get("window-size")
         iterations = request.headers.get("iterations")
         negatives = request.headers.get("negatives")
-        cbow_or_sg = request.headers.get("cbow_or_sg")
-        min_count = request.headers.get("min_count")
+        cbow_or_sg = request.headers.get("cbow-or-sg")
+        min_count = request.headers.get("min-count")
         sample = request.headers.get("sample")
         epochs = request.headers.get("epochs")
-        hs_string: str = request.headers.get("hierarchical_softmax")
+        hs_string: str = request.headers.get("hierarchical-softmax")
 
         hs = 1 if hs_string == "true" else 0
 
@@ -259,16 +266,16 @@ def is_in_vocabulary():
         True if concept in model vocabulary, else False.
     """
     concept = request.headers.get("concept")
-    model_path = request.headers.get("model_path")
-    vector_path = request.headers.get("vector_path")
+    model_path = request.headers.get("model-path")
+    vector_path = request.headers.get("vector-path")
     vectors = get_vectors(model_path, vector_path)
     return str(concept in vectors.key_to_index)
 
 
 @app.route("/get-vocabulary-size", methods=["GET"])
 def get_vocab_size():
-    model_path = request.headers.get("model_path")
-    vector_path = request.headers.get("vector_path")
+    model_path = request.headers.get("model-path")
+    vector_path = request.headers.get("vector-path")
     vectors = get_vectors(model_path, vector_path)
     return str(len(vectors.key_to_index))
 
@@ -303,10 +310,10 @@ def get_vectors(model_path, vector_path):
 @app.route("/get-similarity", methods=["GET"])
 def get_similarity_given_model():
 
-    concept_1 = request.headers.get("concept_1")
-    concept_2 = request.headers.get("concept_2")
-    model_path = request.headers.get("model_path")
-    vector_path = request.headers.get("vector_path")
+    concept_1 = request.headers.get("concept-1")
+    concept_2 = request.headers.get("concept-2")
+    model_path = request.headers.get("model-path")
+    vector_path = request.headers.get("vector-path")
     vectors = get_vectors(model_path=model_path, vector_path=vector_path)
 
     if vectors is None:
@@ -338,8 +345,8 @@ def get_similarity_given_model():
 
 @app.route("/get-vocabulary-terms", methods=["GET"])
 def get_vocabulary_terms():
-    model_path = request.headers.get("model_path")
-    vector_path = request.headers.get("vector_path")
+    model_path = request.headers.get("model-path")
+    vector_path = request.headers.get("vector-path")
     vectors = get_vectors(model_path, vector_path)
     result = ""
     for word in vectors.key_to_index:
@@ -350,8 +357,8 @@ def get_vocabulary_terms():
 @app.route("/get-vector", methods=["GET"])
 def get_vector_given_model():
     concept = request.headers.get("concept")
-    model_path = request.headers.get("model_path")
-    vector_path = request.headers.get("vector_path")
+    model_path = request.headers.get("model-path")
+    vector_path = request.headers.get("vector-path")
     vectors = get_vectors(model_path=model_path, vector_path=vector_path)
 
     if vectors is None:
@@ -381,8 +388,8 @@ def get_vector_given_model():
 
 @app.route("/train-vector-space-model", methods=["GET"])
 def train_vector_space_model():
-    input_file_path = request.headers.get("input_file_path")
-    model_path = request.headers.get("model_path")
+    input_file_path = request.headers.get("input-file-path")
+    model_path = request.headers.get("model-path")
 
     dictionary = __createDictionary(input_file_path)
     corpus = CsvCorpus(dictionary, input_file_path)
@@ -401,9 +408,9 @@ def train_vector_space_model():
 @app.route("/query-vector-space-model", methods=["GET"])
 def query_vector_space_model():
     try:
-        model_path = request.headers.get("model_path")
-        document_id_one = request.headers.get("document_id_one")
-        document_id_two = request.headers.get("document_id_two")  # can be None
+        model_path = request.headers.get("model-path")
+        document_id_one = request.headers.get("document-id-one")
+        document_id_two = request.headers.get("document-id-two")  # can be None
 
         model = active_models.get(model_path)
         if model is None:
@@ -675,10 +682,10 @@ def write_vectors_as_text_file():
     boolean
         'True' as string if operation was successful, else 'False' (as string).
     """
-    model_path = request.headers.get("model_path")
-    vector_path = request.headers.get("vector_path")
-    file_to_write = request.headers.get("file_to_write")
-    entity_file = request.headers.get("entity_file")
+    model_path = request.headers.get("model-path")
+    vector_path = request.headers.get("vector-path")
+    file_to_write = request.headers.get("file-to-write")
+    entity_file = request.headers.get("entity-file")
     vectors = get_vectors(model_path=model_path, vector_path=vector_path)
     print("Writing the vectors as text file.")
     with open(file_to_write, "w+") as f:

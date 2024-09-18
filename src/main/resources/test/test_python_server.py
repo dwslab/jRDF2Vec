@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 uri_prefix = "http://localhost:1808/"
-
+base_dir = Path(__file__).resolve().parent.parent.parent.parent / "test" / "resources"
 
 class ServerThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -40,45 +40,41 @@ def setup_module(module):
 
 
 def test_get_vector():
-    test_model_vectors = "../../test/resources/test_model_vectors.kv"
-    vector_test_path = Path(test_model_vectors)
+    vector_test_path = (base_dir / "test_model_vectors.kv")
     assert vector_test_path.is_file()
     result = requests.get(
         uri_prefix + "get-vector",
-        headers={"concept": "Europe", "vector_path": test_model_vectors},
+        headers={"concept": "Europe", "vector-path": str(vector_test_path)},
     )
     assert len(result.content.decode("utf-8").split(" ")) == 100
 
 
 def test_is_in_vocabulary():
-    test_model = "../../test/resources/test_model"
-    test_vectors = "../../test/resources/test_model_vectors.kv"
-    model_test_path = Path(test_model)
-    vector_test_path = Path(test_vectors)
+    model_test_path = (base_dir / "test_model")
+    vector_test_path = (base_dir / "test_model_vectors.kv")
     assert model_test_path.is_file()
     assert vector_test_path.is_file()
     result = requests.get(
         uri_prefix + "is-in-vocabulary",
-        headers={"concept": "Europe", "model_path": test_model},
+        headers={"concept": "Europe", "model-path": str(model_test_path)},
     )
     assert result.content.decode("utf-8") == "True"
     result = requests.get(
         uri_prefix + "is-in-vocabulary",
-        headers={"concept": "Europe", "vector_path": test_vectors},
+        headers={"concept": "Europe", "vector-path": str(vector_test_path)},
     )
     assert result.content.decode("utf-8") == "True"
 
 
 def test_get_similarity():
-    test_model = "../../test/resources/test_model"
-    model_test_path = Path(test_model)
+    model_test_path = (base_dir / "test_model")
     assert model_test_path.is_file()
     result = requests.get(
         uri_prefix + "get-similarity",
         headers={
-            "concept_1": "Europe", 
-        "concept_2": "united",
-        "model_path": test_model},
+            "concept-1": "Europe", 
+        "concept-2": "united",
+        "model-path": str(model_test_path)},
     )
     result_str = result.content.decode("utf-8")
     assert float(result_str) > 0

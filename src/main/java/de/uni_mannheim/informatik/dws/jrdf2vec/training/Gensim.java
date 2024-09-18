@@ -114,8 +114,8 @@ public class Gensim {
      */
     public void trainVectorSpaceModel(String modelPath, String trainingFilePath) {
         HttpGet request = new HttpGet(serverUrl + "/train-vector-space-model");
-        request.addHeader("input_file_path", getCanonicalPath(trainingFilePath));
-        request.addHeader("model_path", modelPath);
+        request.addHeader("input-file-path", getCanonicalPath(trainingFilePath));
+        request.addHeader("model-path", modelPath);
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
@@ -135,9 +135,9 @@ public class Gensim {
      */
     public double queryVectorSpaceModel(String modelPath, String documentIdOne, String documentIdTwo) throws Exception {
         HttpGet request = new HttpGet(serverUrl + "/query-vector-space-model");
-        request.addHeader("model_path", modelPath);
-        request.addHeader("document_id_one", documentIdOne);
-        request.addHeader("document_id_two", documentIdTwo);
+        request.addHeader("model-path", modelPath);
+        request.addHeader("document-id-one", documentIdOne);
+        request.addHeader("document-id-two", documentIdTwo);
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
@@ -168,24 +168,24 @@ public class Gensim {
     public boolean trainWord2VecModel(String modelOrVectorPath, String trainingFilePath, Word2VecConfiguration configuration) {
         HttpGet request = new HttpGet(serverUrl + "/train-word2vec");
         if (modelOrVectorPath.endsWith(".kv")) {
-            request.addHeader("vector_path", modelOrVectorPath);
-            request.addHeader("model_path", modelOrVectorPath.substring(0, modelOrVectorPath.length() - 3));
+            request.addHeader("vector-path", modelOrVectorPath);
+            request.addHeader("model-path", modelOrVectorPath.substring(0, modelOrVectorPath.length() - 3));
         } else {
-            request.addHeader("model_path", modelOrVectorPath);
-            request.addHeader("vector_path", modelOrVectorPath + ".kv");
+            request.addHeader("model-path", modelOrVectorPath);
+            request.addHeader("vector-path", modelOrVectorPath + ".kv");
         }
 
-        request.addHeader("file_path", getCanonicalPath(trainingFilePath));
-        request.addHeader("vector_dimension", "" + configuration.getVectorDimension());
-        request.addHeader("number_of_threads", "" + configuration.getNumberOfThreads());
-        request.addHeader("window_size", "" + configuration.getWindowSize());
+        request.addHeader("file-path", getCanonicalPath(trainingFilePath));
+        request.addHeader("vector-dimension", "" + configuration.getVectorDimension());
+        request.addHeader("number-of-threads", "" + configuration.getNumberOfThreads());
+        request.addHeader("window-size", "" + configuration.getWindowSize());
         request.addHeader("iterations", "" + configuration.getIterations());
         request.addHeader("negatives", "" + configuration.getNegatives());
-        request.addHeader("cbow_or_sg", configuration.getType().toString());
-        request.addHeader("min_count", "" + configuration.getMinCount());
+        request.addHeader("cbow-or-sg", configuration.getType().toString());
+        request.addHeader("min-count", "" + configuration.getMinCount());
         request.addHeader("sample", "" + configuration.getSample());
         request.addHeader("epochs", "" + configuration.getEpochs());
-        request.addHeader("hierarchical_softmax", "" + configuration.isUseHierarchicalSoftmax());
+        request.addHeader("hierarchical-softmax", "" + configuration.isUseHierarchicalSoftmax());
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
@@ -224,8 +224,8 @@ public class Gensim {
             }
         } else {
             HttpGet request = new HttpGet(serverUrl + "/get-similarity");
-            request.addHeader("concept_1", concept1);
-            request.addHeader("concept_2", concept2);
+            request.addHeader("concept-1", concept1);
+            request.addHeader("concept-2", concept2);
             addModelToRequest(request, modelOrVectorPath);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 HttpEntity entity = response.getEntity();
@@ -481,8 +481,8 @@ public class Gensim {
      */
     private void addModelToRequest(HttpGet request, String modelOrVectorPath) {
         if (modelOrVectorPath.endsWith(".kv")) {
-            request.addHeader("vector_path", getCanonicalPath(modelOrVectorPath));
-        } else request.addHeader("model_path", getCanonicalPath(modelOrVectorPath));
+            request.addHeader("vector-path", getCanonicalPath(modelOrVectorPath));
+        } else request.addHeader("model-path", getCanonicalPath(modelOrVectorPath));
     }
 
     /**
@@ -573,7 +573,7 @@ public class Gensim {
             LOGGER.error("Could not find requirements file.");
             return false;
         }
-        request.addHeader("requirements_file", requirementsFile.getAbsolutePath());
+        request.addHeader("requirements-file", requirementsFile.getAbsolutePath());
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
             String resultMessage = EntityUtils.toString(entity);
@@ -822,8 +822,8 @@ public class Gensim {
      */
     public void convertW2vToKv(String w2vPath, String fileToWrite){
         HttpGet request = new HttpGet(serverUrl + "/w2v-to-kv");
-        request.addHeader("w2v_path", w2vPath);
-        request.addHeader("new_file", fileToWrite);
+        request.addHeader("w2v-path", w2vPath);
+        request.addHeader("new-file", fileToWrite);
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
             if (entity == null) {
@@ -852,9 +852,9 @@ public class Gensim {
         HttpGet request = new HttpGet(serverUrl + "/write-model-as-text-file");
         addModelToRequest(request, modelOrVectorPath);
         if (entityFile != null) {
-            request.addHeader("entity_file", entityFile);
+            request.addHeader("entity-file", entityFile);
         }
-        request.addHeader("file_to_write", fileToWrite);
+        request.addHeader("file-to-write", fileToWrite);
         try (CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
             if (entity == null) {
