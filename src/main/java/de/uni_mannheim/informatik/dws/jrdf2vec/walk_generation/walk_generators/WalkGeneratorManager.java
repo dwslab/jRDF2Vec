@@ -4,6 +4,7 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.E
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.HdtEntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.MemoryEntitySelector;
 import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.entity_selector.OntModelEntitySelector;
+import org.rdfhdt.hdt.hdt.HDT;  
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.riot.Lang;
 import org.javatuples.Pair;
@@ -90,8 +91,10 @@ public class WalkGeneratorManager {
             } else if (fileName.toLowerCase().endsWith(".hdt") || fileName.toLowerCase().endsWith(".hdt.index.v1-1")) {
                 LOGGER.info("HDT file detected. Using HDT parser.");
                 try {
-                    parser = new HdtWalkGenerator(pathToTripleFile);
-                    entitySelector = new HdtEntitySelector(pathToTripleFile);
+                    HdtWalkGenerator parser2 = new HdtWalkGenerator(pathToTripleFile);
+                    HDT hdt = parser2.getHdt();
+                    entitySelector = new HdtEntitySelector(hdt);
+                    parser = parser2;
                 } catch (IOException ioe) {
                     LOGGER.error("Propagated HDT Initializer Exception", ioe);
                 }

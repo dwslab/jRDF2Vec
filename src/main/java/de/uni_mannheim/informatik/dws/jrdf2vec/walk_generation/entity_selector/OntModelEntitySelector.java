@@ -5,6 +5,7 @@ import org.apache.jena.query.*;
 
 import java.util.HashSet;
 
+
 /**
  * Get all entities using a Jena OntModel.
  */
@@ -31,6 +32,7 @@ public class OntModelEntitySelector implements EntitySelector {
      * @return Set of entities as String.
      */
     public HashSet<String> getEntities() {
+        
         HashSet<String> result = new HashSet<>(100000);
 
         // (1) Subjects

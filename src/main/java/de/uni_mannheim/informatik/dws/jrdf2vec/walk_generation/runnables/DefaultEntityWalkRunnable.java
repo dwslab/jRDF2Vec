@@ -54,6 +54,7 @@ public class DefaultEntityWalkRunnable implements Runnable {
         this.walkGenerationManager = generator;
         this.walkGenerationMode = mode;
     }
+    
 
     /**
      * Actual thread execution.

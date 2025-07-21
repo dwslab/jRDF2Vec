@@ -5,6 +5,11 @@ import de.uni_mannheim.informatik.dws.jrdf2vec.walk_generation.data_structures.T
 import java.util.HashSet;
 import java.util.Set;
 
+
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 /**
  * This entity selector selects all unique nodes.
  */
@@ -26,6 +31,7 @@ public class MemoryEntitySelector implements EntitySelector {
         Set<String> result = new HashSet<>();
         result.addAll(data.getUniqueSubjects());
         result.addAll(data.getUniqueObjectTripleObjects());
+
         return result;
     }
 }

@@ -315,6 +315,7 @@ public abstract class MemoryWalkGenerator implements IWalkGenerator,
      * @return One walk as list where each element is a walk component.
      */
     public List<String> generateMidWalkForEntity(String entity, int depth) {
+        
         LinkedList<String> result = new LinkedList<>();
 
         String nextElementPredecessor = entity;
